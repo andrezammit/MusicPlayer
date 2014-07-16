@@ -45,16 +45,6 @@ var processFile = function(dir, fileList, fileIndex, results, callback)
     }
 }
 
-var processResult = function(results, resultIndex)
-{
-    var fullPath = results[resultIndex++];
-
-    if (!fullPath)
-       return;
-
-    getID3Tag(fullPath, results, resultIndex, getID3TagCallback);
-}
-
 var walkCallback = function(error, results) 
 {
     if (error)
@@ -69,7 +59,19 @@ var walkCallback = function(error, results)
     }
 
     var resultIndex = 0;
-    processResult(results, resultIndex);
+    var resultSize = results.length;
+
+    while (filePath = results[resultIndex++])
+    {
+        getID3Tag(filePath, 
+            function()
+            {
+                if (--resultSize !== 0)
+                    return;
+
+                console.log("Done extracting ID3 tags and saving to DB.");
+            });
+    }
 };
 
 var walk = function(dir, callback)
@@ -90,14 +92,18 @@ var walk = function(dir, callback)
         });
 };
 
-var saveFileToDB = function(artist, track, album, fullPath)
+var saveFileToDB = function(artist, track, album, fullPath, callback)
 {
+    console.log(artist + " - " + track + ' - ' + album);
+
     var doc = {artist: artist.toString(), album: album.toString(), path: fullPath};
     collection.insert(doc, {w:1}, 
         function(error, result) 
         {
             if (error)
                 console.log(error);
+
+            callback();
         });
 }
 
@@ -114,14 +120,6 @@ var playTrack = function(fullPath)
     return;
 }
 
-var getID3TagCallback = function(artist, track, album, fullPath, results, resultIndex)
-{
-    console.log(artist + " - " + track + ' - ' + album);
-    saveFileToDB(artist, track, album, fullPath);
-
-    processResult(results, resultIndex);
-}
-
 var getID3Tag = function(fullPath, results, resultIndex, callback)
 {
     var fileExt = path.extname(fullPath);
@@ -129,8 +127,10 @@ var getID3Tag = function(fullPath, results, resultIndex, callback)
     if (fileExt !== '.mp3')
         return;
 
+    console.log(fullPath);
+
     var readStream = fs.createReadStream(fullPath);
-    var parser = mm(readStream);
+    var parser = new mm(readStream);
 
     parser.on('metadata',
         function (result) 
@@ -142,7 +142,7 @@ var getID3Tag = function(fullPath, results, resultIndex, callback)
             if (artist.toString() === '')
                 artist = result["artist"];
 
-            callback(artist, track, album, fullPath, results, resultIndex);
+            saveFileToDB(artist, track, album, fullPath, callback);
         });
     
     parser.on('done', function (error) 
