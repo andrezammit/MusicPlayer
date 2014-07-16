@@ -6,57 +6,8 @@ var format = require('util').format
 var path = require('path');
 var async = require('async');
 
-var saveFileToDB = function(artist, track, album, fullPath)
-{
-    var doc = {artist: artist.toString(), album: album.toString(), path: fullPath};
-    collection.insert(doc, {w:1}, 
-        function(error, result) 
-        {
-            if (error)
-                console.log(error);
-        });
-}
-
-var getID3Tag = function(fullPath, callback)
-{
-    var fileExt = path.extname(fullPath);
-
-    if (fileExt !== '.mp3')
-        return;
-
-    var readStream = fs.createReadStream(fullPath);
-
-    if (!readStream)
-        return;
-
-    var parser = mm(readStream);
-
-    if (!parser)
-        return;
-    
-    parser.on('metadata',
-        function (result) 
-        {
-            console.log(result);
-            
-            var artist = result["albumartist"];
-            var album = result["album"];
-            var track = result["track"];
-
-            if (artist.toString() === '')
-                artist = result["artist"];
-
-            callback(artist, track, album, fullPath);
-        });
-    
-    parser.on('done', function (error) 
-    {
-        readStream.destroy();
-
-        if (error)
-            console.log(error);
-    });
-}
+var db;
+var collection;
 
 var processFile = function(dir, fileList, fileIndex, results, callback)
 {
@@ -94,6 +45,33 @@ var processFile = function(dir, fileList, fileIndex, results, callback)
     }
 }
 
+var processResult = function(results, resultIndex)
+{
+    var fullPath = results[resultIndex++];
+
+    if (!fullPath)
+       return;
+
+    getID3Tag(fullPath, results, resultIndex, getID3TagCallback);
+}
+
+var walkCallback = function(error, results) 
+{
+    if (error)
+        console.log(error);
+
+    console.log('Finished file listing.');
+
+    if (results)
+    {
+        console.log('Found ' + results.length + ' files.');
+        console.log('Adding to database...');
+    }
+
+    var resultIndex = 0;
+    processResult(results, resultIndex);
+};
+
 var walk = function(dir, callback)
 {
     var results = [];
@@ -112,6 +90,17 @@ var walk = function(dir, callback)
         });
 };
 
+var saveFileToDB = function(artist, track, album, fullPath)
+{
+    var doc = {artist: artist.toString(), album: album.toString(), path: fullPath};
+    collection.insert(doc, {w:1}, 
+        function(error, result) 
+        {
+            if (error)
+                console.log(error);
+        });
+}
+
 var playTrack = function(fullPath)
 {
    var mp3Player = new player(fullPath);
@@ -125,31 +114,45 @@ var playTrack = function(fullPath)
     return;
 }
 
-var getID3TagCallback = function(artist, track, album, fullPath)
+var getID3TagCallback = function(artist, track, album, fullPath, results, resultIndex)
 {
     console.log(artist + " - " + track + ' - ' + album);
     saveFileToDB(artist, track, album, fullPath);
+
+    processResult(results, resultIndex);
 }
 
-var walkCallback = function(error, results) 
+var getID3Tag = function(fullPath, results, resultIndex, callback)
 {
-    if (error)
-        console.log(error);
+    var fileExt = path.extname(fullPath);
 
-    console.log('Finished file listing.');
+    if (fileExt !== '.mp3')
+        return;
 
-    if (results)
+    var readStream = fs.createReadStream(fullPath);
+    var parser = mm(readStream);
+
+    parser.on('metadata',
+        function (result) 
+        {
+            var artist = result["albumartist"];
+            var album = result["album"];
+            var track = result["title"];
+
+            if (artist.toString() === '')
+                artist = result["artist"];
+
+            callback(artist, track, album, fullPath, results, resultIndex);
+        });
+    
+    parser.on('done', function (error) 
     {
-        console.log('Found ' + results.length + ' files.');
-        console.log('Adding to database...');
-    }
+        readStream.destroy();
 
-    var cnt = 0;
-    while (fullPath = results[cnt++])
-    {
-        getID3Tag(fullPath, getID3TagCallback);
-    }
-};
+        if (error)
+            console.log(error);
+    });
+}
 
 var setupDatabaseCallback = function()
 {
@@ -160,10 +163,6 @@ var clearDatabaseCallback = function()
 {
     console.log('Finished clearing database.');
 }
-
-
-var db;
-var collection;
 
 var setupDatabase = function(callback)
 {
