@@ -1,36 +1,34 @@
-var fs = require('fs');
 var http = require('http');
-
-var helpers = require('./helpers');
+var database = require('./database');
 
 var getHTML = function(request, callback)
 {
-	helpers.getMp3Files(
+	database.getAllTags(
 		function(docs)
 		{
 			var html = '<html>';
 		
-		html += '<head>';
-		html += '<title>MusicPlayer</title>';
-		html += '</head>';
-		
-		html += '<body>';
+			html += '<head>';
+			html += '<title>MusicPlayer</title>';
+			html += '</head>';
+			
+			html += '<body>';
 
-		var i = 0;
-		var mp3File;
+			var listSize = docs.length;
+			for (var cnt = 0; cnt < listSize; cnt++)
+			{
+				var tag = docs[cnt];
 
-		while (mp3File = docs[i++])
-		{
-			html += mp3File.artist + ' - ' + mp3File.album;
-			html += '<br />';
-		}
+				html += tag.artist + ' - ' + tag.track + ' - ' + tag.album;
+				html += '<br />';
+			}
 
-		html += '</body>';
+			html += '</body>';
 
-		html += '</html>'
+			html += '</html>'
 
-		callback(html);
-	});
+			callback(html);
+		});
 }
 
 var processRequest = function(request, response)
