@@ -9,7 +9,7 @@ var async = require('async');
 var db;
 var collection;
 
-var processFile = function(dir, fileList, fileIndex, results, callback)
+function processFile(dir, fileList, fileIndex, results, callback)
 {
     var fileEntry = fileList[fileIndex++];
 
@@ -45,7 +45,7 @@ var processFile = function(dir, fileList, fileIndex, results, callback)
     }
 }
 
-var walkCallback = function(error, results) 
+function walkCallback(error, results) 
 {
     if (error)
         console.log(error);
@@ -74,7 +74,7 @@ var walkCallback = function(error, results)
     }
 };
 
-var walk = function(dir, callback)
+function walk(dir, callback)
 {
     var results = [];
 
@@ -92,7 +92,7 @@ var walk = function(dir, callback)
         });
 };
 
-var saveFileToDB = function(artist, track, album, fullPath, callback)
+function saveFileToDB(artist, track, album, fullPath, callback)
 {
     console.log(artist + " - " + track + ' - ' + album);
 
@@ -107,7 +107,7 @@ var saveFileToDB = function(artist, track, album, fullPath, callback)
         });
 }
 
-var playTrack = function(fullPath)
+function playTrack(fullPath)
 {
    var mp3Player = new player(fullPath);
 
@@ -120,16 +120,14 @@ var playTrack = function(fullPath)
     return;
 }
 
-var getID3Tag = function(fullPath, results, resultIndex, callback)
+function getID3Tag(fullPath, callback)
 {
     var fileExt = path.extname(fullPath);
 
     if (fileExt !== '.mp3')
         return;
 
-    console.log(fullPath);
-
-    var readStream = fs.createReadStream(fullPath);
+    var readStream = new fs.createReadStream(fullPath);
     var parser = new mm(readStream);
 
     parser.on('metadata',
@@ -154,17 +152,17 @@ var getID3Tag = function(fullPath, results, resultIndex, callback)
     });
 }
 
-var setupDatabaseCallback = function()
+function setupDatabaseCallback()
 {
     console.log('Finished setting up database.');
 }
 
-var clearDatabaseCallback = function()
+function clearDatabaseCallback()
 {
     console.log('Finished clearing database.');
 }
 
-var setupDatabase = function(callback)
+function setupDatabase(callback)
 {
     db = new dbEngine.Db('', {});
     collection = db.collection('Settings'); 
@@ -173,7 +171,7 @@ var setupDatabase = function(callback)
         callback();
 }
 
-var clearDatabase = function(callback)
+function clearDatabase(callback)
 {
     collection.remove();
 
@@ -181,7 +179,7 @@ var clearDatabase = function(callback)
         callback();
 }
 
-var getMp3Files = function(callback)
+function getMp3Files(callback)
 {
     collection.find().toArray(
         function(error, docs) 
