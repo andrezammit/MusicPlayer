@@ -1,45 +1,130 @@
+var fs = require('fs');
+var url = require('url');
 var http = require('http');
+var path = require('path');
 var database = require('./database');
 
-var getHTML = function(request, callback)
+extensions = 
 {
-	database.getAllTags(
-		function(docs)
+    ".html" : "text/html",
+    ".css" : "text/css",
+    ".js" : "application/javascript",
+    ".png" : "image/png",
+    ".gif" : "image/gif",
+    ".jpg" : "image/jpeg"
+};
+
+function getFileNotFoundResponse(requestPath)
+{
+	return '<html>File not found.<br />' + requestPath;
+}
+
+function getAJAXFailedResponse(requestPath)
+{
+	return '<html>AJAX request failed.<br />' + requestPath;
+}
+
+function getNoTagsResponse(requestPath)
+{
+	return '<html>No mp3 files.<br />' + requestPath;
+}
+
+function processAJAXRequest(request, callback)
+{
+	var url_parts = url.parse(request.url, true);
+	var requestPath = url_parts.pathname;
+
+	switch (requestPath)
+	{
+	case '/getAllTags':
 		{
-			var html = '<html>';
-		
-			html += '<head>';
-			html += '<title>MusicPlayer</title>';
-			html += '</head>';
-			
-			html += '<body>';
+			database.getAllTags(
+				function(docs)
+				{
+					if (!docs)
+					{
+						callback(getNoTagsResponse(requestPath), 'text/html');
+						return;
+					}
 
-			var listSize = docs.length;
-			for (var cnt = 0; cnt < listSize; cnt++)
-			{
-				var tag = docs[cnt];
+					var html;
+				
+					var listSize = docs.length;
+					for (var cnt = 0; cnt < listSize; cnt++)
+					{
+						var tag = docs[cnt];
 
-				html += tag.artist + ' - ' + tag.track + ' - ' + tag.album;
-				html += '<br />';
-			}
+						html += tag.artist + ' - ' + tag.track + ' - ' + tag.album;
+						html += '<br />';
+					}
 
-			html += '</body>';
+					callback(html, 'text/html');
+				});
+		}
+		break;
+	}
+}
 
-			html += '</html>'
+function processFileRequest(request, callback)
+{
+	var url_parts = url.parse(request.url, true);
+	var requestPath = url_parts.pathname;
 
-			callback(html);
+	var extension = path.extname(requestPath);
+	var mimeType = extensions[extension];
+
+	if (!mimeType)
+	{
+		callback(getFileNotFoundResponse(requestPath), 'text/html');
+		return;
+	}
+
+	var fullPath = '.' + requestPath;
+
+	if (!fs.existsSync(fullPath))
+	{
+		callback(getFileNotFoundResponse(requestPath), "text/html");
+		return;
+	}
+
+	fs.readFile(fullPath, 
+		function (err, data) 
+		{
+			callback(data, mimeType);
 		});
 }
 
-var processRequest = function(request, response)
+function getHTML(request, callback)
+{
+	var url_parts = url.parse(request.url, true);
+	var requestPath = url_parts.pathname;
+
+	if (requestPath == '/')
+	{
+		request.url = '/index.html';
+		requestPath = '/index.html';
+	}
+
+	var extension = path.extname(requestPath);
+
+	if (!extension)
+	{
+		processAJAXRequest(request, callback);
+		return;
+	}
+
+	processFileRequest(request, callback);
+}
+
+function processRequest(request, response)
 {
     	console.log(request.url);
 
     	getHTML(request,
-    		function (html)
+    		function (data, mimeType)
     		{
-    			response.writeHead(200, {'Content-Type': 'text/html'});
-    			response.write(html + '');  
+    			response.writeHead(200, {'Content-Type': 'text/html', 'Content-Length' : data.length });
+    			response.write(data + '');  
     			response.end();		
     		});
 

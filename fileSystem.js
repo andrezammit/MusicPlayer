@@ -1,7 +1,7 @@
 var fs = require('fs');
+var path = require('path');
 var mm = require('musicmetadata');
 var format = require('util').format
-var path = require('path');
 
 function processFile(dir, fileList, fileIndex, results, callback)
 {
@@ -69,10 +69,12 @@ function extractTags(fileList, callback)
     {
         tagList.push(tag);
 
-        if (++filesDone == thisBunch)
+        if (++filesDone == listSize)
         {
             console.log("Done extracting ID3 tags.");
             callback(tagList);
+
+            return;
         }
 
         if (filesDone % 500 == 0)
@@ -82,7 +84,7 @@ function extractTags(fileList, callback)
     function getSomeTags(startIndex)
     {
         var remainingFiles = listSize - startIndex;
-        thisBunch = Math.min(remainingFiles, 500);
+        thisBunch = startIndex + Math.min(remainingFiles, 500);
 
         for (var cnt = startIndex; cnt < thisBunch; cnt++)
             getTag(fileList[cnt], getTagDone);
@@ -100,6 +102,8 @@ function getTag(fullPath, callback)
 
     var tag = { error: 0 };
 
+    console.log(fullPath);
+
     var readStream = fs.createReadStream(fullPath);
     var parser = mm(readStream);
 
@@ -108,8 +112,6 @@ function getTag(fullPath, callback)
     parser.on('metadata',
         function (result) 
         {
-            console.log(result);
-
             tag.artist = result["albumartist"][0] || result["artist"][0];
             tag.album = result["album"];
             tag.track = result["title"];

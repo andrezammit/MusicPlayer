@@ -65,10 +65,16 @@ function saveTags(tagList, callback)
 
 function getAllTags(callback)
 {
+	var didCallback = false;
+
     collection.find().toArray(
         function(error, docs) 
         {
-            callback(docs)
+    		if (!didCallback)
+    		{
+            	callback(docs);
+    			didCallback = true;
+            }
         });
 }
 
