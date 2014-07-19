@@ -5,9 +5,9 @@ var frameHeaderSize = 10;
 
 function getTag(fullPath, callback)
 {	
-	function returnError(error)
+	function returnError(errorMsg)
 	{
-		var error = { msg: status.message }
+		var error = { msg: errorMsg }
     	callback(error);
 	}
 
@@ -26,6 +26,56 @@ function getTag(fullPath, callback)
 		readTagHeader(fd, readTagHeaderDone);
 	}
 
+	function verifyTagHeader(buffer)
+	{
+		if (buffer.length < 3)
+			return false;
+
+		var tagID = buffer.toString('utf-8', 0, 3);
+
+		console.log(tagID);
+
+		if (tagID != 'ID3')
+			return false;
+
+		return true;
+	}
+
+	function verifyTagVersion(tagMinorVer)
+	{
+		if (tagMinorVer < 1 || tagMinorVer > 4)
+			return false;
+
+		return true;
+	}
+
+	function getTagLength(buffer, tagMinorVer)
+	{
+		var tagLen = 0;
+
+		if (tagMinorVer > 3)
+		{
+			tagLen = buffer.readUInt32BE(6);
+		}
+		else
+		{
+			var hexLen = [];
+			hexLen[0] = buffer[6];
+			hexLen[1] = buffer[7];
+			hexLen[2] = buffer[8];
+			hexLen[3] = buffer[9];
+
+			var tagLen = hexLen[3];
+
+			for (cnt = 2; cnt >= 0; cnt--)
+			{
+				tagLen += hexLen[cnt] >> 1;
+			}
+		}
+
+		return tagLen;
+	}
+
 	function readTagHeader(fd, callback)
 	{
 		var buffer = new Buffer(tagHeaderSize);
@@ -38,7 +88,21 @@ function getTag(fullPath, callback)
 					return;
 				}
 
-				tagLen = buffer.readUInt32BE(6);
+				if (!verifyTagHeader(buffer))
+				{
+					returnError('Invalid tag header.');
+					return;
+				}
+
+				tagMinorVer = buffer.readUInt8(3);
+
+				if (!verifyTagVersion(tagMinorVer))
+				{
+					returnError('Invalid tag version.');
+					return;
+				}
+
+				var tagLen = getTagLength(buffer, tagMinorVer);
 
     			console.log(buffer.toString('utf-8', 0, bytesRead));
     			console.log('Tag length = ' + tagLen);
@@ -97,8 +161,12 @@ function getTag(fullPath, callback)
 
 	function getTagFrame(tagData, offset, callback)
 	{
+		console.log(fullPath);
+
 		var frameID = tagData.toString('utf8', offset, offset + 4);
 		offset += 4;
+
+		console.log(frameID);
 
 		var frameSize = tagData.readUInt32BE(offset);
 		offset += 4;
@@ -153,7 +221,7 @@ function getTag(fullPath, callback)
 		{
 			if (offset >= tagData.length)
 			{
-				callback(tag);
+				callback(null, tag);
 				return;
 			}
 

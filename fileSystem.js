@@ -3,6 +3,8 @@ var path = require('path');
 var mm = require('musicmetadata');
 var format = require('util').format
 
+var tagParser = require('./tagParser');
+
 function processFile(dir, fileList, fileIndex, results, callback)
 {
     var fileEntry = fileList[fileIndex++];
@@ -104,37 +106,49 @@ function getTag(fullPath, callback)
 
     console.log(fullPath);
 
-    var readStream = fs.createReadStream(fullPath);
-    var parser = mm(readStream);
-
-    var didCallback = false;
-
-    parser.on('metadata',
-        function (result) 
+    tagParser.getTag(fullPath, 
+        function(error, tag)
         {
-            tag.artist = result["albumartist"][0] || result["artist"][0];
-            tag.album = result["album"];
-            tag.track = result["title"];
-
-            tag.fullPath = fullPath;
+            if (error)
+            {
+                console.log(error);
+                return;
+            }
 
             callback(tag);
-            didCallback = true;
         });
+
+    // var readStream = fs.createReadStream(fullPath);
+    // var parser = mm(readStream);
+
+    // var didCallback = false;
+
+    // parser.on('metadata',
+    //     function (result) 
+    //     {
+    //         tag.artist = result["albumartist"][0] || result["artist"][0];
+    //         tag.album = result["album"];
+    //         tag.track = result["title"];
+
+    //         tag.fullPath = fullPath;
+
+    //         callback(tag);
+    //         didCallback = true;
+    //     });
     
-    parser.on('done', function (error) 
-    {
-        readStream.destroy();
+    // parser.on('done', function (error) 
+    // {
+    //     readStream.destroy();
 
-        if (error)
-        {
-            console.log(error);
-            tag.error = error;
-        }
+    //     if (error)
+    //     {
+    //         console.log(error);
+    //         tag.error = error;
+    //     }
 
-        if (!didCallback)
-            callback(tag);
-    });
+    //     if (!didCallback)
+    //         callback(tag);
+    // });
 }
 
 module.exports.scan = scan;
