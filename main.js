@@ -2,6 +2,8 @@ var fileSystem = require('./fileSystem');
 var database = require('./database');
 var webServer = require('./webserver');
 
+var tagParser = require('./tagParser');
+
 function saveTagsDone()
 {
     console.log("Done saving ID3 tags to database.");
@@ -36,4 +38,10 @@ function scanDone(error, fileList)
     fileSystem.extractTags(fileList, extractTagsDone)
 }
 
-fileSystem.scan('H:\\Music\\Music', scanDone);
+tagParser.getTag('H:\\Music\\Music\\COOP3RDRUMM3R\\Drum Covers\\Jay Z, Kanye West, Big Sean - Clique.mp3',
+	function(tag)
+	{
+		console.log(tag);
+	});
+
+//fileSystem.scan('H:\\Music\\Music', scanDone);
