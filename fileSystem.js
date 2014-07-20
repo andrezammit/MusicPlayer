@@ -80,7 +80,7 @@ function extractTags(fileList, callback)
         }
 
         if (filesDone % 500 == 0)
-            getSomeTags(filesDone);
+            setTimeout(getSomeTags, 0, filesDone);
     };
 
     function getSomeTags(startIndex)
@@ -89,7 +89,7 @@ function extractTags(fileList, callback)
         thisBunch = startIndex + Math.min(remainingFiles, 500);
 
         for (var cnt = startIndex; cnt < thisBunch; cnt++)
-            getTag(fileList[cnt], getTagDone);
+            setTimeout(getTag, 0, fileList[cnt], getTagDone);
     }
 
     getSomeTags(0);
@@ -104,9 +104,9 @@ function getTag(fullPath, callback)
 
     var tag = { error: 0 };
 
-    console.log(fullPath);
+    //console.log(fullPath);
 
-    tagParser.getTag(fullPath, 
+    new tagParser.getTag(fullPath, 
         function(error, tag)
         {
             if (error)
