@@ -1,10 +1,24 @@
 var fs = require('fs');
 
-var tagHeaderSize = 10;
-var frameHeaderSize = 10;
+function trimNullChar(string)
+{
+	if (!string || string.length == 0)
+		return string;
+
+	var lastIndex = string.length - 1;
+
+	if (string.charCodeAt(lastIndex) == 0)
+		string = string.substring(0, lastIndex);
+
+	return string;
+}
 
 function getTag(fullPath, callback)
 {	
+	var tagHeaderSize = 10;
+	var frameHeaderSize = 10;
+	var tagMinorVer = 3;
+
 	function returnError(errorMsg)
 	{
 		var error = { msg: errorMsg }
@@ -41,7 +55,7 @@ function getTag(fullPath, callback)
 		return true;
 	}
 
-	function verifyTagVersion(tagMinorVer)
+	function verifyTagVersion()
 	{
 		if (tagMinorVer < 1 || tagMinorVer > 4)
 			return false;
@@ -49,7 +63,23 @@ function getTag(fullPath, callback)
 		return true;
 	}
 
-	function getTagLength(buffer, tagMinorVer)
+	function setTagDefaults()
+	{
+		switch (tagMinorVer)
+		{
+			case 2:
+				frameHeaderSize = 6;
+				break;
+
+			case 3:
+			case 4:
+			default:
+				frameHeaderSize = 10;
+				break;
+		}
+	}
+
+	function getTagLength(buffer)
 	{
 		var tagLen = 0;
 
@@ -62,10 +92,10 @@ function getTag(fullPath, callback)
 			tagLen = buffer.readUInt32BE(6);
 
 			var tmpValue = tagLen & 0x7F;
-			for (lineCount = 1; lineCount < 4; lineCount++)
+			for (byteCount = 1; byteCount < 4; byteCount++)
 			{
-				var tmpByte = (0x7F << (8 * lineCount));
-				tmpValue = ((tagLen & tmpByte) >> lineCount) + tmpValue;
+				var tmpByte = (0x7F << (8 * byteCount));
+				tmpValue = ((tagLen & tmpByte) >> byteCount) + tmpValue;
 			}
 
 			tagLen = tmpValue;
@@ -94,13 +124,15 @@ function getTag(fullPath, callback)
 
 				tagMinorVer = headerBuffer.readUInt8(3);
 
-				if (!verifyTagVersion(tagMinorVer))
+				if (!verifyTagVersion())
 				{
 					returnError('Invalid tag version.');
 					return;
 				}
 
-				var tagLen = getTagLength(headerBuffer, tagMinorVer);
+				setTagDefaults();
+
+				var tagLen = getTagLength(headerBuffer);
 
     			console.log(headerBuffer.toString('utf-8', 0, bytesRead));
     			
@@ -124,7 +156,7 @@ function getTag(fullPath, callback)
 				{
 					dataBuffer = null;
 					returnError(error);
-					
+
 					return;
 				}
 
@@ -169,17 +201,32 @@ function getTag(fullPath, callback)
 
 	function getTagFrame(tagData, offset, callback)
 	{
-		var frameID = tagData.toString('utf8', offset, offset + 4);
-		offset += 4;
+		var frameID;
+		var frameSize = 0;
 
-		if (frameID.charCodeAt(3) == 0)
-			frameID = frameID.substring(0, 3);
+		if (tagMinorVer > 2)
+		{
+			frameID = tagData.toString('utf8', offset, offset + 4);
+			offset += 4;
 
-		var frameSize = tagData.readUInt32BE(offset);
-		offset += 4;
+			frameSize = tagData.readUInt32BE(offset);
+			offset += 4;
 
-		var frameFlags = tagData.readUInt16BE(offset);
-		offset += 2;
+			var frameFlags = tagData.readUInt16BE(offset);
+			offset += 2;
+		}
+		else
+		{
+			frameID = tagData.toString('utf8', offset, offset + 3);
+			offset += 3;
+
+			for (cnt = 0; cnt < 3; cnt++)
+				frameSize += tagData[offset + cnt] << 8 * (2 - cnt);
+
+			offset += 3;
+		}
+
+		frameID = trimNullChar(frameID);
 
 		var frameData;
 
@@ -224,6 +271,8 @@ function getTag(fullPath, callback)
 
 	function processTagData(tag, frameID, frameData, callback)
 	{
+		frameData = trimNullChar(frameData)
+
 		switch (frameID)
 		{
 		case 'TAL':
@@ -250,26 +299,44 @@ function getTag(fullPath, callback)
 		var tag = {};
 		var offset = 0;
 
+		function isTagReady()
+		{
+			if (!tag.artist || !tag.track || !tag.album)
+				return false;
+
+			return true;
+		}
+
 		function processFrameDataDone()
 		{
-			if (offset + 10 >= tagData.length)
+			if (isTagReady() || offset + frameHeaderSize >= tagData.length)
 			{
+				debugger;
 				tagData = null;
 
 				callback(null, tag);
 				return;
 			}
 
-            setTimeout(getTagFrame, 0, tagData, offset, readTagFrameDone);
+            setTimeout(getTagFrame, 0, tagData, offset, getTagFrameDone);
 		}
 
-		function readTagFrameDone(frameID, frameSize, frameData)
+		function getTagFrameDone(frameID, frameSize, frameData)
 		{
-			offset += frameHeaderSize + frameSize;
+			if (!frameID || frameID.length == 0)
+			{
+				// stop reading the tag if we read a blank frameID.
+				offset = tagData.length;
+			}	
+			else
+			{
+				offset += frameHeaderSize + frameSize;
+			}
+
 			processTagData(tag, frameID, frameData, processFrameDataDone);
 		}
 
-		getTagFrame(tagData, offset, readTagFrameDone);
+		getTagFrame(tagData, offset, getTagFrameDone);
 	}
 
     fs.open(fullPath, 'r', 

@@ -51,4 +51,4 @@ function scanDone(error, fileList)
 //         console.log(tag);
 //     });
 
-fileSystem.scan('H:\\Music\\Music', scanDone);
+fileSystem.scan('H:\\Music\\Music\\Aerosmith', scanDone);
