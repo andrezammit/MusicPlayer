@@ -107,6 +107,7 @@ function getTag(fullPath, callback)
     			console.log('Path = ' + fullPath);
     			console.log('Tag length = ' + tagLen);
 
+    			headerBuffer = null;
     			callback(tagLen);
     		});
 	}
@@ -118,10 +119,12 @@ function getTag(fullPath, callback)
 			function(error, bytesRead) 
 			{
 				fs.closeSync(fd);
-				
+
 				if (error)
 				{
+					dataBuffer = null;
 					returnError(error);
+					
 					return;
 				}
 
@@ -251,6 +254,8 @@ function getTag(fullPath, callback)
 		{
 			if (offset + 10 >= tagData.length)
 			{
+				tagData = null;
+
 				callback(null, tag);
 				return;
 			}

@@ -104,9 +104,7 @@ function getTag(fullPath, callback)
 
     var tag = { error: 0 };
 
-    //console.log(fullPath);
-
-    new tagParser.getTag(fullPath, 
+    tagParser.getTag(fullPath, 
         function(error, tag)
         {
             if (error)
@@ -117,38 +115,6 @@ function getTag(fullPath, callback)
 
             callback(tag);
         });
-
-    // var readStream = fs.createReadStream(fullPath);
-    // var parser = mm(readStream);
-
-    // var didCallback = false;
-
-    // parser.on('metadata',
-    //     function (result) 
-    //     {
-    //         tag.artist = result["albumartist"][0] || result["artist"][0];
-    //         tag.album = result["album"];
-    //         tag.track = result["title"];
-
-    //         tag.fullPath = fullPath;
-
-    //         callback(tag);
-    //         didCallback = true;
-    //     });
-    
-    // parser.on('done', function (error) 
-    // {
-    //     readStream.destroy();
-
-    //     if (error)
-    //     {
-    //         console.log(error);
-    //         tag.error = error;
-    //     }
-
-    //     if (!didCallback)
-    //         callback(tag);
-    // });
 }
 
 module.exports.scan = scan;
