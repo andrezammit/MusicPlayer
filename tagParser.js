@@ -296,8 +296,8 @@ function getTag(fullPath, callback)
 
 	function readTagFrames(tagData, callback)
 	{
-		var tag = {};
 		var offset = 0;
+		var tag = { 'path' : fullPath};
 
 		function isTagReady()
 		{
@@ -311,7 +311,6 @@ function getTag(fullPath, callback)
 		{
 			if (isTagReady() || offset + frameHeaderSize >= tagData.length)
 			{
-				debugger;
 				tagData = null;
 
 				callback(null, tag);
