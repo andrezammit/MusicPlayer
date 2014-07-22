@@ -5,7 +5,7 @@ var format = require('util').format
 
 var tagParser = require('./tagParser');
 
-var bunchOfTags = 100;
+var bunchOfTags = 300;
 
 function processFile(dir, fileList, fileIndex, results, callback)
 {
