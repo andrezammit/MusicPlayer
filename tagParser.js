@@ -1,5 +1,16 @@
 var fs = require('fs');
 
+var minTagMinorVer = 1;
+var maxTagMinorVar = 4;
+
+var minTagSize = 3;
+
+var ver22HeaderSize = 6;
+var ver23HeaderSize = 10;
+
+var sevenBitMask = 0x7F;
+var byteSize = 8;
+
 function trimNullChar(string)
 {
 	if (!string || string.length == 0)
@@ -17,6 +28,7 @@ function getTag(fullPath, callback)
 {	
 	var tagHeaderSize = 10;
 	var frameHeaderSize = 10;
+
 	var tagMinorVer = 3;
 
 	function returnError(errorMsg)
@@ -32,9 +44,9 @@ function getTag(fullPath, callback)
 			readTagFrames(tagData, callback);
 		}
 
-		function readTagHeaderDone(tagLen)
+		function readTagHeaderDone(tagSize)
 		{
-			readTagData(fd, tagLen, readTagDataDone);
+			readTagData(fd, tagSize, readTagDataDone);
 		}
 
 		readTagHeader(fd, readTagHeaderDone);
@@ -42,7 +54,7 @@ function getTag(fullPath, callback)
 
 	function verifyTagHeader(buffer)
 	{
-		if (buffer.length < 3)
+		if (buffer.length < minTagSize)
 			return false;
 
 		var tagID = buffer.toString('utf8', 0, 3);
@@ -55,7 +67,8 @@ function getTag(fullPath, callback)
 
 	function verifyTagVersion()
 	{
-		if (tagMinorVer < 1 || tagMinorVer > 4)
+		if (tagMinorVer < minTagMinorVer || 
+			tagMinorVer > maxTagMinorVar)
 			return false;
 
 		return true;
@@ -66,40 +79,40 @@ function getTag(fullPath, callback)
 		switch (tagMinorVer)
 		{
 			case 2:
-				frameHeaderSize = 6;
+				frameHeaderSize = ver22HeaderSize;
 				break;
 
 			case 3:
 			case 4:
 			default:
-				frameHeaderSize = 10;
+				frameHeaderSize = ver23HeaderSize;
 				break;
 		}
 	}
 
-	function getTagLength(buffer)
+	function getTagSize(buffer)
 	{
-		var tagLen = 0;
+		var tagSize = 0;
 
 		if (tagMinorVer > 3)
 		{
-			tagLen = buffer.readUInt32BE(6);
+			tagSize = buffer.readUInt32BE(6);
 		}
 		else
 		{
-			tagLen = buffer.readUInt32BE(6);
+			tagSize = buffer.readUInt32BE(6);
 
-			var tmpValue = tagLen & 0x7F;
+			var tmpValue = tagSize & sevenBitMask;
 			for (byteCount = 1; byteCount < 4; byteCount++)
 			{
-				var tmpByte = (0x7F << (8 * byteCount));
-				tmpValue = ((tagLen & tmpByte) >> byteCount) + tmpValue;
+				var tmpByte = (sevenBitMask << (byteSize * byteCount));
+				tmpValue = ((tagSize & tmpByte) >> byteCount) + tmpValue;
 			}
 
-			tagLen = tmpValue;
+			tagSize = tmpValue;
 		}
 
-		return tagLen;
+		return tagSize;
 	}
 
 	function readTagHeader(fd, callback)
@@ -130,17 +143,17 @@ function getTag(fullPath, callback)
 
 				setTagDefaults();
 
-				var tagLen = getTagLength(headerBuffer);
+				var tagSize = getTagSize(headerBuffer);
 
     			headerBuffer = null;
-    			callback(tagLen);
+    			callback(tagSize);
     		});
 	}
 
-	function readTagData(fd, tagLen, callback)
+	function readTagData(fd, tagSize, callback)
 	{
-		var dataBuffer = new Buffer(tagLen);
-		fs.read(fd, dataBuffer, 0, tagLen, 10, 
+		var dataBuffer = new Buffer(tagSize);
+		fs.read(fd, dataBuffer, 0, tagSize, tagHeaderSize, 
 			function(error, bytesRead) 
 			{
 				fs.closeSync(fd);

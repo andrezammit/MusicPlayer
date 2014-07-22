@@ -5,6 +5,8 @@ var format = require('util').format
 
 var tagParser = require('./tagParser');
 
+var bunchOfTags = 100;
+
 function processFile(dir, fileList, fileIndex, results, callback)
 {
     var fileEntry = fileList[fileIndex++];
@@ -80,14 +82,14 @@ function extractTags(fileList, callback)
             return;
         }
 
-        if (filesDone % 20 == 0)
+        if (filesDone % bunchOfTags == 0)
             setTimeout(getSomeTags, 0, filesDone);
     };
 
     function getSomeTags(startIndex)
     {
         var remainingFiles = listSize - startIndex;
-        thisBunch = startIndex + Math.min(remainingFiles, 20);
+        thisBunch = startIndex + Math.min(remainingFiles, bunchOfTags);
 
         for (var cnt = startIndex; cnt < thisBunch; cnt++)
             setTimeout(getTag, 0, fileList[cnt], getTagDone);
