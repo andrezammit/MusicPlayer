@@ -185,15 +185,14 @@ function getTag(fullPath, callback)
 		default:
 		case 0:
 			return 'ascii';
-
-		case 1:
-			return 'utf16le';
-
-		case 2:
-			return 'utf16le';
-
+			
 		case 3: 
 			return 'utf8';
+
+		case 1:
+		case 2:
+			return 'utf16le';
+			return 'utf16le';
 		}
 	}
 
@@ -219,7 +218,7 @@ function getTag(fullPath, callback)
 			offset += 3;
 
 			for (cnt = 0; cnt < 3; cnt++)
-				frameSize += tagData[offset + cnt] << 8 * (2 - cnt);
+				frameSize += tagData[offset + cnt] << byteSize * (2 - cnt);
 
 			offset += 3;
 		}
@@ -240,7 +239,7 @@ function getTag(fullPath, callback)
 				offset += 1;
 				dataSize -= 1;
 
-				//frameEncoding = getFrameEncodingType(frameEncodingByte);
+				frameEncoding = getFrameEncodingType(frameEncodingByte);
 			}
 
 			frameData = tagData.toString(frameEncoding, offset, offset + dataSize);
