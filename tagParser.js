@@ -47,8 +47,6 @@ function getTag(fullPath, callback)
 
 		var tagID = buffer.toString('utf8', 0, 3);
 
-		console.log(tagID);
-
 		if (tagID != 'ID3')
 			return false;
 
@@ -134,11 +132,6 @@ function getTag(fullPath, callback)
 
 				var tagLen = getTagLength(headerBuffer);
 
-    			console.log(headerBuffer.toString('utf-8', 0, bytesRead));
-    			
-    			console.log('Path = ' + fullPath);
-    			console.log('Tag length = ' + tagLen);
-
     			headerBuffer = null;
     			callback(tagLen);
     		});
@@ -166,16 +159,8 @@ function getTag(fullPath, callback)
 
 	function isEncodedFrame(frameID)
 	{
-		switch (frameID)
-		{
-		case 'TAL':
-		case 'TALB':
-		case 'TT2':
-		case 'TIT2':
-		case 'TP1':
-		case 'TPE1':
+		if (frameID[0] == 'T')
 			return true;
-		}
 
 		return false;
 	}
@@ -232,8 +217,6 @@ function getTag(fullPath, callback)
 
 		if (!isIgnoreFrame(frameID))
 		{
-			console.log(frameID);
-
 			var dataSize = frameSize;
 
 			var frameEncoding = 'utf8';
@@ -263,6 +246,8 @@ function getTag(fullPath, callback)
 		case 'TIT2':
 		case 'TP1':
 		case 'TPE1':
+		case 'TP2':
+		case 'TPE2':
 			return false;
 		}
 
@@ -289,6 +274,11 @@ function getTag(fullPath, callback)
 		case 'TPE1':
 			tag.artist = frameData;
 			break;
+
+		case 'TP2':
+		case 'TPE2':
+			tag.albumArtist = frameData;
+			break;
 		}
 
 		callback();
@@ -297,11 +287,11 @@ function getTag(fullPath, callback)
 	function readTagFrames(tagData, callback)
 	{
 		var offset = 0;
-		var tag = { 'path' : fullPath};
+		var tag = { 'path' : fullPath };
 
 		function isTagReady()
 		{
-			if (!tag.artist || !tag.track || !tag.album)
+			if (!tag.artist || !tag.track || !tag.album || !tag.albumArtist)
 				return false;
 
 			return true;
@@ -322,13 +312,15 @@ function getTag(fullPath, callback)
 
 		function getTagFrameDone(frameID, frameSize, frameData)
 		{
-			if (!frameID || frameID.length == 0)
+			if (!frameID || frameID.charCodeAt(0) == 0)
 			{
 				// stop reading the tag if we read a blank frameID.
 				offset = tagData.length;
 			}	
 			else
 			{
+				//console.log('FrameID: ' + frameID + ' >> ' + frameData + ' << ');
+
 				offset += frameHeaderSize + frameSize;
 			}
 

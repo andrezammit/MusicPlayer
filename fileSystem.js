@@ -70,6 +70,7 @@ function extractTags(fileList, callback)
     function getTagDone(tag)
     {
         tagList.push(tag);
+        console.log(tag);
 
         if (++filesDone == listSize)
         {
@@ -79,14 +80,14 @@ function extractTags(fileList, callback)
             return;
         }
 
-        if (filesDone % 500 == 0)
+        if (filesDone % 20 == 0)
             setTimeout(getSomeTags, 0, filesDone);
     };
 
     function getSomeTags(startIndex)
     {
         var remainingFiles = listSize - startIndex;
-        thisBunch = startIndex + Math.min(remainingFiles, 500);
+        thisBunch = startIndex + Math.min(remainingFiles, 20);
 
         for (var cnt = startIndex; cnt < thisBunch; cnt++)
             setTimeout(getTag, 0, fileList[cnt], getTagDone);

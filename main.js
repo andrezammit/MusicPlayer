@@ -4,9 +4,9 @@ var webServer = require('./webserver');
 
 var tagParser = require('./tagParser');
 
-function saveTagsDone()
+function saveTagsDone(tagCount)
 {
-    console.log("Done saving ID3 tags to database.");
+    console.log('Done saving ' + tagCount + ' ID3 tags to database.');
 }
 
 function extractTagsDone(tagList)
@@ -38,17 +38,4 @@ function scanDone(error, fileList)
     fileSystem.extractTags(fileList, extractTagsDone)
 }
 
-// tagParser.getTag('H:\\Music\\Music\\COOP3RDRUMM3R\\Drum Covers\\Jay Z, Kanye West, Big Sean - Clique.mp3',
-// 	function(error, tag)
-// 	{
-// 		console.log('Tag: ' + tag.artist);
-// 	});
-
-
-// tagParser.getTag('H:\\Music\\Music\\AC_DC\\Iron Man 2\\01 Shoot To Thrill.mp3',
-//     function(error, tag)
-//     {
-//         console.log(tag);
-//     });
-
-//fileSystem.scan('H:\\Music\\Music', scanDone);
+fileSystem.scan('H:\\Music\\Music', scanDone);

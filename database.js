@@ -5,9 +5,11 @@ var collection;
 
 function saveTag(tag, callback)
 {
-    console.log('Saving: ' + tag.artist + " - " + tag.track + ' - ' + tag.album);
+    var tmpArtist = tag.albumArtist || tag.artist;
 
-    var doc = { artist: tag.artist, track: tag.track, album: tag.album, path: tag.fullPath };
+    console.log('Saving: ' + tmpArtist + ' - ' + tag.track + ' - ' + tag.album);
+
+    var doc = { artist: tag.artist, albumArtist: tag.albumArtist, track: tag.track, album: tag.album, path: tag.fullPath };
 
     collection.insert(doc, {w:1}, 
         function(error, result) 
@@ -58,7 +60,7 @@ function saveTags(tagList, callback)
 			function()
 			{
 				if (++tagsSaved == listSize)
-					callback();
+					callback(listSize);
 			});
 	}
 }
