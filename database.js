@@ -24,7 +24,7 @@ function saveTag(tag, callback)
 function setupDatabaseDone()
 {
     console.log('Finished setting up database.');
-	//clearDatabase(clearDatabaseDone);
+	clearDatabase(clearDatabaseDone);
 }
 
 function clearDatabaseDone()
