@@ -2,6 +2,7 @@ var fs = require('fs');
 var url = require('url');
 var http = require('http');
 var path = require('path');
+var qs = require('querystring');
 var database = require('./database');
 
 extensions = 
@@ -29,16 +30,48 @@ function getNoTagsResponse(requestPath)
 	return '<html>No mp3 files.<br />' + requestPath;
 }
 
-function processAJAXRequest(request, callback)
+function getRequestData(request, callback)
+{
+	if (request.method == 'POST') 
+	{
+		var bodyData = '';
+
+	    request.on('data', 
+	    	function (data) 
+	    	{
+				bodyData += data;
+
+				// Too much POST data, kill the connection!
+				if (bodyData.length > 1e6)
+					request.connection.destroy();
+			});
+	
+		request.on('end', 
+			function () 
+			{
+				var postData = qs.parse(bodyData);
+				callback(postData)
+			});
+	}
+	else
+	{
+		callback(null);
+	}
+}
+
+function processAJAXRequest(request, data, callback)
 {
 	var url_parts = url.parse(request.url, true);
 	var requestPath = url_parts.pathname;
 
 	switch (requestPath)
 	{
-	case '/getAllTags':
+	case '/getTags':
 		{
-			database.getAllTags(
+			var offset = data['offset'];
+			var tagsToGet = data['tagsToGet'];
+
+			database.getTags(offset, tagsToGet, 
 				function(docs)
 				{
 					if (!docs)
@@ -47,18 +80,23 @@ function processAJAXRequest(request, callback)
 						return;
 					}
 
-					var html;
-				
-					var listSize = docs.length;
-					for (var cnt = 0; cnt < listSize; cnt++)
-					{
-						var tag = docs[cnt];
+					var replyData = { tagCount: docs.length, tagData: docs };
 
-						html += tag.artist + ' - ' + tag.track + ' - ' + tag.album;
-						html += '<br />';
-					}
+					var json = JSON.stringify(replyData);
+					callback(json, 'application/json');
+				});
+		}
+		break;
 
-					callback(html, 'text/html');
+	case '/getTagCount':
+		{
+			database.getTagCount(
+				function(count)
+				{
+					var replyData = { tagCount: count };
+
+					var json = JSON.stringify(replyData);
+					callback(json, 'application/json');
 				});
 		}
 		break;
@@ -109,7 +147,12 @@ function getHTML(request, callback)
 
 	if (!extension)
 	{
-		processAJAXRequest(request, callback);
+		getRequestData(request, 
+			function(data)
+			{
+				processAJAXRequest(request, data, callback);
+			});
+
 		return;
 	}
 
@@ -123,8 +166,11 @@ function processRequest(request, response)
     	getHTML(request,
     		function (data, mimeType)
     		{
-    			response.writeHead(200, {'Content-Type': 'text/html', 'Content-Length' : data.length });
-    			response.write(data + '');  
+    			console.log(data);
+    			console.log(data.length);
+
+    			response.writeHead(200, {'Content-Type' : mimeType, 'Content-Length' : data.length });
+    			response.write(data);  
     			response.end();		
     		});
 
