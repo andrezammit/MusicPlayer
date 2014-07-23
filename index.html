@@ -5,94 +5,110 @@
 	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <script type="text/javascript">
 
+    var webSock = new WebSocket('ws://localhost:8080/');
+
+	var tagList = [];
+
+	var tagCount = 0;
+	var tagOffset = 0;
+
+    function onWebSockOpen()
+    {
+    	alert('Connected!');
+    }
+
+    function onWebSockMessage(event)
+    {
+    	var data = JSON.parse(event.data);
+
+    	switch (data.replyTo)
+    	{
+    	case 'getTagCount':
+    		onGetTagCountReply(data);
+    		break;
+
+    	case 'getTags':
+    		onGetTagsReply(data);
+    		break;
+
+    	default:
+    		alert('Invalid reply data.');
+    		break;
+    	}
+    }
+
+    webSock.onopen = onWebSockOpen;
+    webSock.onmessage = onWebSockMessage;
+
     function getTagCount(callback)
     {
-		function getTagCountDone(data, textStatus, jqXHR)
-		{
-			callback(data.tagCount);
-		}
-
-    	$.ajax(
-		{
-		    url: "getTagCount",
-		    success: getTagCountDone,
-		    error: errorCallback,
-		});
+		var query = { call: 'getTagCount' };
+		sendQuery(query);
     }
 
-    function getAllTags(tagCount, callback)
-    {
-    	var tagList = [];
+    function onGetTagCountReply(data)
+   	{
+   		tagCount = data.tagCount;
+   		getTags();
+   	}
 
-		var offset = 0;
+    function getTags()
+	{
+		var tagsRemaning = tagCount - tagOffset;
+		var tagsToGet = Math.min(4, tagsRemaning);
 
-		function getTagsDone(data, textStatus, jqXHR)
-		{
-			offset += data.tagCount;
-			tagList += data.tagData;
+		var query = { call: 'getTags', offset: tagOffset, tagsToGet: tagsToGet };
+		sendQuery(query);
+	}
 
-			if (offset >= tagCount)
-			{
-				callback();
-				return;
-			}
+	function onGetTagsReply(data)
+   	{
+   		tagOffset += data.tagCount;
+   		tagList = tagList.concat(data.tagData);
 
-			getTags(offset);
-		}
+   		if (tagOffset >= tagCount)
+   		{
+   			displayTags();
+   			return;
+   		}
 
-    	function getTags(offset)
-    	{
-    		var tagsRemaning = tagCount - offset;
-    		var tagsToGet = Math.min(4, tagsRemaning);
-
-    		var postData = { offset: offset, tagsToGet: tagsToGet };
-
-    		$.ajax(
-			{
-			    url: 'getTags',
-			    type: 'POST',
-			    data: postData,
-			    success: getTagsDone,
-			    error: errorCallback,
-			});
-    	}
-
-    	getTags(0);
-    }
+   		getTags();
+   	}
 
     function startGettingTags()
     {
 		var ajax_loading = "<img src='images/loading.gif' alt='loading...' />";
-		//$("#result").html(ajax_loading);
+		$("#result").html(ajax_loading);
 
-		getTagCount(
-			function(tagCount)
-			{
-				getAllTags(tagCount, getAllTagsDone)
-			});
+		getTagCount();
     }
 
-    function getAllTagsDone(tagList)
+    function displayTags()
     {
-    	alert(tagList.length);
+    	var html = '';
 
-    	//var fileList = JSON.parse(data);
-    	$("#result").html(tagList);
+    	for (cnt = 0; cnt < tagList.length; cnt++)
+    	{
+    		var tag = tagList[cnt];
+
+    		if (!tag)
+    			continue;
+
+    		html += tag.artist + ' - ' + tag.album + ' - ' + tag.track;
+    		html += '<br />';
+    	} 
+
+    	$("#result").html(html);
     }
 
-    function errorCallback(jqXHR, textStatus, errorThrown)
+    function sendQuery(query)
     {
-    	$("#result").html(errorThrown);
+    	webSock.send(JSON.stringify(query));
     }
 
     $(document).ready(
     	function() 
     	{
-	    	$.ajaxSetup(
-	    	{
-	        	cache: false
-	    	});
-		     
 		    $("#getAllFiles").click(startGettingTags);
 		});
     </script>

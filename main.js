@@ -1,6 +1,7 @@
 var fileSystem = require('./fileSystem');
 var database = require('./database');
 var webServer = require('./webserver');
+var webServer = require('./webSocketServer');
 
 var tagParser = require('./tagParser');
 

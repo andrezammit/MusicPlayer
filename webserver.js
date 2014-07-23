@@ -3,7 +3,6 @@ var url = require('url');
 var http = require('http');
 var path = require('path');
 var qs = require('querystring');
-var database = require('./database');
 
 extensions = 
 {
@@ -17,90 +16,7 @@ extensions =
 
 function getFileNotFoundResponse(requestPath)
 {
-	return '<html>File not found.<br />' + requestPath;
-}
-
-function getAJAXFailedResponse(requestPath)
-{
-	return '<html>AJAX request failed.<br />' + requestPath;
-}
-
-function getNoTagsResponse(requestPath)
-{
-	return '<html>No mp3 files.<br />' + requestPath;
-}
-
-function getRequestData(request, callback)
-{
-	if (request.method == 'POST') 
-	{
-		var bodyData = '';
-
-	    request.on('data', 
-	    	function (data) 
-	    	{
-				bodyData += data;
-
-				// Too much POST data, kill the connection!
-				if (bodyData.length > 1e6)
-					request.connection.destroy();
-			});
-	
-		request.on('end', 
-			function () 
-			{
-				var postData = qs.parse(bodyData);
-				callback(postData)
-			});
-	}
-	else
-	{
-		callback(null);
-	}
-}
-
-function processAJAXRequest(request, data, callback)
-{
-	var url_parts = url.parse(request.url, true);
-	var requestPath = url_parts.pathname;
-
-	switch (requestPath)
-	{
-	case '/getTags':
-		{
-			var offset = data['offset'];
-			var tagsToGet = data['tagsToGet'];
-
-			database.getTags(offset, tagsToGet, 
-				function(docs)
-				{
-					if (!docs)
-					{
-						callback(getNoTagsResponse(requestPath), 'text/html');
-						return;
-					}
-
-					var replyData = { tagCount: docs.length, tagData: docs };
-
-					var json = JSON.stringify(replyData);
-					callback(json, 'application/json');
-				});
-		}
-		break;
-
-	case '/getTagCount':
-		{
-			database.getTagCount(
-				function(count)
-				{
-					var replyData = { tagCount: count };
-
-					var json = JSON.stringify(replyData);
-					callback(json, 'application/json');
-				});
-		}
-		break;
-	}
+	return '<html>File not found.<br /> File: ' + requestPath;
 }
 
 function processFileRequest(request, callback)
