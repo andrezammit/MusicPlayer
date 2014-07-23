@@ -3,11 +3,11 @@ var database = require('./database');
 
 var wsServer = new ws({ port: 8080 });
 
-function onWSConnection(ws)
+function onWSConnection(webSock)
 {
 	console.log('New web socket connection.');
 
-	ws.on('message', processRequest);
+	webSock.on('message', processRequest);
 
 	function processRequest(message)
 	{
@@ -22,14 +22,16 @@ function onWSConnection(ws)
 					{
 						if (!docs)
 						{
-							var reply = { replyTo: query.call, error: getNoTagsResponse() };
-							sendReply(reply);
+							var reply = { command: 'getTagsReply', error: getNoTagsResponse() };
+							sendData(reply);
 
 							return;
 						}
 
-						var reply = { replyTo: query.call, tagCount: docs.length, tagData: docs };
-						sendReply(reply);
+						var reply = { command: 'getTagsReply', tagCount: docs.length, tagData: docs };
+						sendData(reply);
+						
+						updateProgress(docs.length);
 					});
 			}
 			break;
@@ -39,17 +41,23 @@ function onWSConnection(ws)
 				database.getTagCount(
 					function(count)
 					{
-						var reply = { replyTo: query.call, tagCount: count };
-						sendReply(reply);
+						var reply = { command: 'getTagCountReply', tagCount: count };
+						sendData(reply);
 					});
 			}
 			break;
 		}
 	}
 
-	function sendReply(reply)
+	function updateProgress(step)
 	{
-		ws.send(JSON.stringify(reply));
+		var notif = { command: 'updateProgress', step: step};
+		sendData(notif);
+	}
+
+	function sendData(data)
+	{
+		webSock.send(JSON.stringify(data));
 	}
 }
 

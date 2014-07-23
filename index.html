@@ -12,6 +12,8 @@
 	var tagCount = 0;
 	var tagOffset = 0;
 
+	var progress = 0;
+
     function onWebSockOpen()
     {
     	alert('Connected!');
@@ -21,14 +23,18 @@
     {
     	var data = JSON.parse(event.data);
 
-    	switch (data.replyTo)
+    	switch (data.command)
     	{
-    	case 'getTagCount':
+    	case 'getTagCountReply':
     		onGetTagCountReply(data);
     		break;
 
-    	case 'getTags':
+    	case 'getTagsReply':
     		onGetTagsReply(data);
+    		break;
+
+    	case 'updateProgress':
+    		onUpdateProgress(data);
     		break;
 
     	default:
@@ -75,10 +81,20 @@
    		getTags();
    	}
 
+   	function onUpdateProgress(data)
+   	{
+   		progress += data.step;
+
+   		var html = progress + ' out of ' + tagCount + ' received.';
+   		$("#progress").html(html); 
+   	}
+
     function startGettingTags()
     {
-		var ajax_loading = "<img src='images/loading.gif' alt='loading...' />";
-		$("#result").html(ajax_loading);
+    	progress = 0;
+
+		var loadingHtml = "<img src='images/loading.gif' width='32px' height='32px' alt='loading...' />";
+		$("#result").html(loadingHtml);
 
 		getTagCount();
     }
@@ -94,7 +110,7 @@
     		if (!tag)
     			continue;
 
-    		html += tag.artist + ' - ' + tag.album + ' - ' + tag.track;
+    		html += '(' + tag._id + ') - ' + tag.artist + ' - ' + tag.album + ' - ' + tag.track;
     		html += '<br />';
     	} 
 
@@ -116,6 +132,9 @@
   <body>
   	<input type="submit" value="Get file list" id="getAllFiles" />
 
+  	<div id="progress">
+  	</div>
+  	
   	<div id="result">
   	</div>
   </body>
