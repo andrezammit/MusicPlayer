@@ -4,6 +4,87 @@
 
 	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <script type="text/javascript">
+
+    function getTagCount(callback)
+    {
+		function getTagCountDone(data, textStatus, jqXHR)
+		{
+			callback(data.tagCount);
+		}
+
+    	$.ajax(
+		{
+		    url: "getTagCount",
+		    success: getTagCountDone,
+		    error: errorCallback,
+		});
+    }
+
+    function getAllTags(tagCount, callback)
+    {
+    	var tagList = [];
+
+		var offset = 0;
+
+		function getTagsDone(data, textStatus, jqXHR)
+		{
+			offset += data.tagCount;
+			tagList += data.tagData;
+
+			if (offset >= tagCount)
+			{
+				callback();
+				return;
+			}
+
+			getTags(offset);
+		}
+
+    	function getTags(offset)
+    	{
+    		var tagsRemaning = tagCount - offset;
+    		var tagsToGet = Math.min(4, tagsRemaning);
+
+    		var postData = { offset: offset, tagsToGet: tagsToGet };
+
+    		$.ajax(
+			{
+			    url: 'getTags',
+			    type: 'POST',
+			    data: postData,
+			    success: getTagsDone,
+			    error: errorCallback,
+			});
+    	}
+
+    	getTags(0);
+    }
+
+    function startGettingTags()
+    {
+		var ajax_loading = "<img src='images/loading.gif' alt='loading...' />";
+		//$("#result").html(ajax_loading);
+
+		getTagCount(
+			function(tagCount)
+			{
+				getAllTags(tagCount, getAllTagsDone)
+			});
+    }
+
+    function getAllTagsDone(tagList)
+    {
+    	alert(tagList.length);
+
+    	//var fileList = JSON.parse(data);
+    	$("#result").html(tagList);
+    }
+
+    function errorCallback(jqXHR, textStatus, errorThrown)
+    {
+    	$("#result").html(errorThrown);
+    }
+
     $(document).ready(
     	function() 
     	{
@@ -11,16 +92,8 @@
 	    	{
 	        	cache: false
 	    	});
-
-		    var ajax_loading = "<img src='images/loading.gif' alt='loading...' />";
 		     
-		    var loadUrl = "getAllTags";
-
-		    $("#getAllFiles").click(
-		    	function()
-		    	{
-		        	$("#result").html(ajax_loading).load(loadUrl);
-		    	});
+		    $("#getAllFiles").click(startGettingTags);
 		});
     </script>
   </head>
