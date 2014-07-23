@@ -24,7 +24,7 @@ function saveTag(tag, callback)
 function setupDatabaseDone()
 {
     console.log('Finished setting up database.');
-	clearDatabase(clearDatabaseDone);
+	//clearDatabase(clearDatabaseDone);
 }
 
 function clearDatabaseDone()
@@ -65,6 +65,15 @@ function saveTags(tagList, callback)
 	}
 }
 
+function getTagCount(callback)
+{
+    collection.count(
+        function(error, count)
+        {
+            callback(count);
+        });
+}
+
 function getAllTags(callback)
 {
 	var didCallback = false;
@@ -74,13 +83,24 @@ function getAllTags(callback)
         {
     		if (!didCallback)
     		{
-            	callback(docs);
+                callback(docs);
     			didCallback = true;
             }
         });
 }
 
+function getTags(offset, tagsToGet, callback)
+{
+    collection.find().skip(offset).limit(tagsToGet).toArray(
+        function(error, docs) 
+        {
+            callback(docs);
+        });
+}
+
 setupDatabase(setupDatabaseDone);
 
+module.exports.getTags = getTags;
 module.exports.saveTags = saveTags;
 module.exports.getAllTags = getAllTags;
+module.exports.getTagCount = getTagCount;
