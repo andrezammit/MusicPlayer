@@ -37,6 +37,7 @@ function processRequest(request, response)
 
 		response.writeHead(206, header); 
 		response.write(file.slice(start, end) + '0', 'binary');
+		response.end();
 	}
 
 	var id = request.url.substr(1);

@@ -11,7 +11,8 @@ extensions =
     ".js" : "application/javascript",
     ".png" : "image/png",
     ".gif" : "image/gif",
-    ".jpg" : "image/jpeg"
+    ".jpg" : "image/jpeg",
+    ".mp3" : "audio/mpeg"
 };
 
 function getFileNotFoundResponse(requestPath)
@@ -89,8 +90,6 @@ function processRequest(request, response)
     			response.write(data);  
     			response.end();		
     		});
-
-		//fs.readFile('./index.html', function (err, html) {
 }
 
 http.createServer(processRequest).listen(3000, '127.0.0.1');

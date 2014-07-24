@@ -125,12 +125,24 @@
 
     function playSong(id)
     {
-    	$("#currentPlaying").attr('src', 'http://localhost:3002/' + id);
-    	$("#currentPlaying").bind('canplay', 
-    		function()
-    		{
-    			$("#currentPlaying").play();
-    		});
+    	//var audioTag = $(".currentPlaying");
+
+    	// audioTag.attr('src', 'http://localhost:3002/' + id);
+    	// audioTag.on('canplay', 
+    	// 	function()
+    	// 	{
+    	// 		audioTag.play();
+    	// 	});
+
+		var audioTag = document.getElementById('currentPlaying');
+		audioTag.src = 'http://localhost:3002/' + id;
+		audioTag.volume = 0.5;
+		
+		audioTag.oncanplay = 
+			function()
+			{
+				play();
+			}
     }
 
     $(document).ready(
