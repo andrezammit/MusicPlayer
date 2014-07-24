@@ -2,6 +2,7 @@ var fileSystem = require('./fileSystem');
 var database = require('./database');
 var webServer = require('./webserver');
 var webServer = require('./webSocketServer');
+var webServer = require('./mp3Server');
 
 var tagParser = require('./tagParser');
 

@@ -5,7 +5,7 @@
 	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <script type="text/javascript">
 
-    var webSock = new WebSocket('ws://localhost:8080/');
+    var webSock = new WebSocket('ws://localhost:3001/');
 
 	var tagList = [];
 
@@ -110,7 +110,8 @@
     		if (!tag)
     			continue;
 
-    		html += '(' + tag._id + ') - ' + tag.artist + ' - ' + tag.album + ' - ' + tag.track;
+    		html += '<a href="javascript:void(0)" onclick="playSong(' + tag._id + ')"><img src="images/play.png" width="16px" height="16px" alt="Play" /></a>';
+    		html += tag.artist + ' - ' + tag.album + ' - ' + tag.track;
     		html += '<br />';
     	} 
 
@@ -120,6 +121,16 @@
     function sendQuery(query)
     {
     	webSock.send(JSON.stringify(query));
+    }
+
+    function playSong(id)
+    {
+    	$("#currentPlaying").attr('src', 'http://localhost:3002/' + id);
+    	$("#currentPlaying").bind('canplay', 
+    		function()
+    		{
+    			$("#currentPlaying").play();
+    		});
     }
 
     $(document).ready(
@@ -137,5 +148,8 @@
   	
   	<div id="result">
   	</div>
+
+  	<audio id="currentPlaying">
+  	</audio>
   </body>
 </html>

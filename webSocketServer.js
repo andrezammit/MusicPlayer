@@ -1,7 +1,7 @@
 var ws = require('ws').Server;
 var database = require('./database');
 
-var wsServer = new ws({ port: 8080 });
+var wsServer = new ws({ port: 3001 });
 
 function onWSConnection(webSock)
 {
