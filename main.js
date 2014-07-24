@@ -40,4 +40,4 @@ function scanDone(error, fileList)
     fileSystem.extractTags(fileList, extractTagsDone)
 }
 
-//fileSystem.scan('H:\\Music\\Music', scanDone);
+// fileSystem.scan('H:\\Music\\Music', scanDone);
