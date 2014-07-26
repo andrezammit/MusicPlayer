@@ -5,6 +5,8 @@
 	<link rel="stylesheet" type="text/css" href="inc/style.css">
 
 	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+  <script src="songControl.js"></script>
+
   <script type="text/javascript">
 
     var webSock = new WebSocket('ws://localhost:3001/');
@@ -15,9 +17,6 @@
   	var tagOffset = 0;
 
   	var progress = 0;
-
-  	var songLoaded = false;
-    var audioTag = null;
 
     function onWebSockOpen()
     {
@@ -128,59 +127,6 @@
     	webSock.send(JSON.stringify(query));
     }
 
-    function playSong(id)
-    {
-    	audioTag.src = 'http://localhost:3002/' + id + '.mp3';
-    	
-      audioTag.addEventListener('canplay', 
-    		function()
-    		{
-    			songLoaded = true;
-    			audioTag.play();
-    		});
-
-      audioTag.addEventListener('pause', onPause);
-    	audioTag.addEventListener('play', onPlay);
-    }
-
-    function onPlay()
-    {
-      updateControlButtons();
-    }
-
-    function onPause()
-    {
-      updateControlButtons();
-    }
-
-    function updateControlButtons()
-    {
-    	var playButton = $('#playButton');
-    	
-    	if (audioTag.paused)
-    	{
-    		playButton.text('Play');
-    	}
-    	else
-    	{
-    		playButton.text('Pause');
-    	}
-
-      updateStopButton();
-    }
-
-    function togglePlay()
-    {
-    	if (audioTag.paused)
-    	{
-    		audioTag.play();
-    	}
-    	else
-    	{
-    		audioTag.pause();
-    	}
-    }
-
     $(document).ready(
     	function() 
     	{
@@ -204,7 +150,6 @@
 
   	<div id="controlBar">
   		<a href="javascript:void(0)" onclick="togglePlay()" id="playButton"></a>
-  		<a href="javascript:void(0)" onclick="stopSong()" id="stopButton">Stop</a>
       <div id="songInfo"><div>
   	</div>
   </body>
