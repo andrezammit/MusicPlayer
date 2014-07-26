@@ -107,6 +107,39 @@ function getFileFromID(id, callback)
         });
 }
 
+function getAllAlbums(callback)
+{
+    var albums = [];
+
+    function isAlbumInArray(album)
+    {
+        for (cnt = 0; cnt < albums.length; cnt++)
+        {
+            var tmpAlbum = albums[cnt];
+
+            if (album.albumArtist != tmpAlbum.albumArtist)
+                return false;
+
+            if (album.album != tmpAlbum.album)
+                return false;
+            
+            return true;
+        }        
+    }
+
+    collection.find( { }, { albumArtist: 1, album: 1 } ).toArray(
+        function(error, docs)
+        {
+            for (cnt = 0; cnt < docs.length; cnt++)
+            {
+                if (isAlbumInArray(doc[cnt]))
+                    continue;
+
+                albums.push(docs);
+            }
+        });
+}
+
 setupDatabase(setupDatabaseDone);
 
 module.exports.getTags = getTags;
