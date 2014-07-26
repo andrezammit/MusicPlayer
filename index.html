@@ -2,21 +2,26 @@
   <head>
     <title>MusicPlayer</title>
 
+	<link rel="stylesheet" type="text/css" href="inc/style.css">
+
 	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-    <script type="text/javascript">
+  <script type="text/javascript">
 
     var webSock = new WebSocket('ws://localhost:3001/');
 
-	var tagList = [];
+  	var tagList = [];
 
-	var tagCount = 0;
-	var tagOffset = 0;
+  	var tagCount = 0;
+  	var tagOffset = 0;
 
-	var progress = 0;
+  	var progress = 0;
+
+  	var songLoaded = false;
+    var audioTag = null;
 
     function onWebSockOpen()
     {
-    	alert('Connected!');
+    	console.log('Connected!');
     }
 
     function onWebSockMessage(event)
@@ -59,15 +64,15 @@
    	}
 
     function getTags()
-	{
-		var tagsRemaning = tagCount - tagOffset;
-		var tagsToGet = Math.min(4, tagsRemaning);
+  	{
+  		var tagsRemaning = tagCount - tagOffset;
+  		var tagsToGet = Math.min(100, tagsRemaning);
 
-		var query = { call: 'getTags', offset: tagOffset, tagsToGet: tagsToGet };
-		sendQuery(query);
-	}
+  		var query = { call: 'getTags', offset: tagOffset, tagsToGet: tagsToGet };
+  		sendQuery(query);
+  	}
 
-	function onGetTagsReply(data)
+    function onGetTagsReply(data)
    	{
    		tagOffset += data.tagCount;
    		tagList = tagList.concat(data.tagData);
@@ -125,29 +130,62 @@
 
     function playSong(id)
     {
-    	//var audioTag = $(".currentPlaying");
+    	audioTag.src = 'http://localhost:3002/' + id + '.mp3';
+    	
+      audioTag.addEventListener('canplay', 
+    		function()
+    		{
+    			songLoaded = true;
+    			audioTag.play();
+    		});
 
-    	// audioTag.attr('src', 'http://localhost:3002/' + id);
-    	// audioTag.on('canplay', 
-    	// 	function()
-    	// 	{
-    	// 		audioTag.play();
-    	// 	});
+      audioTag.addEventListener('pause', onPause);
+    	audioTag.addEventListener('play', onPlay);
+    }
 
-		var audioTag = document.getElementById('currentPlaying');
-		audioTag.src = 'http://localhost:3002/' + id;
-		audioTag.volume = 0.5;
-		
-		audioTag.oncanplay = 
-			function()
-			{
-				play();
-			}
+    function onPlay()
+    {
+      updateControlButtons();
+    }
+
+    function onPause()
+    {
+      updateControlButtons();
+    }
+
+    function updateControlButtons()
+    {
+    	var playButton = $('#playButton');
+    	
+    	if (audioTag.paused)
+    	{
+    		playButton.text('Play');
+    	}
+    	else
+    	{
+    		playButton.text('Pause');
+    	}
+
+      updateStopButton();
+    }
+
+    function togglePlay()
+    {
+    	if (audioTag.paused)
+    	{
+    		audioTag.play();
+    	}
+    	else
+    	{
+    		audioTag.pause();
+    	}
     }
 
     $(document).ready(
     	function() 
     	{
+    		audioTag = $("#currentPlaying")[0];
+
 		    $("#getAllFiles").click(startGettingTags);
 		});
     </script>
@@ -163,5 +201,11 @@
 
   	<audio id="currentPlaying">
   	</audio>
+
+  	<div id="controlBar">
+  		<a href="javascript:void(0)" onclick="togglePlay()" id="playButton"></a>
+  		<a href="javascript:void(0)" onclick="stopSong()" id="stopButton">Stop</a>
+      <div id="songInfo"><div>
+  	</div>
   </body>
 </html>
