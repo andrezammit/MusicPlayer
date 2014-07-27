@@ -24,12 +24,25 @@ function trimNullChar(string)
 	return string;
 }
 
+function getBitsFromByte(buffer, byteIndex, mask, shift)
+{
+	var tmpByte = buffer[byteIndex];
+	var tmp = tmpByte & mask;
+
+	return tmp >> shift;
+}
+
 function getTag(fullPath, callback)
 {	
 	var tagHeaderSize = 10;
 	var frameHeaderSize = 10;
 
 	var tagMinorVer = 3;
+	var tagSize = 0;
+
+	var fileHandle = null;
+
+	var tag = { 'path' : fullPath };
 
 	function returnError(errorMsg)
 	{
@@ -37,19 +50,88 @@ function getTag(fullPath, callback)
     	callback(error);
 	}
 
-	function readTag(fd)
+	function readTagDone()
+	{
+		getTrackTime();
+	}
+
+	function getTrackTime()
+	{
+		buffer = new Buffer(4);
+		fs.read(fileHandle, buffer, 0, 4, tagSize + 10,  
+			function(error, bytesRead)
+			{
+				debugger;
+
+				if (error)
+				{
+					returnError("Error reading mp3 frame.")
+					return;
+				}
+
+				if (!verifyFrame(buffer))
+				{
+					returnError("Invalid mp3 frame.")
+					return;
+				}
+
+				var mpegVersion = getMPEGVersion(buffer);
+				var layerIndex = getLayerIndex(buffer);
+				var bitRateIndex = getBitrateIndex(buffer);
+				var samplingRate = getSamplingRate(buffer);
+				var paddingBit = getPaddingBit(buffer);
+				var channelMode = getChannelMode(buffer);
+			});
+	}
+
+	function verifyFrame(buffer)
+	{
+		return buffer[0] == 0xFF;
+	}
+
+	function getMPEGVersion(buffer)
+	{
+		return getBitsFromByte(buffer, 1, 0x18, 3);
+	}
+
+	function getLayerIndex(buffer)
+	{
+		return getBitsFromByte(buffer, 1, 0x6, 1);
+	}
+
+	function getBitrateIndex(buffer)
+	{
+		return getBitsFromByte(buffer, 2, 0xF0, 4);
+	}
+
+	function getSamplingRate(buffer)
+	{
+		return getBitsFromByte(buffer, 2, 0xC, 2);
+	}
+
+	function getPaddingBit(buffer)
+	{
+		return getBitsFromByte(buffer, 2, 0x2, 1);
+	}
+
+	function getChannelMode(buffer)
+	{
+		return getBitsFromByte(buffer, 2, 0xC0, 6);
+	}
+
+	function readTag()
 	{
 		function readTagDataDone(tagData)
 		{
-			readTagFrames(tagData, callback);
+			readTagFrames(tagData, readTagDone);
 		}
 
-		function readTagHeaderDone(tagSize)
+		function readTagHeaderDone()
 		{
-			readTagData(fd, tagSize, readTagDataDone);
+			readTagData(tagSize, readTagDataDone);
 		}
 
-		readTagHeader(fd, readTagHeaderDone);
+		readTagHeader(readTagHeaderDone);
 	}
 
 	function verifyTagHeader(buffer)
@@ -90,10 +172,8 @@ function getTag(fullPath, callback)
 		}
 	}
 
-	function getTagSize(buffer)
+	function setTagSize(buffer)
 	{
-		var tagSize = 0;
-
 		if (tagMinorVer > 3)
 		{
 			tagSize = buffer.readUInt32BE(6);
@@ -111,14 +191,12 @@ function getTag(fullPath, callback)
 
 			tagSize = tmpValue;
 		}
-
-		return tagSize;
 	}
 
-	function readTagHeader(fd, callback)
+	function readTagHeader(callback)
 	{
 		var headerBuffer = new Buffer(tagHeaderSize);
-		fs.read(fd, headerBuffer, 0, tagHeaderSize, 0, 
+		fs.read(fileHandle, headerBuffer, 0, tagHeaderSize, 0, 
 			function(error, bytesRead) 
 			{
 				if (error)
@@ -143,21 +221,19 @@ function getTag(fullPath, callback)
 
 				setTagDefaults();
 
-				var tagSize = getTagSize(headerBuffer);
+				setTagSize(headerBuffer);
 
     			headerBuffer = null;
-    			callback(tagSize);
+    			callback();
     		});
 	}
 
-	function readTagData(fd, tagSize, callback)
+	function readTagData(tagSize, callback)
 	{
 		var dataBuffer = new Buffer(tagSize);
-		fs.read(fd, dataBuffer, 0, tagSize, tagHeaderSize, 
+		fs.read(fileHandle, dataBuffer, 0, tagSize, tagHeaderSize, 
 			function(error, bytesRead) 
 			{
-				fs.closeSync(fd);
-
 				if (error)
 				{
 					dataBuffer = null;
@@ -185,7 +261,7 @@ function getTag(fullPath, callback)
 		default:
 		case 0:
 			return 'ascii';
-			
+
 		case 3: 
 			return 'utf8';
 
@@ -299,7 +375,6 @@ function getTag(fullPath, callback)
 	function readTagFrames(tagData, callback)
 	{
 		var offset = 0;
-		var tag = { 'path' : fullPath };
 
 		function isTagReady()
 		{
@@ -315,7 +390,10 @@ function getTag(fullPath, callback)
 			{
 				tagData = null;
 
-				callback(null, tag);
+				if (!tag.albumArtist)
+					tag.albumArtist = tag.artist;
+
+				callback();
 				return;
 			}
 
@@ -351,7 +429,8 @@ function getTag(fullPath, callback)
         		return;
         	}
 
-    		readTag(fd);
+        	fileHandle = fd;
+    		readTag();
     	});
 }
 
