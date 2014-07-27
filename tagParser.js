@@ -81,6 +81,8 @@ function getTag(fullPath, callback)
 				var samplingRate = getSamplingRate(buffer);
 				var paddingBit = getPaddingBit(buffer);
 				var channelMode = getChannelMode(buffer);
+
+				var bitRate = getBitRate(bitRateIndex, mpegVersion, layerIndex);
 			});
 	}
 
@@ -104,7 +106,7 @@ function getTag(fullPath, callback)
 		return getBitsFromByte(buffer, 2, 0xF0, 4);
 	}
 
-	function getSamplingRate(buffer)
+	function getSamplingRateIndex(buffer)
 	{
 		return getBitsFromByte(buffer, 2, 0xC, 2);
 	}
@@ -117,6 +119,72 @@ function getTag(fullPath, callback)
 	function getChannelMode(buffer)
 	{
 		return getBitsFromByte(buffer, 2, 0xC0, 6);
+	}
+
+	function getSamplingRate(samplingRate)
+	{
+		var sampleRateArray =
+		{ 
+			[44100, 22050, 11025],
+			[48000, 24000, 12000],
+			[32000, 16000, 8000] 
+		}
+	}
+
+	function getBitRate(bitRateIndex, mpegVersion, layerIndex)
+	{
+		var x = 0;
+
+		if (mpegVersion == 1)
+		{
+			switch (layerIndex)
+			{
+			case 1:
+				x = 0;
+				break;
+
+			case 2:
+				x = 1;
+				break;
+
+			case 3:
+				x = 2;
+			}
+		}
+		else
+		{
+			switch (layerIndex)
+			{
+			case 1:
+				x = 3;
+				break;
+
+			case 2:
+			case 3:
+				x = 4;
+				break;
+			}
+		}
+
+		var bitRateArray =
+		{ 
+			[32,	32,		32,		32,		8],
+			[64,	48,		40,		48,		16],
+			[96,	56,		48,		56,		24],
+			[128,	64,		56,		64,		32],
+			[160,	80,		64,		80,		40],
+			[192,	96,		80,		96,		48],
+			[224,	112,	96,		112,	56],
+			[256,	128,	112,	128,	64],
+			[288,	160,	128,	144,	80],
+			[320,	192,	160,	160,	96],
+			[352,	224,	192,	176,	112],
+			[384,	256,	224,	192,	128],
+			[416,	320,	256,	224,	144],
+			[448,	384,	320,	256,	160]
+		}
+
+		return bitRateArray[x, bitRateIndex];
 	}
 
 	function readTag()
