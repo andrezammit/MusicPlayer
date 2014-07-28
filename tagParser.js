@@ -76,13 +76,16 @@ function getTag(fullPath, callback)
 				}
 
 				var mpegVersion = getMPEGVersion(buffer);
-				var layerIndex = getLayerIndex(buffer);
+				var layer = getLayer(buffer);
 				var bitRateIndex = getBitrateIndex(buffer);
-				var samplingRate = getSamplingRate(buffer);
+				var samplingRate = getSamplingRateIndex(buffer);
 				var paddingBit = getPaddingBit(buffer);
 				var channelMode = getChannelMode(buffer);
 
-				var bitRate = getBitRate(bitRateIndex, mpegVersion, layerIndex);
+				var bitRate = getBitRate(bitRateIndex, mpegVersion, layer);
+
+				var trackTime = getTimeString(bitRate);
+
 			});
 	}
 
@@ -93,12 +96,44 @@ function getTag(fullPath, callback)
 
 	function getMPEGVersion(buffer)
 	{
-		return getBitsFromByte(buffer, 1, 0x18, 3);
+		var tmpVersion = getBitsFromByte(buffer, 1, 0x18, 3);
+
+		switch (tmpVersion)
+		{
+		case 0:
+			return 3; // MPEG 2.5
+
+		case 1:
+			return 0; // Reserved
+
+		case 2: 
+			return 2; // MPEG 2
+
+		case 3:
+		default:
+			return 1; // MPEG 1
+		}
 	}
 
-	function getLayerIndex(buffer)
+	function getLayer(buffer)
 	{
-		return getBitsFromByte(buffer, 1, 0x6, 1);
+		var tmpLayer = getBitsFromByte(buffer, 1, 0x6, 1);
+
+		switch (tmpLayer)
+		{
+		case 0:
+			return 0; // Reserved
+
+		case 1:
+		default:		
+			return 3; // Layer III
+
+		case 2:
+			return 2; // Layer II
+
+		case 3:
+			return 1; // Layer I 
+		}
 	}
 
 	function getBitrateIndex(buffer)
@@ -124,20 +159,20 @@ function getTag(fullPath, callback)
 	function getSamplingRate(samplingRate)
 	{
 		var sampleRateArray =
-		{ 
+		[ 
 			[44100, 22050, 11025],
 			[48000, 24000, 12000],
 			[32000, 16000, 8000] 
-		}
+		]
 	}
 
-	function getBitRate(bitRateIndex, mpegVersion, layerIndex)
+	function getBitRate(bitRateIndex, mpegVersion, layer)
 	{
 		var x = 0;
 
 		if (mpegVersion == 1)
 		{
-			switch (layerIndex)
+			switch (layer)
 			{
 			case 1:
 				x = 0;
@@ -153,7 +188,7 @@ function getTag(fullPath, callback)
 		}
 		else
 		{
-			switch (layerIndex)
+			switch (layer)
 			{
 			case 1:
 				x = 3;
@@ -167,7 +202,8 @@ function getTag(fullPath, callback)
 		}
 
 		var bitRateArray =
-		{ 
+		[ 
+			[0,		0,		0,		0,		0],
 			[32,	32,		32,		32,		8],
 			[64,	48,		40,		48,		16],
 			[96,	56,		48,		56,		24],
@@ -182,9 +218,20 @@ function getTag(fullPath, callback)
 			[384,	256,	224,	192,	128],
 			[416,	320,	256,	224,	144],
 			[448,	384,	320,	256,	160]
-		}
+		]
 
-		return bitRateArray[x, bitRateIndex];
+		return bitRateArray[bitRateIndex][x];
+	}
+
+	function getTimeString(bitRate)
+	{
+		var stat = fs.statSync(fullPath);
+		var time = Math.floor(stat.size / bitRate * 8);
+
+		var minutes = Math.floor(time / 60);
+		var seconds = time - (minutes * 60);
+
+		return minutes + ':' + seconds;
 	}
 
 	function readTag()
