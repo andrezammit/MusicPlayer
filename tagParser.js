@@ -226,7 +226,7 @@ function getTag(fullPath, callback)
 	function getTimeString(bitRate)
 	{
 		var stat = fs.statSync(fullPath);
-		var time = Math.floor(stat.size / bitRate * 8);
+		var time = Math.floor((stat.size - tagSize) / ((bitRate * 1000) / 8));
 
 		var minutes = Math.floor(time / 60);
 		var seconds = time - (minutes * 60);
