@@ -1,6 +1,5 @@
 var fs = require('fs');
 var path = require('path');
-var mm = require('musicmetadata');
 var format = require('util').format
 
 var tagParser = require('./tagParser');
@@ -105,9 +104,7 @@ function getTag(fullPath, callback)
     if (fileExt !== '.mp3')
         return;
 
-    var tag = { error: 0 };
-
-    tagParser.getTag(fullPath, 
+    new tagParser().getTag(fullPath, 
         function(error, tag)
         {
             if (error)
