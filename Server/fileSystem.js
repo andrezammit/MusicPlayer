@@ -2,7 +2,7 @@ var fs = require('fs');
 var path = require('path');
 var format = require('util').format
 
-var tagParser = require('./tagParser');
+var tagParser = require('./TagParser');
 
 var bunchOfTags = 300;
 

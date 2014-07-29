@@ -2,11 +2,22 @@ var fs = require('fs');
 
 var id3TagPadding = 10;
 
-function trackTime(fd, tagOffset)
+function TrackTime(fd, fullPath, tagOffset)
 {
-	this.fd = fd;
-	this.frameHeader = null;
-	this.tagOffset = tagOffset;
+	var _fd = fd;
+	var _frameHeader = null;
+	var _fullPath = fullPath;
+	var _tagOffset = tagOffset + id3TagPadding;
+	var _callback = null;
+	
+	var _mpegVersion = 0;
+	var _layer = 0;
+	var _bitRateIndex = 0;
+	var _samplingRate = 0;
+	var _paddingBit = 0;
+	var _channelMode = 0;
+
+	var _bitRate = 0;
 
 	////////////////////////////////////////////////////////////////////////////
 	// Helpers 
@@ -14,12 +25,20 @@ function trackTime(fd, tagOffset)
 	function returnError(errorMsg)
 	{
 		var error = { msg: errorMsg }
-    	this.callback(error);
+    	_callback(error);
 	}
 
 	function verifyFrame(buffer)
 	{
 		return buffer[0] == 0xFF;
+	}
+
+	function getBitsFromByte(buffer, byteIndex, mask, shift)
+	{
+		var tmpByte = buffer[byteIndex];
+		var tmp = tmpByte & mask;
+
+		return tmp >> shift;
 	}
 
 	function getMPEGVersion(buffer)
@@ -94,13 +113,13 @@ function trackTime(fd, tagOffset)
 		]
 	}
 
-	function getBitRate(bitRateIndex, mpegVersion, layer)
+	function getBitRate()
 	{
 		var x = 0;
 
-		if (mpegVersion == 1)
+		if (_mpegVersion == 1)
 		{
-			switch (layer)
+			switch (_layer)
 			{
 			case 1:
 				x = 0;
@@ -116,7 +135,7 @@ function trackTime(fd, tagOffset)
 		}
 		else
 		{
-			switch (layer)
+			switch (_layer)
 			{
 			case 1:
 				x = 3;
@@ -148,16 +167,52 @@ function trackTime(fd, tagOffset)
 			[448,	384,	320,	256,	160]
 		]
 
-		return bitRateArray[bitRateIndex][x];
+		return bitRateArray[_bitRateIndex][x];
 	}
 
 	////////////////////////////////////////////////////////////////////////////
 	// Flow
 
-	function getTimeString(bitRate)
+	this.getTrackTime = function(callback)
 	{
-		var stat = fs.statSync(fullPath);
-		var time = Math.floor((stat.size - tagSize) / ((bitRate * 1000) / 8));
+		_callback = callback;
+
+		_frameHeader = new Buffer(4);
+
+		fs.read(_fd, _frameHeader, 0, 4, _tagOffset,  
+			function(error, bytesRead)
+			{
+				if (error)
+				{
+					returnError("Error reading mp3 frame.")
+					return;
+				}
+
+				if (!verifyFrame(_frameHeader))
+				{
+					returnError("Invalid mp3 frame.")
+					return;
+				}
+
+				_mpegVersion = getMPEGVersion(_frameHeader);
+				_layer = getLayer(_frameHeader);
+				_bitRateIndex = getBitrateIndex(_frameHeader);
+				_samplingRate = getSamplingRateIndex(_frameHeader);
+				_paddingBit = getPaddingBit(_frameHeader);
+				_channelMode = getChannelMode(_frameHeader);
+
+				_bitRate = getBitRate();
+
+				var trackTime = getTimeString();
+
+				_callback(null, trackTime);
+			});
+	}
+
+	function getTimeString()
+	{
+		var stat = fs.statSync(_fullPath);
+		var time = Math.floor((stat.size - _tagOffset) / ((_bitRate * 1000) / 8));
 
 		var minutes = Math.floor(time / 60);
 		var seconds = time - (minutes * 60);
@@ -166,39 +221,4 @@ function trackTime(fd, tagOffset)
 	}
 }
 
-trackTime.prototype.getTrackTime = function(callback)
-{
-	this.frameHeader = new Buffer(4);
-	fs.read(this.fd, this.frameHeader, 0, 4, this.tagOffset + id3TagPadding,  
-		function(error, bytesRead)
-		{
-			debugger;
-
-			if (error)
-			{
-				returnError("Error reading mp3 frame.")
-				return;
-			}
-
-			if (!verifyFrame(buffer))
-			{
-				returnError("Invalid mp3 frame.")
-				return;
-			}
-
-			var mpegVersion = getMPEGVersion(buffer);
-			var layer = getLayer(buffer);
-			var bitRateIndex = getBitrateIndex(buffer);
-			var samplingRate = getSamplingRateIndex(buffer);
-			var paddingBit = getPaddingBit(buffer);
-			var channelMode = getChannelMode(buffer);
-
-			var bitRate = getBitRate(bitRateIndex, mpegVersion, layer);
-
-			var trackTime = getTimeString(bitRate);
-
-			callback(trackTime);
-		});
-}
-
-module.exports = trackTime;
+module.exports = TrackTime;

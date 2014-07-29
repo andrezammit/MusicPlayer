@@ -28,28 +28,20 @@ function trimNullChar(string)
 	return string;
 }
 
-function getBitsFromByte(buffer, byteIndex, mask, shift)
+function TagParser()
 {
-	var tmpByte = buffer[byteIndex];
-	var tmp = tmpByte & mask;
+	var _tagSize = 0;
+	var _tagOffset = 0;
+	var _tagMinorVer = 3;
 
-	return tmp >> shift;
-}
+	var _fd = null;
 
-function tagParser()
-{
-	_tagSize = 0;
-	_tagOffset = 0;
-	_tagMinorVer = 3;
+	var _tag = { };
 
-	_fd = null;
+	var _callback = null;
 
-	_tag = { };
-
-	_callback = null;
-
-	_dataBuffer = null;
-	_headerBuffer = null;
+	var _dataBuffer = null;
+	var _headerBuffer = null;
 
 	////////////////////////////////////////////////////////////////////////////
 	// Helpers 
@@ -113,7 +105,7 @@ function tagParser()
 		switch (tagMinorVer)
 		{
 			case 2:
-				this._frameHeaderSize = ver22HeaderSize;
+				_frameHeaderSize = ver22HeaderSize;
 				break;
 
 			case 3:
@@ -286,11 +278,11 @@ function tagParser()
 		}
 		else
 		{
-			frameID = _dataBuffer.toString('utf8', _tagOffset, offset + 3);
+			frameID = _dataBuffer.toString('utf8', _tagOffset, _tagOffset + 3);
 			_tagOffset += 3;
 
 			for (cnt = 0; cnt < 3; cnt++)
-				frameSize += _dataBuffer[offset + cnt] << byteSize * (2 - cnt);
+				frameSize += _dataBuffer[_tagOffset + cnt] << byteSize * (2 - cnt);
 
 			_tagOffset += 3;
 		}
@@ -301,36 +293,34 @@ function tagParser()
 
 		if (!isIgnoreFrame(frameID))
 		{
-			var dataSize = frameSize;
+			var tmpDataSize = frameSize;
+			var tmpOffset = _tagOffset;
 
 			var frameEncoding = 'utf8';
 			if (isEncodedFrame(frameID))
 			{
 				var frameEncodingByte = _dataBuffer.readUInt8(_tagOffset);
 				
-				_tagOffset += 1;
-				dataSize -= 1;
+				tmpDataSize -= 1;
+				tmpOffset += 1;
 
 				frameEncoding = getFrameEncodingType(frameEncodingByte);
 			}
 
-			frameData = _dataBuffer.toString(frameEncoding, _tagOffset, _tagOffset + dataSize);
+			frameData = _dataBuffer.toString(frameEncoding, tmpOffset, tmpOffset + tmpDataSize);
 		}
 
-		callback(frameID, frameSize, frameData);
+		_tagOffset += frameSize;
+		callback(frameID, frameData);
 	}
 
-	function getTagFrameDone(frameID, frameSize, frameData)
+	function getTagFrameDone(frameID, frameData)
 	{
 		if (!frameID || frameID.charCodeAt(0) == 0)
 		{
 			// stop reading the tag if we read a blank frameID.
 			_tagOffset = _dataBuffer.length;
 		}	
-		else
-		{
-			_tagOffset += frameHeaderSize + frameSize;
-		}
 
 		processFrameData(frameID, frameData, processFrameDataDone);
 	}
@@ -372,11 +362,12 @@ function tagParser()
 		{
 			_dataBuffer = null;
 
+			_tag.album = decodeURIComponent(escape(_tag.album));
+			
 			if (!_tag.albumArtist)
 				_tag.albumArtist = _tag.artist;
 
-			_trackTime = new trackTime(_fd, _tagSize);
-			_trackTime.getTrackTime(getTrackTimeDone);
+			new trackTime(_fd, _tag.path, _tagSize).getTrackTime(getTrackTimeDone);
 
 			return;
 		}
@@ -386,7 +377,7 @@ function tagParser()
 
 	function getTrackTimeDone(error, time)
 	{	
-		fs.closeSync(_fd);
+		//fs.closeSync(_fd);
 		
 		if (error)
 		{
@@ -401,4 +392,4 @@ function tagParser()
 	}
 }
 
-module.exports = tagParser;
+module.exports = TagParser;
