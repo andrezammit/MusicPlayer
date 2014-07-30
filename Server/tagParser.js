@@ -301,10 +301,21 @@ function TagParser()
 			{
 				var frameEncodingByte = _dataBuffer.readUInt8(_tagOffset);
 				
+				// Skip the encoding byte.
+
 				tmpDataSize -= 1;
 				tmpOffset += 1;
 
 				frameEncoding = getFrameEncodingType(frameEncodingByte);
+
+				if (frameEncodingByte == 1 ||
+					frameEncodingByte == 2)
+				{
+					// Skip the UTF-16 BOM.
+
+					tmpDataSize -=2;
+					tmpOffset += 2;
+				}
 			}
 
 			frameData = _dataBuffer.toString(frameEncoding, tmpOffset, tmpOffset + tmpDataSize);
@@ -362,8 +373,6 @@ function TagParser()
 		{
 			_dataBuffer = null;
 
-			_tag.album = decodeURIComponent(escape(_tag.album));
-			
 			if (!_tag.albumArtist)
 				_tag.albumArtist = _tag.artist;
 
@@ -377,7 +386,7 @@ function TagParser()
 
 	function getTrackTimeDone(error, time)
 	{	
-		//fs.closeSync(_fd);
+		fs.closeSync(_fd);
 		
 		if (error)
 		{

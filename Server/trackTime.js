@@ -5,9 +5,13 @@ var id3TagPadding = 10;
 function TrackTime(fd, fullPath, tagOffset)
 {
 	var _fd = fd;
+	
 	var _frameHeader = null;
+	var _vbrHeader = null;
+
 	var _fullPath = fullPath;
 	var _tagOffset = tagOffset + id3TagPadding;
+	
 	var _callback = null;
 	
 	var _mpegVersion = 0;
@@ -18,6 +22,12 @@ function TrackTime(fd, fullPath, tagOffset)
 	var _channelMode = 0;
 
 	var _bitRate = 0;
+	var _samplesPerFrame = 0;
+
+	var _isVBR = false;
+
+	var _vbrOffset = 0;
+	var _vbrFrames = 0;
 
 	////////////////////////////////////////////////////////////////////////////
 	// Helpers 
@@ -105,12 +115,15 @@ function TrackTime(fd, fullPath, tagOffset)
 
 	function getSamplingRate(samplingRate)
 	{
-		var sampleRateArray =
+		var samplingRateArray =
 		[ 
 			[44100, 22050, 11025],
 			[48000, 24000, 12000],
 			[32000, 16000, 8000] 
 		]
+
+		var x = _mpegVersion - 1;
+		return samplingRateArray[_samplingRateIndex][x];
 	}
 
 	function getBitRate()
@@ -170,6 +183,31 @@ function TrackTime(fd, fullPath, tagOffset)
 		return bitRateArray[_bitRateIndex][x];
 	}
 
+	function getSamplesPerFrame()
+	{
+		var samplesPerFrameArray =
+		[
+			[384,	384,	384],
+			[1152,	1152,	1152],
+			[1152,	576,	576]
+		]
+
+		var y = _layer - 1;
+		var x = _mpegVersion - 1;
+
+		return samplesPerFrameArray[y][x];
+	}
+
+	function verifyVBRFrame(vbrHeader)
+	{
+		xingTag = vbrHeader.toString('utf8', 0, 4);
+
+		if (xingTag != 'Xing')
+			return false;
+
+		return true;
+	}
+
 	////////////////////////////////////////////////////////////////////////////
 	// Flow
 
@@ -197,25 +235,100 @@ function TrackTime(fd, fullPath, tagOffset)
 				_mpegVersion = getMPEGVersion(_frameHeader);
 				_layer = getLayer(_frameHeader);
 				_bitRateIndex = getBitrateIndex(_frameHeader);
-				_samplingRate = getSamplingRateIndex(_frameHeader);
+				_samplingRateIndex = getSamplingRateIndex(_frameHeader);
 				_paddingBit = getPaddingBit(_frameHeader);
 				_channelMode = getChannelMode(_frameHeader);
 
 				_bitRate = getBitRate();
+				_samplingRate = getSamplingRate();
+				_samplesPerFrame = getSamplesPerFrame();
 
-				var trackTime = getTimeString();
-
-				_callback(null, trackTime);
+				readVBRHeader(readVBRHeaderDone)
 			});
+	}
+
+	function readVBRHeader(callback)
+	{
+		_vbrHeader = new Buffer(120)
+
+		var vbrHeaderPos = _tagOffset + 36;
+		fs.read(_fd, _vbrHeader, 0, 120, vbrHeaderPos, 
+			function(error, bytesRead)
+			{
+				debugger;
+
+				if (error)
+				{
+					returnError("Error reading mp3 VBR frame.")
+					return;
+				}
+
+				if (!verifyVBRFrame(_vbrHeader))
+				{
+					callback(false);
+					return;
+				}
+
+				_vbrOffset = 4;
+				_isVBR = true;
+
+				var vbrFlags = getVBRFlags();
+				_vbrOffset += 4;
+
+				if (isFrameCountAvail(vbrFlags))
+				{
+					_vbrFrames = getFrameCount();
+					_vbrOffset += 4;
+				}
+
+				_vbrHeader = null;
+
+				callback();
+			});
+	}
+
+	function getVBRFlags()
+	{
+		return _vbrHeader.readUInt32BE(_vbrOffset);
+	}
+
+	function isFrameCountAvail(vbrFlags)
+	{
+		return vbrFlags & 0x01;
+	}
+
+	function getFrameCount()
+	{
+		return _vbrHeader.readUInt32BE(_vbrOffset);
+	}
+
+	function readVBRHeaderDone()
+	{
+		var trackTime = getTimeString();
+		_callback(null, trackTime);
 	}
 
 	function getTimeString()
 	{
-		var stat = fs.statSync(_fullPath);
-		var time = Math.floor((stat.size - _tagOffset) / ((_bitRate * 1000) / 8));
+		var time = 0;
+
+		if (_isVBR)
+		{
+			time = _vbrFrames * (_samplesPerFrame / _samplingRate);
+		}
+		else
+		{
+			var stat = fs.statSync(_fullPath);
+			time = (stat.size - _tagOffset) / ((_bitRate * 1000) / 8);
+		}
+
+		time = Math.floor(time);
 
 		var minutes = Math.floor(time / 60);
 		var seconds = time - (minutes * 60);
+
+		if (seconds < 10)
+			seconds = '0' + seconds;
 
 		return minutes + ':' + seconds;
 	}
