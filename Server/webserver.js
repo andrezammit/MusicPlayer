@@ -34,7 +34,7 @@ function processFileRequest(request, callback)
 		return;
 	}
 
-	var fullPath = '.' + requestPath;
+	var fullPath = '../Client' + requestPath;
 
 	if (!fs.existsSync(fullPath))
 	{

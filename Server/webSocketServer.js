@@ -30,8 +30,6 @@ function onWSConnection(webSock)
 
 						var reply = { command: 'getTagsReply', tagCount: docs.length, tagData: docs };
 						sendData(reply);
-						
-						updateProgress(docs.length);
 					});
 			}
 			break;
@@ -46,13 +44,37 @@ function onWSConnection(webSock)
 					});
 			}
 			break;
-		}
-	}
 
-	function updateProgress(step)
-	{
-		var notif = { command: 'updateProgress', step: step};
-		sendData(notif);
+		case 'getAlbumCount':
+			{
+				database.getAlbumCount(
+					function(count)
+					{
+						var reply = { command: 'getAlbumCountReply', albumCount: count };
+						sendData(reply);
+					});
+			}
+			break;
+
+		case 'getAlbums':
+			{
+				database.getAlbums(query.offset, query.albumsToGet, 
+					function(docs)
+					{
+						if (!docs)
+						{
+							var reply = { command: 'getAlbumsReply', error: getNoTagsResponse() };
+							sendData(reply);
+
+							return;
+						}
+
+						var reply = { command: 'getAlbumsReply', albumCount: docs.length, albumData: docs };
+						sendData(reply);
+					});
+			}
+			break;
+		}
 	}
 
 	function sendData(data)

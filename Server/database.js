@@ -107,36 +107,74 @@ function getFileFromID(id, callback)
         });
 }
 
-function getAllAlbums(callback)
+function isAlbumInArray(albumList, album)
+{
+    for (var cnt = 0; cnt < albumList.length; cnt++)
+    {
+        var tmpAlbum = albumList[cnt];
+
+        if (album.albumArtist != tmpAlbum.albumArtist)
+            return false;
+
+        if (album.album != tmpAlbum.album)
+            return false;
+        
+        return true;
+    }        
+}
+
+function getAlbumCount(callback)
 {
     var albums = [];
-
-    function isAlbumInArray(album)
-    {
-        for (cnt = 0; cnt < albums.length; cnt++)
-        {
-            var tmpAlbum = albums[cnt];
-
-            if (album.albumArtist != tmpAlbum.albumArtist)
-                return false;
-
-            if (album.album != tmpAlbum.album)
-                return false;
-            
-            return true;
-        }        
-    }
 
     collection.find( { }, { albumArtist: 1, album: 1 } ).toArray(
         function(error, docs)
         {
-            for (cnt = 0; cnt < docs.length; cnt++)
+            for (var cnt = 0; cnt < docs.length; cnt++)
             {
-                if (isAlbumInArray(doc[cnt]))
+                if (isAlbumInArray(albums, docs[cnt]))
                     continue;
 
-                albums.push(docs);
+                albums.push(docs[cnt]);
             }
+
+            callback(albums.length);
+        });
+}
+
+function getAllAlbums(callback)
+{
+    var albums = [];
+
+    collection.find( { }, { albumArtist: 1, album: 1 } ).toArray(
+        function(error, docs)
+        {
+            for (var cnt = 0; cnt < docs.length; cnt++)
+            {
+                if (isAlbumInArray(albums, docs[cnt]))
+                    continue;
+
+                albums.push(doc[cnt]);
+            }
+        });
+}
+
+function getAlbums(offset, albumsToGet, callback)
+{
+    var albums = [];
+
+    collection.find( { }, { albumArtist: 1, album: 1 } ).toArray(
+        function(error, docs)
+        {
+            for (var cnt = 0; cnt < docs.length; cnt++)
+            {
+                if (isAlbumInArray(albums, docs[cnt]))
+                    continue;
+
+                albums.push(docs[cnt]);
+            }
+
+            callback(albums.slice(offset, offset + albumsToGet))
         });
 }
 
@@ -144,6 +182,8 @@ setupDatabase(setupDatabaseDone);
 
 module.exports.getTags = getTags;
 module.exports.saveTags = saveTags;
+module.exports.getAlbums = getAlbums;
 module.exports.getAllTags = getAllTags;
 module.exports.getTagCount = getTagCount;
+module.exports.getAlbumCount = getAlbumCount;
 module.exports.getFileFromID = getFileFromID;

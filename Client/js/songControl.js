@@ -18,12 +18,12 @@ function playSong(id)
 
 function onPlay()
 {
-  updateControlButtons();
+	updateControlButtons();
 }
 
 function onPause()
 {
-  updateControlButtons();
+	updateControlButtons();
 }
 
 function updateControlButtons()
@@ -39,7 +39,7 @@ function updateControlButtons()
 		playButton.text('Pause');
 	}
 
-  updateStopButton();
+ 	updateStopButton();
 }
 
 function togglePlay()

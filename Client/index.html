@@ -2,138 +2,25 @@
   <head>
     <title>MusicPlayer</title>
 
-	<link rel="stylesheet" type="text/css" href="inc/style.css">
+  	<link rel="stylesheet" type="text/css" href="inc/style.css">
 
-	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-  <script src="songControl.js"></script>
+  	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="js/songControl.js"></script>
+    <script src="js/connect.js"></script>
+    <script src="js/main.js"></script>
 
-  <script type="text/javascript">
-
-    var webSock = new WebSocket('ws://localhost:3001/');
-
-  	var tagList = [];
-
-  	var tagCount = 0;
-  	var tagOffset = 0;
-
-  	var progress = 0;
-
-    function onWebSockOpen()
-    {
-    	console.log('Connected!');
-    }
-
-    function onWebSockMessage(event)
-    {
-    	var data = JSON.parse(event.data);
-
-    	switch (data.command)
-    	{
-    	case 'getTagCountReply':
-    		onGetTagCountReply(data);
-    		break;
-
-    	case 'getTagsReply':
-    		onGetTagsReply(data);
-    		break;
-
-    	case 'updateProgress':
-    		onUpdateProgress(data);
-    		break;
-
-    	default:
-    		alert('Invalid reply data.');
-    		break;
-    	}
-    }
-
-    webSock.onopen = onWebSockOpen;
-    webSock.onmessage = onWebSockMessage;
-
-    function getTagCount(callback)
-    {
-		var query = { call: 'getTagCount' };
-		sendQuery(query);
-    }
-
-    function onGetTagCountReply(data)
-   	{
-   		tagCount = data.tagCount;
-   		getTags();
-   	}
-
-    function getTags()
-  	{
-  		var tagsRemaning = tagCount - tagOffset;
-  		var tagsToGet = Math.min(100, tagsRemaning);
-
-  		var query = { call: 'getTags', offset: tagOffset, tagsToGet: tagsToGet };
-  		sendQuery(query);
-  	}
-
-    function onGetTagsReply(data)
-   	{
-   		tagOffset += data.tagCount;
-   		tagList = tagList.concat(data.tagData);
-
-   		if (tagOffset >= tagCount)
-   		{
-   			displayTags();
-   			return;
-   		}
-
-   		getTags();
-   	}
-
-   	function onUpdateProgress(data)
-   	{
-   		progress += data.step;
-
-   		var html = progress + ' out of ' + tagCount + ' received.';
-   		$("#progress").html(html); 
-   	}
-
-    function startGettingTags()
-    {
-    	progress = 0;
-
-		var loadingHtml = "<img src='images/loading.gif' width='32px' height='32px' alt='loading...' />";
-		$("#result").html(loadingHtml);
-
-		getTagCount();
-    }
-
-    function displayTags()
-    {
-    	var html = '';
-
-    	for (cnt = 0; cnt < tagList.length; cnt++)
-    	{
-    		var tag = tagList[cnt];
-
-    		if (!tag)
-    			continue;
-
-    		html += '<a href="javascript:void(0)" onclick="playSong(' + tag._id + ')"><img src="images/play.png" width="16px" height="16px" alt="Play" /></a>';
-    		html += tag.artist + ' - ' + tag.album + ' - ' + tag.track;
-    		html += '<br />';
-    	} 
-
-    	$("#result").html(html);
-    }
-
-    function sendQuery(query)
-    {
-    	webSock.send(JSON.stringify(query));
-    }
+    <script type="text/javascript">
 
     $(document).ready(
     	function() 
     	{
+        connectWebSocket();
+        
     		audioTag = $("#currentPlaying")[0];
 
-		    $("#getAllFiles").click(startGettingTags);
+		    $("#getAllFiles").click(startGettingAlbums);
 		});
+
     </script>
   </head>
   <body>
