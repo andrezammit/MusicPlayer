@@ -255,8 +255,6 @@ function TrackTime(fd, fullPath, tagOffset)
 		fs.read(_fd, _vbrHeader, 0, 120, vbrHeaderPos, 
 			function(error, bytesRead)
 			{
-				debugger;
-
 				if (error)
 				{
 					returnError("Error reading mp3 VBR frame.")

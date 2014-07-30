@@ -7,9 +7,9 @@ function saveTag(tag, callback)
 {
     var tmpArtist = tag.albumArtist || tag.artist;
 
-    console.log('Saving: ' + tmpArtist + ' - ' + tag.track + ' - ' + tag.album);
+    console.log('Saving: ' + tmpArtist + ' - ' + tag.song + ' - ' + tag.album + ' - ' + tag.track);
 
-    var doc = { artist: tag.artist, albumArtist: tag.albumArtist, track: tag.track, album: tag.album, path: tag.path };
+    var doc = { artist: tag.artist, albumArtist: tag.albumArtist, song: tag.song, album: tag.album, track: tag.track, path: tag.path };
 
     collection.insert(doc, {w:1}, 
         function(error, result) 

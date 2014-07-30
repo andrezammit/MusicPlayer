@@ -75,9 +75,7 @@ function extractTags(fileList, callback)
 
         if (++filesDone == listSize)
         {
-            console.log("Done extracting ID3 tags.");
             callback(tagList);
-
             return;
         }
 

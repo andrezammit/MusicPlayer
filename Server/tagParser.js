@@ -140,9 +140,10 @@ function TagParser()
 	function isTagReady()
 	{
 		if (!_tag.artist || 
-			!_tag.track || 
+			!_tag.song || 
 			!_tag.album || 
-			!_tag.albumArtist)
+			!_tag.albumArtist ||
+			!_tag.track)
 			return false;
 
 		return true;
@@ -160,6 +161,8 @@ function TagParser()
 		case 'TPE1':
 		case 'TP2':
 		case 'TPE2':
+		case 'TRK':
+		case 'TRCK':
 			return false;
 		}
 
@@ -349,7 +352,7 @@ function TagParser()
 
 		case 'TT2':
 		case 'TIT2':
-			_tag.track = frameData;
+			_tag.song = frameData;
 			break;
 
 		case 'TP1':
@@ -360,6 +363,14 @@ function TagParser()
 		case 'TP2':
 		case 'TPE2':
 			_tag.albumArtist = frameData;
+			break;
+
+		case 'TRK':
+		case 'TRCK':
+			{
+				tmpTrack = frameData.split('/');
+				_tag.track = tmpTrack[0];
+			}
 			break;
 		}
 
