@@ -38,8 +38,6 @@ function updateControlButtons()
 	{
 		playButton.text('Pause');
 	}
-
- 	updateStopButton();
 }
 
 function togglePlay()
