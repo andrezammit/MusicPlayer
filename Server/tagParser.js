@@ -67,8 +67,8 @@ function TagParser()
 
 	function verifyTagVersion()
 	{
-		if (tagMinorVer < minTagMinorVer || 
-			tagMinorVer > maxTagMinorVar)
+		if (_tagMinorVer < minTagMinorVer || 
+			_tagMinorVer > maxTagMinorVar)
 			return false;
 
 		return true;
@@ -102,7 +102,7 @@ function TagParser()
 
 	function setTagDefaults()
 	{
-		switch (tagMinorVer)
+		switch (_tagMinorVer)
 		{
 			case 2:
 				_frameHeaderSize = ver22HeaderSize;
@@ -118,7 +118,7 @@ function TagParser()
 
 	function setTagSize()
 	{
-		if (tagMinorVer > 3)
+		if (_tagMinorVer > 3)
 		{
 			_tagSize = _headerBuffer.readUInt32BE(6);
 		}
@@ -214,7 +214,7 @@ function TagParser()
 					return;
 				}
 
-				tagMinorVer = _headerBuffer.readUInt8(3);
+				_tagMinorVer = _headerBuffer.readUInt8(3);
 
 				if (!verifyTagVersion())
 				{
@@ -268,7 +268,7 @@ function TagParser()
 		var frameID;
 		var frameSize = 0;
 
-		if (tagMinorVer > 2)
+		if (_tagMinorVer > 2)
 		{
 			frameID = _dataBuffer.toString('utf8', _tagOffset, _tagOffset + 4);
 			_tagOffset += 4;
