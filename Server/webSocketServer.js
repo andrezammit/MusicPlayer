@@ -74,6 +74,24 @@ function onWSConnection(webSock)
 					});
 			}
 			break;
+
+		case 'getTracks':
+			{
+				database.getAlbumTracks(query.albumArtist, query.album, 
+					function(docs)
+					{
+						if (!docs)
+						{
+							var reply = { command: 'getTracksReply', error: getNoTagsResponse() };
+							sendData(reply);
+
+							return;
+						}
+
+						var reply = { command: 'getTracksReply', trackCount: docs.length, trackList: docs };
+						sendData(reply);
+					});
+			}
 		}
 	}
 

@@ -19,7 +19,7 @@ function onWebSockMessage(event)
 	callback(data);
 }
 
-function getAllAlbums(callback, progress)
+function getAllAlbums(callback, progressCallback)
 {
 	var _albumList = [];
 
@@ -28,7 +28,7 @@ function getAllAlbums(callback, progress)
 	var _albumProgress = 0;
 
 	var _callback = callback;
-	var _progress = progress;
+	var _progressCallback = progressCallback;
 
 	getAlbumCount();
 
@@ -42,7 +42,7 @@ function getAllAlbums(callback, progress)
 	{
 		_albumCount = data.albumCount;
 
-		progress(_albumProgress, _albumCount);
+		_progressCallback(_albumProgress, _albumCount);
 		getAlbums();
 	}
 
@@ -62,7 +62,7 @@ function getAllAlbums(callback, progress)
 		_albumProgress += data.albumCount;
 		_albumList = _albumList.concat(data.albumData);
 
-		_progress(_albumProgress, _albumCount);
+		_progressCallback(_albumProgress, _albumCount);
 
 		if (_albumOffset >= _albumCount)
 		{
@@ -129,6 +129,46 @@ function getAllTags(callback, progress)
 	}
 }
 
+function chooseAlbum(artist, album)
+{
+	getAlbumTracks(artist, album, showAlbumTracks);
+}
+
+function getAlbumTracks(artist, album, callback)
+{
+	getTracks();
+
+	function getTracks()
+	{
+		var query = { call: 'getTracks', albumArtist: artist, album: album };
+		sendQuery(query);
+	}
+
+	msgHandlers['getTracksReply'] = function(data)
+	{
+		callback(data.trackList);
+	}
+}
+
+function showAlbumTracks(trackList)
+{
+	var html = '';
+
+	for (cnt = 0; cnt < trackList.length; cnt++)
+	{
+		var track = trackList[cnt];
+
+		if (!track)
+			continue;
+
+		html += '<a href="javascript:void(0)" onclick="playSong(' + track._id + ')"><img src="images/play.png" width="16px" height="16px" alt="Play" /></a>';
+		html += track.track + ' - ' + track.artist + ' - ' + track.song;
+		html += '<br />';
+	} 
+
+	$("#albumView").html(html);
+}
+
 function updateProgress(progress, tagCount)
 {
 	var html = progress + ' out of ' + tagCount + ' received.';
@@ -181,9 +221,9 @@ function displayAlbums(albumList)
 		if (!album)
 			continue;
 
-		html += '<a href="javascript:void(0)" onclick="playSong(' + album._id + ')"><img src="images/play.png" width="16px" height="16px" alt="Play" /></a>';
-		html += album.albumArtist + ' - ' + album.album + ' - ' + album.track;
-		html += '<br />';
+		html += '<a href="javascript:void(0)" onclick="chooseAlbum(&quot;' + album.albumArtist + '&quot;, &quot;' + album.album + '&quot;)">';
+		html += album.albumArtist + ' - ' + album.album;
+		html += '</a><br />';
 	} 
 
 	$("#result").html(html);

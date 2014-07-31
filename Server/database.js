@@ -116,11 +116,11 @@ function isAlbumInArray(albumList, album)
         if (album.albumArtist != tmpAlbum.albumArtist)
             return false;
 
-        if (album.album != tmpAlbum.album)
-            return false;
-        
-        return true;
-    }        
+        if (album.album == tmpAlbum.album)
+            return true;
+    }
+
+    return false;        
 }
 
 function getAlbumCount(callback)
@@ -178,6 +178,15 @@ function getAlbums(offset, albumsToGet, callback)
         });
 }
 
+function getAlbumTracks(albumArtist, album, callback)
+{
+    collection.find({ albumArtist: albumArtist, album: album }).sort({ track: 1 }).toArray(
+        function(error, docs)
+        {
+            callback(docs);
+        });
+}
+
 setupDatabase(setupDatabaseDone);
 
 module.exports.getTags = getTags;
@@ -187,3 +196,4 @@ module.exports.getAllTags = getAllTags;
 module.exports.getTagCount = getTagCount;
 module.exports.getAlbumCount = getAlbumCount;
 module.exports.getFileFromID = getFileFromID;
+module.exports.getAlbumTracks = getAlbumTracks;
