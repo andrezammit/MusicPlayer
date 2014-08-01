@@ -1,14 +1,26 @@
-var webSock = null;
+var MusicPlayer = window.MusicPlayer || {};
 
-function createWebSocket(callback, onMessageCallback)
+MusicPlayer.connect = (function()
 {
-    webSock = new WebSocket('ws://localhost:3001/');
+	var webSock = null;
 
-	webSock.onopen = callback;
-	webSock.onmessage = onMessageCallback;
-}
+	return {
+		createWebSocket: function(callback, onMessageCallback) 
+		{
+			webSock = new WebSocket('ws://localhost:3001/');
 
-function sendQuery(query)
-{
-	webSock.send(JSON.stringify(query));
-}
+			webSock.onopen = callback;
+			webSock.onmessage = onMessageCallback;
+		},
+
+		sendQuery: function(query)
+		{
+			webSock.send(JSON.stringify(query));
+		},
+
+		chooseAlbum: function(artist, album)
+		{
+			getAlbumTracks(artist, album, showAlbumTracks);
+		},
+	};
+}());

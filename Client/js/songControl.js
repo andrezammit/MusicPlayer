@@ -1,53 +1,65 @@
-var songLoaded = false;
-var audioTag = null;
+var MusicPlayer = window.MusicPlayer || {};
 
-function playSong(id)
+MusicPlayer.songControl = (function()
 {
-	audioTag.src = 'http://localhost:3002/' + id + '.mp3';
-	
-  audioTag.addEventListener('canplay', 
-		function()
+	var songLoaded = false;
+	var audioTag = null;
+
+	function updateControlButtons()
+	{
+		var playButton = $('#playButton');
+		
+		if (audioTag.paused)
 		{
-			songLoaded = true;
-			audioTag.play();
-		});
+			playButton.text('Play');
+		}
+		else
+		{
+			playButton.text('Pause');
+		}
+	};
 
-  audioTag.addEventListener('pause', onPause);
-	audioTag.addEventListener('play', onPlay);
-}
-
-function onPlay()
-{
-	updateControlButtons();
-}
-
-function onPause()
-{
-	updateControlButtons();
-}
-
-function updateControlButtons()
-{
-	var playButton = $('#playButton');
-	
-	if (audioTag.paused)
+	function onPlay()
 	{
-		playButton.text('Play');
+		updateControlButtons();
 	}
-	else
-	{
-		playButton.text('Pause');
-	}
-}
 
-function togglePlay()
-{
-	if (audioTag.paused)
+	function onPause()
 	{
-		audioTag.play();
+		updateControlButtons();
 	}
-	else
-	{
-		audioTag.pause();
-	}
-}
+
+	return {
+		togglePlay: function()
+		{
+			if (audioTag.paused)
+			{
+				audioTag.play();
+			}
+			else
+			{
+				audioTag.pause();
+			}
+		},
+
+		playSong: function(id)
+		{
+			audioTag.src = 'http://localhost:3002/' + id + '.mp3';
+			
+		  	audioTag.addEventListener('canplay', 
+				function()
+				{
+					songLoaded = true;
+					audioTag.play();
+				});
+
+		 	audioTag.addEventListener('pause', onPause);
+			audioTag.addEventListener('play', onPlay);
+		},
+
+		setAudioTag: function()
+		{
+    		audioTag = $("#currentPlaying")[0];
+		},
+	};
+}());

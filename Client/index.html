@@ -11,12 +11,15 @@
 
     <script type="text/javascript">
 
+    var musicPlayer = MusicPlayer.engine;
+    var songControl = MusicPlayer.songControl;
+
     $(document).ready(
     	function() 
     	{
-        connectWebSocket();
+        musicPlayer.connectWebSocket();
+        songControl.setAudioTag();
         
-    		audioTag = $("#currentPlaying")[0];
         //$("#getAllFiles").click(startGettingAlbums);
 		});
 
@@ -45,7 +48,7 @@
     </div>
 
   	<div id="controlBar">
-  		<a href="javascript:void(0)" onclick="togglePlay()" id="playButton"></a>
+  		<a href="javascript:void(0)" onclick="songControl.togglePlay()" id="playButton"></a>
       <div id="songInfo"></div>
   	</div>
 
