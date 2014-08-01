@@ -17,13 +17,16 @@
         connectWebSocket();
         
     		audioTag = $("#currentPlaying")[0];
-
-		    $("#getAllFiles").click(startGettingAlbums);
+        //$("#getAllFiles").click(startGettingAlbums);
 		});
 
     </script>
   </head>
   <body>
+    <h1 id="header">
+      MusicPlayer
+    </h1>
+
   	<input type="submit" value="Get file list" id="getAllFiles" />
 
   	<div id="progress">
@@ -43,7 +46,12 @@
 
   	<div id="controlBar">
   		<a href="javascript:void(0)" onclick="togglePlay()" id="playButton"></a>
-      <div id="songInfo"><div>
+      <div id="songInfo"></div>
   	</div>
+
+    <div id="loadingScreen">
+      <span class="helper"></span>
+      <img src='images/loading.gif' width='32px' height='32px' alt='loading...' />
+    </div>
   </body>
 </html>

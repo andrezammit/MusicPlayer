@@ -2,7 +2,13 @@ var msgHandlers = {};
 
 function connectWebSocket()
 {
-	createWebSocket(onWebSockMessage);
+	createWebSocket(onWebSockOpen, onWebSockMessage);
+}
+
+function onWebSockOpen()
+{
+	console.log('Connected!');
+	startGettingAlbums();
 }
 
 function onWebSockMessage(event)
@@ -178,7 +184,9 @@ function updateProgress(progress, tagCount)
 function startGettingTags()
 {
 	var loadingHtml = "<img src='images/loading.gif' width='32px' height='32px' alt='loading...' />";
-	$("#result").html(loadingHtml);
+	
+	$("#loadingScreen").html(loadingHtml);
+	$("#loadingScreen").show();
 
 	getAllTags(displayTags, updateProgress);
 }
@@ -200,14 +208,26 @@ function displayTags(tagList)
 	} 
 
 	$("#result").html(html);
+	$("#loadingScreen").hide();
 }
 
 function startGettingAlbums()
 {
-	var loadingHtml = "<img src='images/loading.gif' width='32px' height='32px' alt='loading...' />";
-	$("#result").html(loadingHtml);
+	$("#loadingScreen").show();
 
 	getAllAlbums(displayAlbums, updateProgress);
+}
+
+function onAlbumHover(tag)
+{
+	var headerTag = $("#header");
+	
+	headerTag.fadeOut(40,
+		function()
+		{
+			headerTag.html(tag.innerHTML);
+			headerTag.fadeIn();
+		});
 }
 
 function displayAlbums(albumList)
@@ -221,12 +241,13 @@ function displayAlbums(albumList)
 		if (!album)
 			continue;
 
-		html += '<a href="javascript:void(0)" onclick="chooseAlbum(&quot;' + album.albumArtist + '&quot;, &quot;' + album.album + '&quot;)">';
+		html += '<a href="javascript:void(0)" onmouseover="onAlbumHover(this)" onclick="chooseAlbum(&quot;' + album.albumArtist + '&quot;, &quot;' + album.album + '&quot;)">';
 		html += album.albumArtist + ' - ' + album.album;
 		html += '</a><br />';
 	} 
 
 	$("#result").html(html);
+	$("#loadingScreen").fadeOut();
 }
 
 

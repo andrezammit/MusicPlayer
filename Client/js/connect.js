@@ -1,16 +1,11 @@
 var webSock = null;
 
-function createWebSocket(onMessageCallback)
+function createWebSocket(callback, onMessageCallback)
 {
     webSock = new WebSocket('ws://localhost:3001/');
 
-	webSock.onopen = onWebSockOpen;
+	webSock.onopen = callback;
 	webSock.onmessage = onMessageCallback;
-}
-
-function onWebSockOpen()
-{
-	console.log('Connected!');
 }
 
 function sendQuery(query)
