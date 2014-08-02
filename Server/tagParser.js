@@ -143,7 +143,8 @@ function TagParser()
 			!_tag.song || 
 			!_tag.album || 
 			!_tag.albumArtist ||
-			!_tag.track)
+			!_tag.track ||
+			!_tag.year)
 			return false;
 
 		return true;
@@ -163,6 +164,8 @@ function TagParser()
 		case 'TPE2':
 		case 'TRK':
 		case 'TRCK':
+		case 'TYE':
+		case 'TYER':
 			return false;
 		}
 
@@ -372,6 +375,12 @@ function TagParser()
 				_tag.track = tmpTrack[0];
 			}
 			break;
+
+		case 'TYE':
+		case 'TYER':
+			{
+				_tag.year = frameData;
+			}
 		}
 
 		callback();
