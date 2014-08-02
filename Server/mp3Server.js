@@ -94,4 +94,4 @@ function processRequest(request, response)
 	database.getFileFromID(id, getFileFromIDDone);
 }
 
-http.createServer(processRequest).listen(3002, '127.0.0.1');
+http.createServer(processRequest).listen(3002, '0.0.0.0');

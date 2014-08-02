@@ -92,4 +92,4 @@ function processRequest(request, response)
     		});
 }
 
-http.createServer(processRequest).listen(3000, '127.0.0.1');
+http.createServer(processRequest).listen(3000, '0.0.0.0');
