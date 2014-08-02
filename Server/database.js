@@ -7,9 +7,9 @@ function saveTag(tag, callback)
 {
     var tmpArtist = tag.albumArtist || tag.artist;
 
-    console.log('Saving: ' + tmpArtist + ' - ' + tag.song + ' - ' + tag.album + ' - ' + tag.track);
+    console.log('Saving: ' + tmpArtist + ' - ' + tag.song + ' - ' + tag.album + ' - ' + tag.track + ' - ' + tag.year);
 
-    var doc = { artist: tag.artist, albumArtist: tag.albumArtist, song: tag.song, album: tag.album, track: parseInt(tag.track), path: tag.path };
+    var doc = { artist: tag.artist, albumArtist: tag.albumArtist, song: tag.song, album: tag.album, track: parseInt(tag.track), year: parseInt(tag.year), path: tag.path };
 
     collection.insert(doc, {w:1}, 
         function(error, result) 
@@ -107,20 +107,20 @@ function getFileFromID(id, callback)
         });
 }
 
-function isAlbumInArray(albumList, album)
+function isAlbumInArray(albumList, album, callback)
 {
     for (var cnt = 0; cnt < albumList.length; cnt++)
     {
         var tmpAlbum = albumList[cnt];
 
         if (album.albumArtist != tmpAlbum.albumArtist)
-            return false;
+            continue;
 
         if (album.album == tmpAlbum.album)
-            return true;
+            return cnt;
     }
 
-    return false;        
+    return -1;        
 }
 
 function getAlbumCount(callback)
@@ -132,7 +132,7 @@ function getAlbumCount(callback)
         {
             for (var cnt = 0; cnt < docs.length; cnt++)
             {
-                if (isAlbumInArray(albums, docs[cnt]))
+                if (isAlbumInArray(albums, docs[cnt]) > -1)
                     continue;
 
                 albums.push(docs[cnt]);
@@ -151,7 +151,7 @@ function getAllAlbums(callback)
         {
             for (var cnt = 0; cnt < docs.length; cnt++)
             {
-                if (isAlbumInArray(albums, docs[cnt]))
+                if (isAlbumInArray(albums, docs[cnt]) > -1)
                     continue;
 
                 albums.push(doc[cnt]);
@@ -163,13 +163,28 @@ function getAlbums(offset, albumsToGet, callback)
 {
     var albums = [];
 
-    collection.find( { }, { albumArtist: 1, album: 1 } ).toArray(
+    collection.find( { }, { albumArtist: 1, album: 1, year: 1 } ).sort({ year: 1 }).toArray(
         function(error, docs)
         {
             for (var cnt = 0; cnt < docs.length; cnt++)
             {
-                if (isAlbumInArray(albums, docs[cnt]))
-                    continue;
+                var index = isAlbumInArray(albums, docs[cnt]);
+
+                if (index > -1)
+                {
+                    // Check if the currently entry has a later year.
+                    if (albums[index].year < docs[cnt].year)
+                    {
+                        // Remove the previous entry so that we can add the new one.
+                        albums.splice(index, 1);
+
+                        // Add the item again at the back of the array so it will remain sorted.
+                    }
+                    else
+                    {
+                        continue;
+                    }
+                }
 
                 albums.push(docs[cnt]);
             }
