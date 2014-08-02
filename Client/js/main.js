@@ -162,8 +162,8 @@ MusicPlayer.engine = (function()
 			if (!track)
 				continue;
 
-			html += '<a href="javascript:void(0)" onclick="songControl.playSong(' + track._id + ')"><img src="images/play.png" width="16px" height="16px" alt="Play" /></a>';
-			html += track.track + ' - ' + track.song;
+			html += '<a href="javascript:void(0)" id="playButton" onclick="songControl.playSong(' + track._id + ')"><img src="images/play.png" width="16px" height="16px" alt="Play" /></a>';
+			html += '<div id="track">' + track.track + '</div><div id="song">' + track.song + '</div><div id="time">' + track.time + '</div>';
 			html += '<br />';
 		} 
 
