@@ -57,6 +57,47 @@
 	top: 0;
 	right: 15;
 	text-align: right;
-	position: relative;
+	position: absolute;
 	z-index: 2;
+}
+
+#artwork
+{
+	float: left;
+	width: 45%;
+	height: 100%;
+}
+
+#tracks
+{
+	width: 50%;
+	float: right;
+}
+
+#playButton
+{
+	float: left;
+	width: 20px;
+}
+
+#track
+{
+	float: left;
+	width: 25px;
+	text-align: center;
+}
+
+#song
+{
+	float: left;
+	width: 50%;
+	text-align: left;
+}
+
+#time
+{
+	float: right;
+	width: 30px;
+	text-align: right;
+	margin-right: 100px;
 }
