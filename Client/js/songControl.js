@@ -44,7 +44,8 @@ MusicPlayer.songControl = (function()
 
 		playSong: function(id)
 		{
-			audioTag.src = 'http://localhost:3002/' + id + '.mp3';
+			audioTag.src = 'http://' + window.location.hostname + ':3002/' + id + '.mp3';
+			audioTag.load();
 			
 		  	audioTag.addEventListener('canplay', 
 				function()
