@@ -1,3 +1,8 @@
+#header
+{
+	height: 50px;
+}
+
 #controlBar
 {
 	position: fixed; 
@@ -8,14 +13,24 @@
 	z-index: 2;
 }
 
+#albumViewContainer 
+{
+    position: fixed;
+	top: 50;
+	bottom: 50;
+	width: 100%;
+	z-index: 1;
+	display: none;
+}
+
 #albumView
 {
-	position: fixed; 
-	bottom: 50px; 
+	position: absolute;
+	bottom: 0;
 	width: 100%; 
-	height: 50px;
-	background-color: #FFFFFF; 
-	z-index: 1;
+	height: 100%;
+	background-color: #FFFFFF;
+	display: none;
 }
 
 #loadingScreen
@@ -35,4 +50,13 @@
     display: inline-block;
     height: 100%;
     vertical-align: middle;
+}
+
+#closeTracks
+{
+	top: 0;
+	right: 15;
+	text-align: right;
+	position: relative;
+	z-index: 2;
 }

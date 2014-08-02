@@ -163,11 +163,13 @@ MusicPlayer.engine = (function()
 				continue;
 
 			html += '<a href="javascript:void(0)" onclick="songControl.playSong(' + track._id + ')"><img src="images/play.png" width="16px" height="16px" alt="Play" /></a>';
-			html += track.track + ' - ' + track.artist + ' - ' + track.song;
+			html += track.track + ' - ' + track.song;
 			html += '<br />';
 		} 
 
-		$("#albumView").html(html);
+		$("#tracks").html(html);
+		$("#albumViewContainer").show();
+		$("#albumView").slideToggle();
 	}
 
 	function updateProgress(progress, tagCount)
@@ -266,6 +268,15 @@ MusicPlayer.engine = (function()
 		chooseAlbum: function(artist, album)
 		{
 			getAlbumTracks(artist, album, showAlbumTracks);
+		},
+
+		closeTracks: function()
+		{
+			$("#albumView").slideToggle(400, 
+				function()
+				{
+					$("#albumViewContainer").toggle();
+				});
 		},
 	};
 }());

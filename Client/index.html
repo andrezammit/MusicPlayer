@@ -19,8 +19,8 @@
     	{
         musicPlayer.connectWebSocket();
         songControl.setAudioTag();
-        
-        //$("#getAllFiles").click(startGettingAlbums);
+
+        $("#getAllFiles").click($("#currentPlaying")[0].play());
 		});
 
     </script>
@@ -44,7 +44,14 @@
   	<audio id="currentPlaying">
   	</audio>
 
-    <div id="albumView">
+    <div id="albumViewContainer">
+      <div id="albumView">
+        <div id="closeTracks">
+          <a href="javascript:void(0)" onclick="musicPlayer.closeTracks()"><img src='images/close.png' width='20px' height='20px' alt='close' /></a>
+        </div>
+        <div id="tracks">
+        </div>
+      </div>
     </div>
 
   	<div id="controlBar">
