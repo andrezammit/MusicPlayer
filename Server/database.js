@@ -166,6 +166,12 @@ function getAlbums(offset, albumsToGet, callback)
     collection.find( { }, { albumArtist: 1, album: 1, year: 1 } ).sort({ year: 1 }).toArray(
         function(error, docs)
         {
+            if (!docs)
+            {
+                callback();
+                return;
+            }
+
             for (var cnt = 0; cnt < docs.length; cnt++)
             {
                 var index = isAlbumInArray(albums, docs[cnt]);

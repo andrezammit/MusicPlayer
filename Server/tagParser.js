@@ -28,11 +28,33 @@ function trimNullChar(string)
 	return string;
 }
 
-function TagParser()
+function readUntilNullChar(buffer, offset)
 {
+	var result = '';
+
+	for (var cnt = offset; cnt < buffer.length; cnt++)
+	{
+		var currentByte = buffer[cnt];
+
+		if (currentByte == 0)
+			break;
+
+		result += String.fromCharCode(currentByte);
+	}
+
+	return result;
+}
+
+function TagParser(includeArtwork)
+{
+	if (!includeArtwork)
+		includeArtwork = false;
+
 	var _tagSize = 0;
 	var _tagOffset = 0;
 	var _tagMinorVer = 3;
+
+	var _includeArtwork = includeArtwork;
 
 	var _fd = null;
 
@@ -77,6 +99,14 @@ function TagParser()
 	function isEncodedFrame(frameID)
 	{
 		if (frameID[0] == 'T')
+			return true;
+
+		return false;
+	}
+
+	function isArtworkFrame(frameID)
+	{
+		if (frameID == 'APIC' || frameID == 'PIC')
 			return true;
 
 		return false;
@@ -147,6 +177,9 @@ function TagParser()
 			!_tag.year)
 			return false;
 
+		if (_includeArtwork && !_tag.artwork)
+			return false;
+
 		return true;
 	}
 
@@ -167,6 +200,11 @@ function TagParser()
 		case 'TYE':
 		case 'TYER':
 			return false;
+
+		case 'PIC':
+		case 'APIC':
+			if (_includeArtwork)
+				return false;
 		}
 
 		return true;
@@ -323,6 +361,26 @@ function TagParser()
 					tmpOffset += 2;
 				}
 			}
+			else if (isArtworkFrame(frameID))
+			{
+				var encodingByte = _dataBuffer.readUInt8(tmpOffset);
+				tmpOffset += 1;
+				tmpDataSize -= 1;
+
+				var mimeType = readUntilNullChar(_dataBuffer, tmpOffset);
+				tmpOffset += mimeType.length + 1;
+				tmpDataSize -= mimeType.length + 1;
+
+				var pictureType = _dataBuffer.readUInt8(tmpOffset);
+				tmpOffset += 1;
+				tmpDataSize -= 1;
+
+				var description = readUntilNullChar(_dataBuffer, tmpOffset);
+
+				// assumed that the description is using 1 byte per character and ignoring encodings.
+				tmpOffset += description.length + 1;
+				tmpDataSize -= description.length + 1;
+			}
 
 			frameData = _dataBuffer.toString(frameEncoding, tmpOffset, tmpOffset + tmpDataSize);
 		}
@@ -381,6 +439,14 @@ function TagParser()
 			{
 				_tag.year = frameData;
 			}
+			break;
+
+		case 'PIC':
+		case 'APIC':
+			{
+				_tag.artwork = frameData;
+			}
+			break;
 		}
 
 		callback();
