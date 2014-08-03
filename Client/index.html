@@ -3,6 +3,7 @@
     <title>MusicPlayer</title>
 
   	<link rel="stylesheet" type="text/css" href="inc/style.css">
+    <link href='http://fonts.googleapis.com/css?family=Roboto|Raleway' rel='stylesheet' type='text/css'>
 
   	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <script src="js/songControl.js"></script>
@@ -26,23 +27,12 @@
     </script>
   </head>
   <body>
-    <h1 id="header">
+    <div id="header">
       MusicPlayer
-    </h1>
-
-  	<input type="submit" value="Get file list" id="getAllFiles" />
-
-  	<div id="progress">
-  	</div>
-  	
-    <div>
     </div>
 
-  	<div id="result">
+  	<div id="albums">
   	</div>
-
-  	<audio id="currentPlaying">
-  	</audio>
 
     <div id="albumViewContainer">
       <div id="albumView">
@@ -60,6 +50,9 @@
   		<a href="javascript:void(0)" onclick="songControl.togglePlay()" id="playButton"></a>
       <div id="songInfo"></div>
   	</div>
+
+    <audio id="currentPlaying">
+    </audio>
 
     <div id="loadingScreen">
       <span class="helper"></span>

@@ -204,7 +204,7 @@ MusicPlayer.engine = (function()
 			html += '<br />';
 		} 
 
-		$("#result").html(html);
+		$("#albums").html(html);
 		$("#loadingScreen").hide();
 	}
 
@@ -238,12 +238,14 @@ MusicPlayer.engine = (function()
 			if (!album)
 				continue;
 
+			html += '<div id="album">';
 			html += '<a href="javascript:void(0)" onmouseover="musicPlayer.onAlbumHover(this)" onclick="musicPlayer.chooseAlbum(&quot;' + album.albumArtist + '&quot;, &quot;' + album.album + '&quot;)">';
 			html += album.albumArtist + ' - ' + album.album;
-			html += '</a><br />';
+			html += '</a>';
+			html += '</div>';
 		} 
 
-		$("#result").html(html);
+		$("#albums").html(html);
 		$("#loadingScreen").fadeOut();
 	}
 
