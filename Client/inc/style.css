@@ -49,8 +49,6 @@
 
 #albumImageLarge
 {
-	width: 80%;
-	height: 80%;
 }
 
 #albumViewContainer 
@@ -118,6 +116,17 @@
 {
 	float: left;
 	width: 20px;
+}
+
+.trackClass div
+{
+	height: 25px;
+	line-height: 25px;
+}
+
+.trackClass img
+{
+	margin-top: 4px;
 }
 
 #track
