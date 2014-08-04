@@ -76,7 +76,8 @@ function onWSConnection(webSock)
 							getAlbumArtwork(docs[cnt], 
 								function(tag, artwork)
 								{
-									tag.artwork = artwork;
+									tag.artwork = artwork.data;
+									tag.artworkType = artwork.type;
 
 									albumsDone++;
 
@@ -164,7 +165,8 @@ function getAlbumArtwork(tag, callback)
 							return;
 						}
 
-						callback(tag, tmpTag.artwork);
+						var artwork = { data: tmpTag.artwork, type: tmpTag.artworkType }
+						callback(tag, artwork);
 					});
 			})(index);
 		});

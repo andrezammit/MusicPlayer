@@ -380,6 +380,10 @@ function TagParser(includeArtwork)
 				// assumed that the description is using 1 byte per character and ignoring encodings.
 				tmpOffset += description.length + 1;
 				tmpDataSize -= description.length + 1;
+
+				_tag.artworkType = mimeType;
+
+				frameEncoding = 'base64';
 			}
 
 			frameData = _dataBuffer.toString(frameEncoding, tmpOffset, tmpOffset + tmpDataSize);

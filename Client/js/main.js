@@ -215,18 +215,6 @@ MusicPlayer.engine = (function()
 		getAllAlbums(displayAlbums, updateProgress);
 	}
 
-	function onAlbumHover(tag)
-	{
-		var headerTag = $("#header");
-		
-		headerTag.fadeOut(40,
-			function()
-			{
-				headerTag.html(tag.innerHTML);
-				headerTag.fadeIn();
-			});
-	}
-
 	function displayAlbums(albumList)
 	{
 		var html = '';
@@ -239,8 +227,8 @@ MusicPlayer.engine = (function()
 				continue;
 
 			html += '<div id="album">';
-			html += '<a href="javascript:void(0)" onmouseover="musicPlayer.onAlbumHover(this)" onclick="musicPlayer.chooseAlbum(&quot;' + album.albumArtist + '&quot;, &quot;' + album.album + '&quot;)">';
-			html += album.albumArtist + ' - ' + album.album;
+			html += '<a href="javascript:void(0)" onmouseover="musicPlayer.onAlbumHover(&quot;' + album.albumArtist + '&quot;, &quot;' + album.album + '&quot;)" onclick="musicPlayer.chooseAlbum(&quot;' + album.albumArtist + '&quot;, &quot;' + album.album + '&quot;)">';
+			html += '<img src="data:image/png;base64,' + album.artwork + '" alt="' + album.albumArtist + ' - ' + album.album + '" id="albumImage" />';
 			html += '</a>';
 			html += '</div>';
 		} 
@@ -255,14 +243,14 @@ MusicPlayer.engine = (function()
 			connect.createWebSocket(onWebSockOpen, onWebSockMessage);
 		},
 
-		onAlbumHover: function(tag)
+		onAlbumHover: function(artist, album)
 		{
 			var headerTag = $("#header");
 		
 			headerTag.fadeOut(40,
 				function()
 				{
-					headerTag.html(tag.innerHTML);
+					headerTag.text(artist + ' - ' + album);
 					headerTag.fadeIn();
 				});
 		},
