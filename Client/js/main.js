@@ -204,11 +204,9 @@ MusicPlayer.engine = (function()
 				continue;
 
 			html += '<div class="trackClass">';
-			html += '<a href="javascript:void(0)" id="playButton" class="trackClass" onclick="songControl.playSong(' + track._id + ')"><img src="images/play.png" width="16px" height="16px" alt="Play" /></a>';
+			html += '<a href="javascript:void(0)" id="playSong" onclick="songControl.playSong(' + track._id + ')"><img src="images/play.png" width="16px" height="16px" alt="Play" /></a>';
 			html += '<div id="track">' + track.track + '</div><div id="song">' + track.song + '</div><div id="time">' + track.time + '</div>';
-			html += '<div class="helper" />';
 			html += '</div>';
-			html += '<br />';
 		} 
 
 		$("#tracks").html(html);

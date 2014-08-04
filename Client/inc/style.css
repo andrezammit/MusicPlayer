@@ -112,26 +112,22 @@
 	float: right;
 }
 
-#playButton
+#playSong
 {
 	float: left;
 	width: 20px;
+	margin-top: 7px;
 }
 
 .trackClass div
 {
-	height: 25px;
-	line-height: 25px;
-}
-
-.trackClass img
-{
-	margin-top: 4px;
+	height: 30px;
+	line-height: 30px;
+	display: inline-block;
 }
 
 #track
 {
-	float: left;
 	width: 25px;
 	text-align: center;
 	font-size: small;
@@ -139,7 +135,6 @@
 
 #song
 {
-	float: left;
 	text-align: left;
 }
 
