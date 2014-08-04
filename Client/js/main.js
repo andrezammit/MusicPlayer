@@ -6,6 +6,15 @@ MusicPlayer.engine = (function()
 	var msgHandlers = {};
 
 	var chosenAlbumTag = null;
+	
+	(function()
+	{
+		$(window).resize(
+			function()
+			{
+				resizeArtwork($("#albumImageLarge"));
+	   		});
+	})();
 
 	function onWebSockOpen()
 	{
@@ -153,6 +162,36 @@ MusicPlayer.engine = (function()
 		}
 	}
 
+	function resizeArtwork(artworkTag)
+	{
+		if (!artworkTag)
+			return;
+
+		var parentTag = $(artworkTag).parent();
+		var parentWidth = parentTag.width() - 20;
+
+		parentWidth = Math.min(parentWidth, 800);
+		parentWidth = Math.max(parentWidth, 200);
+
+		var maxWidth = parentWidth; 					// Max width for the image
+        var maxHeight = maxWidth;						// Max height for the image
+        
+        var ratio = 0;  								// Used for aspect ratio
+        
+        var width = artworkTag.width();    				// Current image width
+        var height = artworkTag.height();  				// Current image height
+
+		ratio = maxWidth / width;   				// get ratio for scaling image
+		
+		artworkTag.css("width", maxWidth); 			// Set new width
+		artworkTag.css("height", height * ratio);  	// Scale height based on ratio
+
+		ratio = maxHeight / height; 				// get ratio for scaling image
+
+		artworkTag.css("height", maxHeight);   		// Set new height
+		artworkTag.css("width", width * ratio);    	// Scale width based on ratio
+	}
+
 	function showAlbumTracks(trackList)
 	{
 		var html = '';
@@ -164,8 +203,11 @@ MusicPlayer.engine = (function()
 			if (!track)
 				continue;
 
-			html += '<a href="javascript:void(0)" id="playButton" onclick="songControl.playSong(' + track._id + ')"><img src="images/play.png" width="16px" height="16px" alt="Play" /></a>';
+			html += '<div class="trackClass">';
+			html += '<a href="javascript:void(0)" id="playButton" class="trackClass" onclick="songControl.playSong(' + track._id + ')"><img src="images/play.png" width="16px" height="16px" alt="Play" /></a>';
 			html += '<div id="track">' + track.track + '</div><div id="song">' + track.song + '</div><div id="time">' + track.time + '</div>';
+			html += '<div class="helper" />';
+			html += '</div>';
 			html += '<br />';
 		} 
 
@@ -177,6 +219,8 @@ MusicPlayer.engine = (function()
 
 		html = '<img src="' + albumImage.attr('src') + '" id="albumImageLarge" />';
 		$("#artwork").html(html);
+
+		resizeArtwork($("#albumImageLarge"));
 	}
 
 	function updateProgress(progress, tagCount)
