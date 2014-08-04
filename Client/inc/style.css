@@ -119,6 +119,7 @@
 	float: left;
 	width: 25px;
 	text-align: center;
+	font-size: small;
 }
 
 #song
@@ -133,4 +134,5 @@
 	width: 30px;
 	text-align: right;
 	margin-right: 100px;
+	font-size: small;
 }
