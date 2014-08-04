@@ -367,9 +367,20 @@ function TagParser(includeArtwork)
 				tmpOffset += 1;
 				tmpDataSize -= 1;
 
-				var mimeType = readUntilNullChar(_dataBuffer, tmpOffset);
-				tmpOffset += mimeType.length + 1;
-				tmpDataSize -= mimeType.length + 1;
+				var mimeType = 'PNG';
+
+				if (_tagMinorVer == 2)
+				{
+					mimeType = _dataBuffer.toString('ascii', tmpOffset, tmpOffset + 3);
+					tmpOffset += 3;
+					tmpDataSize -= 3;
+				}
+				else
+				{
+					mimeType = readUntilNullChar(_dataBuffer, tmpOffset);
+					tmpOffset += mimeType.length + 1;
+					tmpDataSize -= mimeType.length + 1;
+				}
 
 				var pictureType = _dataBuffer.readUInt8(tmpOffset);
 				tmpOffset += 1;
