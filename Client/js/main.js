@@ -5,6 +5,8 @@ MusicPlayer.engine = (function()
 	var connect = MusicPlayer.connect;
 	var msgHandlers = {};
 
+	var chosenAlbumTag = null;
+
 	function onWebSockOpen()
 	{
 		console.log('Connected!');
@@ -170,6 +172,11 @@ MusicPlayer.engine = (function()
 		$("#tracks").html(html);
 		$("#albumViewContainer").show();
 		$("#albumView").slideToggle();
+
+		var albumImage = $(chosenAlbumTag).find('img');
+
+		html = '<img src="' + albumImage.attr('src') + '" id="albumImageLarge" />';
+		$("#artwork").html(html);
 	}
 
 	function updateProgress(progress, tagCount)
@@ -227,8 +234,8 @@ MusicPlayer.engine = (function()
 				continue;
 
 			html += '<div id="album">';
-			html += '<a href="javascript:void(0)" onmouseover="musicPlayer.onAlbumHover(&quot;' + album.albumArtist + '&quot;, &quot;' + album.album + '&quot;)" onclick="musicPlayer.chooseAlbum(&quot;' + album.albumArtist + '&quot;, &quot;' + album.album + '&quot;)">';
-			html += '<img src="data:image/png;base64,' + album.artwork + '" alt="' + album.albumArtist + ' - ' + album.album + '" id="albumImage" />';
+			html += '<a href="javascript:void(0)" onmouseover="musicPlayer.onAlbumHover(&quot;' + album.albumArtist + '&quot;, &quot;' + album.album + '&quot;)" onclick="musicPlayer.chooseAlbum(&quot;' + album.albumArtist + '&quot;, &quot;' + album.album + '&quot;, this)">';
+			html += '<img src="data:image/png;base64,' + album.artwork + '" alt="' + album.albumArtist + ' - ' + album.album + '" id="albumImageSmall" />';
 			html += '</a>';
 			html += '</div>';
 		} 
@@ -255,8 +262,9 @@ MusicPlayer.engine = (function()
 				});
 		},
 
-		chooseAlbum: function(artist, album)
+		chooseAlbum: function(artist, album, tag)
 		{
+			chosenAlbumTag = tag;
 			getAlbumTracks(artist, album, showAlbumTracks);
 		},
 
