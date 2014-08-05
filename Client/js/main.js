@@ -294,7 +294,7 @@ MusicPlayer.engine = (function()
 
 		onAlbumHover: function(artist, album)
 		{
-			var headerTag = $("#header");
+			var headerTag = $("#albumName");
 		
 			headerTag.fadeOut(40,
 				function()
