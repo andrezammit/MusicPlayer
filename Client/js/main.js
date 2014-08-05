@@ -91,61 +91,6 @@ MusicPlayer.engine = (function()
 		}
 	}
 
-	function getAllTags(callback, progress)
-	{
-		var _tagList = [];
-
-		var _tagCount = 0;
-		var _tagOffset = 0;
-		var _tagProgress = 0;
-
-		var _callback = callback;
-		var _progress = progress;
-
-		getTagCount();
-
-		function getTagCount()
-		{
-			var query = { call: 'getTagCount' };
-			connect.sendQuery(query);
-		}
-
-		msgHandlers['getTagCountReply'] = function(data)
-		{
-			_tagCount = data.tagCount;
-
-			progress(_tagProgress, _tagCount);
-			getTags();
-		}
-
-		function getTags()
-		{
-			var tagsRemaning = _tagCount - _tagOffset;
-			var tagsToGet = Math.min(100, tagsRemaning);
-
-			var query = { call: 'getTags', offset: _tagOffset, tagsToGet: tagsToGet };
-			connect.sendQuery(query);
-		}
-
-		msgHandlers['getTagsReply'] = function(data)
-		{
-			_tagOffset += data.tagCount;
-			
-			_tagProgress += data.tagCount;
-			_tagList = _tagList.concat(data.tagData);
-
-			_progress(_tagProgress, _tagCount);
-
-			if (_tagOffset >= _tagCount)
-			{
-				_callback(_tagList);
-				return;
-			}
-
-			getTags();
-		}
-	}
-
 	function getAlbumTracks(artist, album, callback)
 	{
 		getTracks();
@@ -173,13 +118,13 @@ MusicPlayer.engine = (function()
 		parentWidth = Math.min(parentWidth, 800);
 		parentWidth = Math.max(parentWidth, 200);
 
-		var maxWidth = parentWidth; 					// Max width for the image
-        var maxHeight = maxWidth;						// Max height for the image
+		var maxWidth = parentWidth; 				// Max width for the image
+        var maxHeight = maxWidth;					// Max height for the image
         
-        var ratio = 0;  								// Used for aspect ratio
+        var ratio = 0;  							// Used for aspect ratio
         
-        var width = artworkTag.width();    				// Current image width
-        var height = artworkTag.height();  				// Current image height
+        var width = artworkTag.width();    			// Current image width
+        var height = artworkTag.height();  			// Current image height
 
 		ratio = maxWidth / width;   				// get ratio for scaling image
 		
@@ -194,22 +139,39 @@ MusicPlayer.engine = (function()
 
 	function showAlbumTracks(trackList)
 	{
-		var html = '';
+		var trackContainer = $('#tracks');
+		trackContainer.empty();
 
 		for (cnt = 0; cnt < trackList.length; cnt++)
 		{
-			var track = trackList[cnt];
+			(function(track)
+			{
+				if (!track)
+					return;
 
-			if (!track)
-				continue;
+				var newTrack = $(".templates").find('#trackEntry').clone();
 
-			html += '<div class="trackClass">';
-			html += '<a href="javascript:void(0)" id="playSong" onclick="songControl.playSong(' + track._id + ')"><img src="images/play.png" width="16px" height="16px" alt="Play" /></a>';
-			html += '<div id="track">' + track.track + '</div><div id="song">' + track.song + '</div><div id="time">' + track.time + '</div>';
-			html += '</div>';
-		} 
+				newTrack.find("#track").html(track.track);
+				newTrack.find("#song").html(track.song);
+				newTrack.find("#time").html(track.time);
 
-		$("#tracks").html(html);
+				var playLink = newTrack.find("#playSong");
+
+				(function(trackID)
+				{
+					playLink.click(
+						function()
+						{
+							songControl.playSong(trackID);
+						});
+
+				})(track._id);
+
+				trackContainer.append(newTrack);
+
+			}(trackList[cnt]));
+		}
+
 		$("#albumViewContainer").show();
 		$("#albumView").slideToggle();
 
@@ -227,36 +189,6 @@ MusicPlayer.engine = (function()
 		$("#progress").html(html); 
 	}
 
-	function startGettingTags()
-	{
-		var loadingHtml = "<img src='images/loading.gif' width='32px' height='32px' alt='loading...' />";
-		
-		$("#loadingScreen").html(loadingHtml);
-		$("#loadingScreen").show();
-
-		getAllTags(displayTags, updateProgress);
-	}
-
-	function displayTags(tagList)
-	{
-		var html = '';
-
-		for (cnt = 0; cnt < tagList.length; cnt++)
-		{
-			var tag = tagList[cnt];
-
-			if (!tag)
-				continue;
-
-			html += '<a href="javascript:void(0)" onclick="songControl.playSong(' + tag._id + ')"><img src="images/play.png" width="16px" height="16px" alt="Play" /></a>';
-			html += tag.artist + ' - ' + tag.album + ' - ' + tag.track;
-			html += '<br />';
-		} 
-
-		$("#albums").html(html);
-		$("#loadingScreen").hide();
-	}
-
 	function startGettingAlbums()
 	{
 		$("#loadingScreen").show();
@@ -266,23 +198,46 @@ MusicPlayer.engine = (function()
 
 	function displayAlbums(albumList)
 	{
-		var html = '';
+		var albumContainer = $('#albums');
+		albumContainer.empty();
 
 		for (cnt = 0; cnt < albumList.length; cnt++)
 		{
-			var album = albumList[cnt];
+			(function(album)
+			{
+				if (!album)
+					return;
 
-			if (!album)
-				continue;
+				var newAlbum = $(".templates").find('#albumEntry').clone();
 
-			html += '<div id="album">';
-			html += '<a href="javascript:void(0)" onmouseover="musicPlayer.onAlbumHover(&quot;' + album.albumArtist + '&quot;, &quot;' + album.album + '&quot;)" onclick="musicPlayer.chooseAlbum(&quot;' + album.albumArtist + '&quot;, &quot;' + album.album + '&quot;, this)">';
-			html += '<img src="data:image/png;base64,' + album.artwork + '" alt="' + album.albumArtist + ' - ' + album.album + '" id="albumImageSmall" />';
-			html += '</a>';
-			html += '</div>';
+				var albumLink = newAlbum.find("#albumLink");
+				
+				(function(album)
+				{
+					albumLink.click(
+						function()
+						{
+							musicPlayer.chooseAlbum(album.albumArtist, album.album, albumLink[0]);
+						});
+
+					albumLink.hover(
+						function()
+						{
+							musicPlayer.onAlbumHover(album.albumArtist, album.album);
+						});
+
+				})(album);
+
+				var albumArtwork = newAlbum.find("#albumImageSmall");
+
+				albumArtwork.attr('src', 'data:image/png;base64,' + album.artwork);
+				albumArtwork.attr('alt', album.albumArtist + ' - ' + album.album);
+
+				albumContainer.append(newAlbum);
+
+			}(albumList[cnt]));
 		} 
 
-		$("#albums").html(html);
 		$("#loadingScreen").fadeOut();
 	}
 

@@ -6,6 +6,7 @@
     <link href='http://fonts.googleapis.com/css?family=Roboto|Raleway' rel='stylesheet' type='text/css'>
 
   	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    
     <script src="js/songControl.js"></script>
     <script src="js/connect.js"></script>
     <script src="js/main.js"></script>
@@ -48,7 +49,7 @@
       </div>
     </div>
 
-    <div height="50px" width="100%">
+    <div id="footer">
     </div>
 
   	<div id="controlBar">
@@ -63,5 +64,21 @@
       <span class="helper"></span>
       <img src='images/loading.gif' width='32px' height='32px' alt='loading...' />
     </div>
+
+    <div class="templates">
+      <div id="albumEntry">
+        <a href="javascript:void(0)" id="albumLink">
+          <img id="albumImageSmall" />
+        </a>
+      </div>
+
+      <div id="trackEntry" class="trackClass">
+        <a href="javascript:void(0)" id="playButtonSmall">
+          <img src="images/play.png" width="16px" height="16px" alt="Play" />
+        </a>
+        <div id="track"></div><div id="song"></div><div id="time"></div>
+      </div>
+    </div>
+
   </body>
 </html>
