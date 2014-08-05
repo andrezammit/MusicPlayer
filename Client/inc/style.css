@@ -4,6 +4,12 @@
 	font-weight: 400;
 }
 
+#loadingImage
+{
+	width: 32px; 
+	height: 32px;
+}
+
 #header
 {
 	position: fixed;
@@ -106,6 +112,12 @@
 	z-index: 2;
 }
 
+#closeTracksImage
+{
+	height: 20px;
+	width: 20px;
+}
+
 #artwork
 {
 	float: left;
@@ -129,6 +141,12 @@
 	float: left;
 	width: 20px;
 	margin-top: 7px;
+}
+
+#playButtonImage
+{
+	width: 16px;
+	height: 16px;
 }
 
 .trackClass div

@@ -20,9 +20,9 @@
     	function() 
     	{
         musicPlayer.connectWebSocket();
+        musicPlayer.setupHandlers();
+        
         songControl.setAudioTag();
-
-        $("#getAllFiles").click($("#currentPlaying")[0].play());
 		});
 
     </script>
@@ -40,7 +40,9 @@
     <div id="albumViewContainer">
       <div id="albumView">
         <div id="closeTracks">
-          <a href="javascript:void(0)" onclick="musicPlayer.closeTracks()"><img src='images/close.png' width='20px' height='20px' alt='close' /></a>
+          <a href="javascript:void(0)" id="closeTracksLink">
+            <img src='images/close.png' id="closeTracksImage" alt='Close' />
+          </a>
         </div>
         <div id="artwork">
         </div>
@@ -53,7 +55,7 @@
     </div>
 
   	<div id="controlBar">
-  		<a href="javascript:void(0)" onclick="songControl.togglePlay()" id="playButton"></a>
+  		<a href="javascript:void(0)" id="playButton"></a>
       <div id="songInfo"></div>
   	</div>
 
@@ -62,7 +64,7 @@
 
     <div id="loadingScreen">
       <span class="helper"></span>
-      <img src='images/loading.gif' width='32px' height='32px' alt='loading...' />
+      <img src='images/loading.gif' id="loadingImage" alt='Loading...' />
     </div>
 
     <div class="templates">
@@ -74,7 +76,7 @@
 
       <div id="trackEntry" class="trackClass">
         <a href="javascript:void(0)" id="playButtonSmall">
-          <img src="images/play.png" width="16px" height="16px" alt="Play" />
+          <img src="images/play.png" id="playButtonImage" alt="Play" />
         </a>
         <div id="track"></div><div id="song"></div><div id="time"></div>
       </div>

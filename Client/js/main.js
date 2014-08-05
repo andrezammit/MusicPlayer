@@ -36,6 +36,21 @@ MusicPlayer.engine = (function()
 		callback(data);
 	}
 
+	function setupHandlers()
+	{
+		$("#closeTracksLink").click(
+			function()
+			{
+				musicPlayer.closeTracks();
+			});
+
+		$("#playButton").click(
+			function()
+			{
+				songControl.togglePlay();
+			});
+	}
+
 	function getAllAlbums(callback, progressCallback)
 	{
 		var _albumList = [];
@@ -119,7 +134,7 @@ MusicPlayer.engine = (function()
 		parentWidth = Math.max(parentWidth, 200);
 
 		var maxWidth = parentWidth; 				// Max width for the image
-        var maxHeight = maxWidth;					// Max height for the image
+        var maxHeight = parentTag.height();			// Max height for the image
         
         var ratio = 0;  							// Used for aspect ratio
         
@@ -155,7 +170,7 @@ MusicPlayer.engine = (function()
 				newTrack.find("#song").html(track.song);
 				newTrack.find("#time").html(track.time);
 
-				var playLink = newTrack.find("#playSong");
+				var playLink = newTrack.find("#playButtonSmall");
 
 				(function(trackID)
 				{
@@ -173,14 +188,18 @@ MusicPlayer.engine = (function()
 		}
 
 		$("#albumViewContainer").show();
-		$("#albumView").slideToggle();
+		$("#albumView").slideToggle(400, 
+			function()
+			{
+				resizeArtwork($("#albumImageLarge"));
+			});
 
 		var albumImage = $(chosenAlbumTag).find('img');
 
 		html = '<img src="' + albumImage.attr('src') + '" id="albumImageLarge" />';
 		$("#artwork").html(html);
 
-		resizeArtwork($("#albumImageLarge"));
+		
 	}
 
 	function updateProgress(progress, tagCount)
@@ -245,6 +264,11 @@ MusicPlayer.engine = (function()
 		connectWebSocket: function() 
 		{
 			connect.createWebSocket(onWebSockOpen, onWebSockMessage);
+		},
+
+		setupHandlers: function()
+		{
+			setupHandlers();
 		},
 
 		onAlbumHover: function(artist, album)
