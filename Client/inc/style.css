@@ -41,7 +41,7 @@
 	text-align: center;
 }
 
-#album
+#albumEntry
 {
 	width: 200px;
 	height: 200px;
@@ -109,17 +109,22 @@
 #artwork
 {
 	float: left;
+	
 	width: 50%;
 	height: 100%;
 }
 
 #tracks
 {
-	width: 50%;
 	float: right;
+	
+	width: 50%;
+	height: 100%;
+
+	overflow: auto;
 }
 
-#playSong
+#playButtonSmall
 {
 	float: left;
 	width: 20px;
@@ -152,4 +157,15 @@
 	text-align: right;
 	margin-right: 100px;
 	font-size: small;
+}
+
+#footer
+{
+	height: 50px;
+	width: 100%;
+}
+
+.templates
+{
+	display: none;
 }
