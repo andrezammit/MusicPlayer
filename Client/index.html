@@ -21,7 +21,7 @@
     	{
         musicPlayer.connectWebSocket();
         musicPlayer.setupHandlers();
-        
+
         songControl.setAudioTag();
 		});
 
@@ -34,13 +34,15 @@
       </div>
     </div>
 
-  	<div id="albums">
-  	</div>
+    <div id="albumsContainer">
+  	 <div id="albums">
+  	 </div>
+    </div>
 
     <div id="albumViewContainer">
       <div id="albumView">
         <div id="closeTracks">
-          <a href="javascript:void(0)" id="closeTracksLink">
+          <a id="closeTracksLink">
             <img src='images/close.png' id="closeTracksImage" alt='Close' />
           </a>
         </div>
@@ -55,7 +57,7 @@
     </div>
 
   	<div id="controlBar">
-  		<a href="javascript:void(0)" id="playButton"></a>
+  		<a id="playButton"></a>
       <div id="songInfo"></div>
   	</div>
 
@@ -69,13 +71,13 @@
 
     <div class="templates">
       <div id="albumEntry">
-        <a href="javascript:void(0)" id="albumLink">
+        <a id="albumLink">
           <img id="albumImageSmall" />
         </a>
       </div>
 
       <div id="trackEntry" class="trackClass">
-        <a href="javascript:void(0)" id="playButtonSmall">
+        <a id="playButtonSmall">
           <img src="images/play.png" id="playButtonImage" alt="Play" />
         </a>
         <div id="track"></div><div id="song"></div><div id="time"></div>

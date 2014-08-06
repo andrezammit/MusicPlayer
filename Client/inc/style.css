@@ -4,6 +4,11 @@
 	font-weight: 400;
 }
 
+a:hover
+{
+	cursor: pointer;
+}
+
 #loadingImage
 {
 	width: 32px; 
@@ -22,7 +27,7 @@
 	padding-bottom: 15px;
 
 	z-index: 1;
-	
+
 	background: rgba(255, 255, 255, 0.8);
 }
 
@@ -43,10 +48,15 @@
 	background: rgba(255, 255, 255, 0.8);
 }
 
-#albums
+#albumsContainer
 {
 	margin-top: 80px;
 	text-align: center;
+}
+
+#albums
+{
+	text-align: left;
 }
 
 #albumEntry
