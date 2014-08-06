@@ -207,7 +207,7 @@ MusicPlayer.engine = (function()
 
 		html = '<img src="' + albumImage.attr('src') + '" id="albumImageLarge" />';
 		$("#artwork").html(html);
-		
+
 		$("#albums").css('webkitFilter', 'blur(20px)');
 
 		$("#albumViewContainer").show();
@@ -259,6 +259,10 @@ MusicPlayer.engine = (function()
 						function()
 						{
 							musicPlayer.onAlbumHover(album.albumArtist, album.album);
+						},
+						function()
+						{
+							musicPlayer.onAlbumOut();
 						});
 
 				})(album);
@@ -277,6 +281,18 @@ MusicPlayer.engine = (function()
 			function()
 			{
 				$("#loadingScreen").fadeOut();
+			});
+	}
+
+	function onAlbumOut()
+	{
+		var headerTag = $("#albumName");
+		
+		headerTag.fadeOut(40,
+			function()
+			{
+				headerTag.text('MusicPlayer');
+				headerTag.fadeIn();
 			});
 	}
 
@@ -301,6 +317,11 @@ MusicPlayer.engine = (function()
 					headerTag.text(artist + ' - ' + album);
 					headerTag.fadeIn();
 				});
+		},
+
+		onAlbumOut: function()
+		{
+			onAlbumOut();
 		},
 
 		chooseAlbum: function(artist, album, tag)
