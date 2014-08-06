@@ -13,6 +13,7 @@ MusicPlayer.engine = (function()
 			function()
 			{
 				resizeArtwork($("#albumImageLarge"));
+				resizeAlbumContainer();
 	   		});
 	})();
 
@@ -143,13 +144,28 @@ MusicPlayer.engine = (function()
 
 		ratio = maxWidth / width;   				// get ratio for scaling image
 		
-		artworkTag.css("width", maxWidth); 			// Set new width
-		artworkTag.css("height", height * ratio);  	// Scale height based on ratio
+		artworkTag.css('width', maxWidth); 			// Set new width
+		artworkTag.css('height', height * ratio);  	// Scale height based on ratio
 
 		ratio = maxHeight / height; 				// get ratio for scaling image
 
-		artworkTag.css("height", maxHeight);   		// Set new height
-		artworkTag.css("width", width * ratio);    	// Scale width based on ratio
+		artworkTag.css('height', maxHeight);   		// Set new height
+		artworkTag.css('width', width * ratio);    	// Scale width based on ratio
+	}
+
+	function resizeAlbumContainer(callback)
+	{
+		var albumContainer = $("#albumsContainer");
+		var albumTemplate = $(".templates").find("#albumEntry");
+		var albumContainerParent = albumContainer.parent();		
+
+		var albumsToFit = Math.floor(albumContainerParent.width() / albumTemplate.width());
+
+		var containerWidth = albumsToFit * albumTemplate.width();
+		albumContainer.css('width', containerWidth);
+
+		if (callback)
+			callback();
 	}
 
 	function showAlbumTracks(trackList)
@@ -257,7 +273,11 @@ MusicPlayer.engine = (function()
 			}(albumList[cnt]));
 		} 
 
-		$("#loadingScreen").fadeOut();
+		resizeAlbumContainer(
+			function()
+			{
+				$("#loadingScreen").fadeOut();
+			});
 	}
 
 	return {
