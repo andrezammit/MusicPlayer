@@ -21,6 +21,8 @@
 	padding-top: 15px;
 	padding-bottom: 15px;
 
+	z-index: 1;
+	
 	background: rgba(255, 255, 255, 0.8);
 }
 
@@ -80,7 +82,7 @@
 	bottom: 0px;
 	width: 100%; 
 	height: 100%;
-	background-color: #FFFFFF;
+	background: rgba(255, 255, 255, 0.7);
 	display: none;
 }
 

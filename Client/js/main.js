@@ -187,6 +187,8 @@ MusicPlayer.engine = (function()
 			}(trackList[cnt]));
 		}
 
+		$("#albums").css('webkitFilter', 'blur(20px)');
+
 		$("#albumViewContainer").show();
 		$("#albumView").slideToggle(400, 
 			function()
@@ -198,8 +200,6 @@ MusicPlayer.engine = (function()
 
 		html = '<img src="' + albumImage.attr('src') + '" id="albumImageLarge" />';
 		$("#artwork").html(html);
-
-		
 	}
 
 	function updateProgress(progress, tagCount)
@@ -291,6 +291,8 @@ MusicPlayer.engine = (function()
 
 		closeTracks: function()
 		{
+			$("#albums").css('webkitFilter', 'blur(0px)');
+
 			$("#albumView").slideToggle(400, 
 				function()
 				{
