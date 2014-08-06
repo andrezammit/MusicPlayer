@@ -123,7 +123,7 @@ MusicPlayer.engine = (function()
 		}
 	}
 
-	function resizeArtwork(artworkTag)
+	function resizeArtwork(artworkTag, callback)
 	{
 		if (!artworkTag)
 			return;
@@ -151,6 +151,9 @@ MusicPlayer.engine = (function()
 
 		artworkTag.css('height', maxHeight);   		// Set new height
 		artworkTag.css('width', width * ratio);    	// Scale width based on ratio
+
+		if (callback)
+			callback();
 	}
 
 	function resizeAlbumContainer(callback)
@@ -163,6 +166,9 @@ MusicPlayer.engine = (function()
 
 		var containerWidth = albumsToFit * albumTemplate.width();
 		albumContainer.css('width', containerWidth);
+
+		var header = $("#header");
+		header.css('margin-left', albumContainer.css('margin-left'));
 
 		if (callback)
 			callback();
@@ -208,13 +214,17 @@ MusicPlayer.engine = (function()
 		html = '<img src="' + albumImage.attr('src') + '" id="albumImageLarge" />';
 		$("#artwork").html(html);
 
-		$("#albums").css('webkitFilter', 'blur(20px)');
-
-		$("#albumViewContainer").show();
-		$("#albumView").slideToggle(400, 
+		$.when($("#albumViewContainer").show(),
+			$("#albumView").slideToggle(400)).done(
 			function()
 			{
-				resizeArtwork($("#albumImageLarge"));
+				$("#albums").css('webkitFilter', 'blur(20px)')
+
+				resizeArtwork($("#albumImageLarge"), 
+					function()
+					{
+						$("#albumImageLarge").fadeIn();
+					});
 			});
 	}
 
@@ -284,7 +294,7 @@ MusicPlayer.engine = (function()
 			});
 	}
 
-	function onAlbumHover()
+	function onAlbumHover(artist, album)
 	{
 		var headerTag = $("#albumName");
 		
@@ -298,6 +308,11 @@ MusicPlayer.engine = (function()
 
 	function onAlbumOut()
 	{
+		// If an album is open we don't want to change the header.
+
+		if ($("#albumViewContainer").is(":visible"))
+			return;
+
 		var headerTag = $("#albumName");
 		
 		headerTag.fadeOut(40,
@@ -332,7 +347,7 @@ MusicPlayer.engine = (function()
 
 		onAlbumHover: function(artist, album)
 		{
-			onAlbumHover();
+			onAlbumHover(artist, album);
 		},
 
 		onAlbumOut: function()
