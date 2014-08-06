@@ -284,6 +284,18 @@ MusicPlayer.engine = (function()
 			});
 	}
 
+	function onAlbumHover()
+	{
+		var headerTag = $("#albumName");
+		
+		headerTag.fadeOut(40,
+			function()
+			{
+				headerTag.text(artist + ' - ' + album);
+				headerTag.fadeIn();
+			});
+	}
+
 	function onAlbumOut()
 	{
 		var headerTag = $("#albumName");
@@ -293,6 +305,17 @@ MusicPlayer.engine = (function()
 			{
 				headerTag.text('MusicPlayer');
 				headerTag.fadeIn();
+			});
+	}
+
+	function closeTracks()
+	{
+		$("#albums").css('webkitFilter', 'blur(0px)');
+
+		$("#albumView").slideToggle(400, 
+			function()
+			{
+				$("#albumViewContainer").toggle();
 			});
 	}
 
@@ -309,14 +332,7 @@ MusicPlayer.engine = (function()
 
 		onAlbumHover: function(artist, album)
 		{
-			var headerTag = $("#albumName");
-		
-			headerTag.fadeOut(40,
-				function()
-				{
-					headerTag.text(artist + ' - ' + album);
-					headerTag.fadeIn();
-				});
+			onAlbumHover();
 		},
 
 		onAlbumOut: function()
@@ -332,13 +348,7 @@ MusicPlayer.engine = (function()
 
 		closeTracks: function()
 		{
-			$("#albums").css('webkitFilter', 'blur(0px)');
-
-			$("#albumView").slideToggle(400, 
-				function()
-				{
-					$("#albumViewContainer").toggle();
-				});
+			closeTracks();
 		},
 	};
 }());
