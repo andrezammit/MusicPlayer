@@ -203,6 +203,11 @@ MusicPlayer.engine = (function()
 			}(trackList[cnt]));
 		}
 
+		var albumImage = $(chosenAlbumTag).find('img');
+
+		html = '<img src="' + albumImage.attr('src') + '" id="albumImageLarge" />';
+		$("#artwork").html(html);
+		
 		$("#albums").css('webkitFilter', 'blur(20px)');
 
 		$("#albumViewContainer").show();
@@ -211,11 +216,6 @@ MusicPlayer.engine = (function()
 			{
 				resizeArtwork($("#albumImageLarge"));
 			});
-
-		var albumImage = $(chosenAlbumTag).find('img');
-
-		html = '<img src="' + albumImage.attr('src') + '" id="albumImageLarge" />';
-		$("#artwork").html(html);
 	}
 
 	function updateProgress(progress, tagCount)
