@@ -68,14 +68,14 @@ a:hover
 	text-align: left;
 }
 
-#albumEntry
+.albumEntry
 {
 	width: 200px;
 	height: 200px;
 	display: inline-block;
 }
 
-#albumImageSmall
+.albumImageSmall
 {
 	width: 200px;
 	height: 200px;
@@ -160,39 +160,39 @@ a:hover
 	overflow: auto;
 }
 
-#playButtonSmall
+.playButtonSmall
 {
 	float: left;
 	width: 20px;
 	margin-top: 7px;
 }
 
-#playButtonImage
+.playButtonImage
 {
 	width: 16px;
 	height: 16px;
 }
 
-.trackClass div
+.trackEntry div
 {
 	height: 30px;
 	line-height: 30px;
 	display: inline-block;
 }
 
-#track
+.track
 {
 	width: 25px;
 	text-align: center;
 	font-size: small;
 }
 
-#song
+.song
 {
 	text-align: left;
 }
 
-#time
+.time
 {
 	float: right;
 	width: 30px;
