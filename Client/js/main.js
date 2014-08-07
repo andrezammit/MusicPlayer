@@ -129,13 +129,13 @@ MusicPlayer.engine = (function()
 			return;
 
 		var parentTag = $(artworkTag).parent();
-		var parentWidth = parentTag.width() - 20;
+		var imageSide = Math.min(parentTag.width() - 20, parentTag.height());
 
-		parentWidth = Math.min(parentWidth, 800);
-		parentWidth = Math.max(parentWidth, 200);
+		imageSide = Math.min(imageSide, 800);
+		imageSide = Math.max(imageSide, 200);
 
-		var maxWidth = parentWidth; 				// Max width for the image
-        var maxHeight = parentTag.height();			// Max height for the image
+		var maxWidth = imageSide; 					// Max width for the image
+        var maxHeight = imageSide;					// Max height for the image
         
         var ratio = 0;  							// Used for aspect ratio
         
@@ -159,7 +159,7 @@ MusicPlayer.engine = (function()
 	function resizeAlbumContainer(callback)
 	{
 		var albumContainer = $("#albumsContainer");
-		var albumTemplate = $(".templates").find("#albumEntry");
+		var albumTemplate = $(".templates").find(".albumEntry");
 		var albumContainerParent = albumContainer.parent();		
 
 		var albumsToFit = Math.floor(albumContainerParent.width() / albumTemplate.width());
