@@ -168,7 +168,7 @@ MusicPlayer.engine = (function()
 		albumContainer.css('width', containerWidth);
 
 		var header = $("#header");
-		header.css('margin-left', albumContainer.css('margin-left'));
+		header.css('padding-left', albumContainer.css('margin-left'));
 
 		if (callback)
 			callback();
