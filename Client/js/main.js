@@ -194,7 +194,6 @@ MusicPlayer.engine = (function()
 				if (!track)
 					return;
 
-
 				var newTrack = new TrackEntry(trackTemplate);
 				newTrack.setInfo(track._id, track.track, track.song, track.time);
 			
@@ -215,6 +214,7 @@ MusicPlayer.engine = (function()
 			$("#albumView").slideToggle(400)).done(
 			function()
 			{
+				$("body").css('overflow', 'hidden');
 				$("#albums").css('webkitFilter', 'blur(20px)')
 
 				resizeArtwork($("#albumImageLarge"), 
@@ -299,6 +299,7 @@ MusicPlayer.engine = (function()
 
 	function closeTracks()
 	{
+		$("body").css('overflow', 'auto');
 		$("#albums").css('webkitFilter', 'blur(0px)');
 
 		$("#albumView").slideToggle(400, 
