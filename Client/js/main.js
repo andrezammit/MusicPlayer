@@ -6,7 +6,8 @@ MusicPlayer.engine = (function()
 	var msgHandlers = {};
 
 	var chosenAlbumTag = null;
-	
+	var albumTracks = [];
+
 	(function()
 	{
 		$(window).resize(
@@ -176,7 +177,14 @@ MusicPlayer.engine = (function()
 
 	function showAlbumTracks(trackList)
 	{
+		var trackTemplate = $(".templates").find('.trackEntry')[0];
+
+		if (!trackTemplate)
+			return;
+
 		var trackContainer = $('#tracks');
+		
+		albumTracks = [];
 		trackContainer.empty();
 
 		for (cnt = 0; cnt < trackList.length; cnt++)
@@ -186,25 +194,14 @@ MusicPlayer.engine = (function()
 				if (!track)
 					return;
 
-				var newTrack = $(".templates").find('.trackEntry').clone();
 
-				newTrack.find(".track").html(track.track);
-				newTrack.find(".song").html(track.song);
-				newTrack.find(".time").html(track.time);
+				var newTrack = new TrackEntry(trackTemplate);
+				newTrack.setInfo(track._id, track.track, track.song, track.time);
+			
+				var newTrackElement = newTrack.getElement();
 
-				var playLink = newTrack.find(".playButtonSmall");
-
-				(function(trackID)
-				{
-					playLink.click(
-						function()
-						{
-							songControl.playSong(trackID);
-						});
-
-				})(track._id);
-
-				trackContainer.append(newTrack);
+				albumTracks.push([track._id, newTrackElement]);
+				trackContainer.append(newTrackElement);
 
 			}(trackList[cnt]));
 		}
@@ -243,6 +240,8 @@ MusicPlayer.engine = (function()
 
 	function displayAlbums(albumList)
 	{
+		var albumTemplate = $(".templates").find('.albumEntry')[0];
+
 		var albumContainer = $('#albums');
 		albumContainer.empty();
 
@@ -253,36 +252,11 @@ MusicPlayer.engine = (function()
 				if (!album)
 					return;
 
-				var newAlbum = $(".templates").find('.albumEntry').clone();
+				var newAlbum = new AlbumEntry(albumTemplate);
+				newAlbum.setInfo(album.albumArtist, album.album, album.artwork);
 
-				var albumLink = newAlbum.find(".albumLink");
-				
-				(function(album)
-				{
-					albumLink.click(
-						function()
-						{
-							musicPlayer.chooseAlbum(album.albumArtist, album.album, albumLink[0]);
-						});
-
-					albumLink.hover(
-						function()
-						{
-							musicPlayer.onAlbumHover(album.albumArtist, album.album);
-						},
-						function()
-						{
-							musicPlayer.onAlbumOut();
-						});
-
-				})(album);
-
-				var albumArtwork = newAlbum.find(".albumImageSmall");
-
-				albumArtwork.attr('src', 'data:image/png;base64,' + album.artwork);
-				albumArtwork.attr('alt', album.albumArtist + ' - ' + album.album);
-
-				albumContainer.append(newAlbum);
+				var newAlbumElement = newAlbum.getElement();
+				albumContainer.append(newAlbumElement);
 
 			}(albumList[cnt]));
 		} 
