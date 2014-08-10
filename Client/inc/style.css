@@ -152,9 +152,9 @@ a:hover
 
 #tracks
 {
-	float: right;
+	float: left;
 	
-	width: 50%;
+	width: 45%;
 	height: 100%;
 
 	overflow: auto;
@@ -195,9 +195,9 @@ a:hover
 .time
 {
 	float: right;
-	width: 30px;
+	width: 40px;
 	text-align: right;
-	margin-right: 100px;
+	margin-right: 15px;
 	font-size: small;
 }
 
