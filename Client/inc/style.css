@@ -15,6 +15,27 @@ a:hover
 	cursor: pointer;
 }
 
+::-webkit-scrollbar 
+{
+	width: 4px;
+}
+
+::-webkit-scrollbar-track 
+{
+	background-color: rgba(0, 0, 0, 0);
+}
+ 
+::-webkit-scrollbar-thumb 
+{
+	background-color: rgba(0, 0, 0, 0.15); 
+	border-radius: 4px;
+}
+ 
+::-webkit-scrollbar-thumb:hover
+{
+	background-color: rgba(0, 0, 0, 0.3); 
+}
+
 #loadingImage
 {
 	width: 32px; 
