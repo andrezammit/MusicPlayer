@@ -1,3 +1,4 @@
+var MusicPlayer = window.MusicPlayer || {};
 
 function TrackEntry(templateElement)
 {
@@ -21,7 +22,7 @@ function TrackEntry(templateElement)
 			playLink.click(
 				function()
 				{
-					songControl.playSong(_id);
+					musicPlayer.playSong(_id);
 				});
 
 		})(_id);

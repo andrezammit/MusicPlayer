@@ -3,9 +3,14 @@ var MusicPlayer = window.MusicPlayer || {};
 MusicPlayer.engine = (function()
 {
 	var connect = MusicPlayer.connect;
+	var songControl = MusicPlayer.songControl;
+
 	var msgHandlers = {};
 
+	var _audioElement = null;
+	var _currentTrackID = null;
 	var chosenAlbumTag = null;
+
 	var albumTracks = [];
 
 	(function()
@@ -168,8 +173,13 @@ MusicPlayer.engine = (function()
 		var containerWidth = albumsToFit * albumTemplate.width();
 		albumContainer.css('width', containerWidth);
 
+		alignHeaderText(albumContainer, callback)
+	}
+
+	function alignHeaderText(anchor, callback)
+	{
 		var header = $("#header");
-		header.css('padding-left', albumContainer.css('margin-left'));
+		header.css('padding-left', anchor.css('margin-left'));
 
 		if (callback)
 			callback();
@@ -309,6 +319,49 @@ MusicPlayer.engine = (function()
 			});
 	}
 
+	function getTrackElement(trackID, callback)
+	{
+		for (var cnt = 0; cnt < albumTracks.length; cnt++)
+		{
+			if (albumTracks[cnt][0] == trackID)
+			{
+				callback(albumTracks[cnt][1]);
+				return;
+			}
+		}
+	}
+
+	function updateNowPlayingTrack()
+	{
+		getTrackElement(_currentTrackID, 
+			function(trackElement)
+			{
+				var playImage = trackElement.find(".playButtonImage");
+
+				if (_audioElement.paused)
+				{
+					playImage.attr('src', 'images/play.png');
+					playImage.attr('alt', 'Play');
+				}
+				else
+				{
+					playImage.attr('src', 'images/pause.png');
+					playImage.attr('alt', 'Pause');
+				}
+			});
+	}
+
+	function playSong(trackID)
+	{
+		if (trackID == _currentTrackID)
+		{
+			songControl.togglePlay();
+			return;
+		}
+
+		songControl.playSong(trackID);
+	}
+
 	return {
 		connectWebSocket: function() 
 		{
@@ -339,6 +392,27 @@ MusicPlayer.engine = (function()
 		closeTracks: function()
 		{
 			closeTracks();
+		},
+
+		updateNowPlayingTrack: function()
+		{
+			updateNowPlayingTrack();
+		},
+
+		setAudioElement: function()
+		{
+    		_audioElement = $("#currentPlaying")[0];
+    		songControl.setAudioElement(_audioElement);
+		},
+
+		setCurrentTrackID: function(trackID)
+		{
+			_currentTrackID = trackID;
+		},
+
+		playSong: function(trackID)
+		{
+			playSong(trackID);
 		},
 	};
 }());

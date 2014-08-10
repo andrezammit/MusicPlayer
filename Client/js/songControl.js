@@ -2,14 +2,14 @@ var MusicPlayer = window.MusicPlayer || {};
 
 MusicPlayer.songControl = (function()
 {
-	var songLoaded = false;
-	var audioTag = null;
+	var _songLoaded = false;
+	var _audioElement = null;
 
 	function updateControlButtons()
 	{
 		var playButton = $('#playButton');
 		
-		if (audioTag.paused)
+		if (_audioElement.paused)
 		{
 			playButton.text('Play');
 		}
@@ -22,45 +22,49 @@ MusicPlayer.songControl = (function()
 	function onPlay()
 	{
 		updateControlButtons();
+		musicPlayer.updateNowPlayingTrack();
 	}
 
 	function onPause()
 	{
 		updateControlButtons();
+		musicPlayer.updateNowPlayingTrack();
 	}
 
 	return {
 		togglePlay: function()
 		{
-			if (audioTag.paused)
+			if (_audioElement.paused)
 			{
-				audioTag.play();
+				_audioElement.play();
 			}
 			else
 			{
-				audioTag.pause();
+				_audioElement.pause();
 			}
 		},
 
-		playSong: function(id)
+		playSong: function(trackID)
 		{
-			audioTag.src = 'http://' + window.location.hostname + ':3002/' + id + '.mp3';
-			audioTag.load();
+			musicPlayer.setCurrentTrackID(trackID);
+
+			_audioElement.src = 'http://' + window.location.hostname + ':3002/' + trackID + '.mp3';
+			_audioElement.load();
 			
-		  	audioTag.addEventListener('canplay', 
+		  	_audioElement.addEventListener('canplay', 
 				function()
 				{
 					songLoaded = true;
-					audioTag.play();
+					_audioElement.play();
 				});
 
-		 	audioTag.addEventListener('pause', onPause);
-			audioTag.addEventListener('play', onPlay);
+		 	_audioElement.addEventListener('pause', onPause);
+			_audioElement.addEventListener('play', onPlay);
 		},
 
-		setAudioTag: function()
+		setAudioElement: function(audioElement)
 		{
-    		audioTag = $("#currentPlaying")[0];
+    		_audioElement = audioElement;
 		},
 	};
 }());
