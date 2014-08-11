@@ -224,6 +224,8 @@ MusicPlayer.engine = (function()
 			$("#albumView").slideToggle(400)).done(
 			function()
 			{
+				updateNowPlayingTrack();
+				
 				$("body").css('overflow', 'hidden');
 				$("#albums").css('webkitFilter', 'blur(20px)')
 
