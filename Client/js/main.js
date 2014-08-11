@@ -135,7 +135,7 @@ MusicPlayer.engine = (function()
 			return;
 
 		var parentTag = $(artworkTag).parent();
-		var imageSide = Math.min(parentTag.width() - 20, parentTag.height());
+		var imageSide = Math.min(parentTag.width() - 20, parentTag.height() - 16);
 
 		imageSide = Math.min(imageSide, 800);
 		imageSide = Math.max(imageSide, 200);
@@ -146,7 +146,7 @@ MusicPlayer.engine = (function()
         var ratio = 0;  							// Used for aspect ratio
         
         var width = artworkTag.width();    			// Current image width
-        var height = artworkTag.height();  			// Current image height
+        var height = artworkTag.height(); 			// Current image height
 
 		ratio = maxWidth / width;   				// get ratio for scaling image
 		
@@ -209,6 +209,12 @@ MusicPlayer.engine = (function()
 			
 				var newTrackElement = newTrack.getElement();
 
+				if (cnt == trackList.length - 1)
+				{
+					// Add 8px to the bottom so that the div aligns exactly with the artwork padding.
+					newTrackElement.css('padding-bottom', '8px');
+				}
+
 				albumTracks.push([track._id, newTrackElement]);
 				trackContainer.append(newTrackElement);
 
@@ -225,7 +231,7 @@ MusicPlayer.engine = (function()
 			function()
 			{
 				updateNowPlayingTrack();
-				
+
 				$("body").css('overflow', 'hidden');
 				$("#albums").css('webkitFilter', 'blur(20px)')
 
@@ -335,22 +341,28 @@ MusicPlayer.engine = (function()
 
 	function updateNowPlayingTrack()
 	{
-		getTrackElement(_currentTrackID, 
-			function(trackElement)
-			{
-				var playImage = trackElement.find(".playButtonImage");
+		for (var cnt = 0; cnt < albumTracks.length; cnt++)
+		{
+			var trackID = albumTracks[cnt][0];
+			var trackElement = albumTracks[cnt][1];
 
-				if (_audioElement.paused)
-				{
-					playImage.attr('src', 'images/play.png');
-					playImage.attr('alt', 'Play');
-				}
-				else
-				{
-					playImage.attr('src', 'images/pause.png');
-					playImage.attr('alt', 'Pause');
-				}
-			});
+			var playImage = trackElement.find(".playButtonImage");
+
+			if (_audioElement.paused || trackID != _currentTrackID)
+			{
+				trackElement.css('background', 'rgba(255, 255, 255, 0)');
+
+				playImage.attr('src', 'images/play.png');
+				playImage.attr('alt', 'Play');
+			}
+			else
+			{
+				trackElement.css('background', 'rgba(255, 255, 255, 0.2)');
+
+				playImage.attr('src', 'images/pause.png');
+				playImage.attr('alt', 'Pause');
+			}
+		}
 	}
 
 	function playSong(trackID)

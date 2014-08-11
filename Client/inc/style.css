@@ -148,9 +148,10 @@ a:hover
 
 #closeTracks
 {
-	top: 5px;
+	top: 6px;
 	left: 13px;
 
+	float: left;
 	position: relative;
 }
 
@@ -183,6 +184,8 @@ a:hover
 	height: 100%;
 
 	text-align: center;
+
+	padding-top: 8px;
 }
 
 #tracks
@@ -217,6 +220,11 @@ a:hover
 .playButtonImage:hover
 {
 	background-color: rgba(128, 128, 128, 0.5);
+}
+
+.trackEntry
+{
+	transition: background 400ms linear;
 }
 
 .trackEntry div
