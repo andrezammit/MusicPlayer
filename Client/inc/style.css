@@ -190,8 +190,18 @@ a:hover
 
 .playButtonImage
 {
-	width: 16px;
-	height: 16px;
+	width: 18px;
+	height: 18px;
+	border: 1px solid;
+	border-radius: 50%;
+	border-color: black;
+
+	transition: background-color 200ms linear;
+}
+
+.playButtonImage:hover
+{
+	background-color: rgba(128, 128, 128, 0.5);
 }
 
 .trackEntry div
