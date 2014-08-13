@@ -112,7 +112,6 @@ function onWSConnection(webSock)
 						sendData(reply);
 					});
 			}
-		}
 	}
 
 	function sendData(data)
@@ -134,6 +133,11 @@ function getNoTagsResponse()
 function getNoArtworkResponse()
 {
 	return 'No artwork for this album.';
+}
+
+function getNoMoreTracksReply()
+{
+	return 'No more tracks in this album.';
 }
 
 function getAlbumArtwork(tag, callback)

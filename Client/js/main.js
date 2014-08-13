@@ -7,11 +7,11 @@ MusicPlayer.engine = (function()
 
 	var msgHandlers = {};
 
-	var _audioElement = null;
 	var _currentTrackID = null;
-	var chosenAlbumTag = null;
+	var _chosenAlbumTag = null;
 
-	var albumTracks = [];
+	var _albumTracks = [];
+	var _currentAlbumTracks = [];
 
 	(function()
 	{
@@ -56,6 +56,11 @@ MusicPlayer.engine = (function()
 			{
 				songControl.togglePlay();
 			});
+	}
+
+	function getAudioElement()
+	{
+		return $("#currentPlaying")[0];
 	}
 
 	function getAllAlbums(callback, progressCallback)
@@ -194,7 +199,7 @@ MusicPlayer.engine = (function()
 
 		var trackContainer = $('#tracks');
 		
-		albumTracks = [];
+		_albumTracks = [];
 		trackContainer.empty();
 
 		for (cnt = 0; cnt < trackList.length; cnt++)
@@ -209,19 +214,13 @@ MusicPlayer.engine = (function()
 			
 				var newTrackElement = newTrack.getElement();
 
-				if (cnt == trackList.length - 1)
-				{
-					// Add 8px to the bottom so that the div aligns exactly with the artwork padding.
-					newTrackElement.css('padding-bottom', '8px');
-				}
-
-				albumTracks.push([track._id, newTrackElement]);
+				_albumTracks.push([track._id, newTrackElement]);
 				trackContainer.append(newTrackElement);
 
 			}(trackList[cnt]));
 		}
 
-		var albumImage = $(chosenAlbumTag).find('img');
+		var albumImage = $(_chosenAlbumTag).find('img');
 
 		html = '<img src="' + albumImage.attr('src') + '" id="albumImageLarge" />';
 		$("#artwork").html(html);
@@ -329,11 +328,11 @@ MusicPlayer.engine = (function()
 
 	function getTrackElement(trackID, callback)
 	{
-		for (var cnt = 0; cnt < albumTracks.length; cnt++)
+		for (var cnt = 0; cnt < _albumTracks.length; cnt++)
 		{
-			if (albumTracks[cnt][0] == trackID)
+			if (_albumTracks[cnt][0] == trackID)
 			{
-				callback(albumTracks[cnt][1]);
+				callback(_albumTracks[cnt][1]);
 				return;
 			}
 		}
@@ -341,14 +340,15 @@ MusicPlayer.engine = (function()
 
 	function updateNowPlayingTrack()
 	{
-		for (var cnt = 0; cnt < albumTracks.length; cnt++)
+		for (var cnt = 0; cnt < _albumTracks.length; cnt++)
 		{
-			var trackID = albumTracks[cnt][0];
-			var trackElement = albumTracks[cnt][1];
+			var trackID = _albumTracks[cnt][0];
+			var trackElement = _albumTracks[cnt][1];
 
 			var playImage = trackElement.find(".playButtonImage");
+			var audioElement = getAudioElement();
 
-			if (_audioElement.paused || trackID != _currentTrackID)
+			if (audioElement.paused || trackID != _currentTrackID)
 			{
 				trackElement.css('background', 'rgba(255, 255, 255, 0)');
 
@@ -365,6 +365,33 @@ MusicPlayer.engine = (function()
 		}
 	}
 
+	function isTrackInCurrentAlbum(trackID)
+	{
+		for (var cnt = 0; cnt < _currentAlbumTracks.length; cnt++)
+		{
+			if (_currentAlbumTracks[cnt][0] == trackID)
+				return true;
+		}
+
+		return false;
+	}
+
+	function getNextTrackID()
+	{
+		for (var cnt = 0; cnt < _currentAlbumTracks.length; cnt++)
+		{
+			if (_currentAlbumTracks[cnt][0] != _currentTrackID)
+				continue;
+			
+			if (cnt + 1 == _currentAlbumTracks.length)
+				break;
+
+			return _currentAlbumTracks[cnt + 1][0]; 		
+		}
+
+		return -1;
+	}
+
 	function playSong(trackID)
 	{
 		if (trackID == _currentTrackID)
@@ -372,6 +399,9 @@ MusicPlayer.engine = (function()
 			songControl.togglePlay();
 			return;
 		}
+
+		if (!isTrackInCurrentAlbum(trackID))
+			_currentAlbumTracks = _albumTracks;
 
 		songControl.playSong(trackID);
 	}
@@ -399,7 +429,7 @@ MusicPlayer.engine = (function()
 
 		chooseAlbum: function(artist, album, tag)
 		{
-			chosenAlbumTag = tag;
+			_chosenAlbumTag = tag;
 			getAlbumTracks(artist, album, showAlbumTracks);
 		},
 
@@ -413,10 +443,9 @@ MusicPlayer.engine = (function()
 			updateNowPlayingTrack();
 		},
 
-		setAudioElement: function()
+		setupAudioElement: function()
 		{
-    		_audioElement = $("#currentPlaying")[0];
-    		songControl.setAudioElement(_audioElement);
+    		songControl.setupAudioElement();
 		},
 
 		setCurrentTrackID: function(trackID)
@@ -428,5 +457,15 @@ MusicPlayer.engine = (function()
 		{
 			playSong(trackID);
 		},
+
+		getAudioElement: function()
+		{
+			return getAudioElement();
+		},
+
+		getNextTrackID: function()
+		{
+			return getNextTrackID();
+		}
 	};
 }());
