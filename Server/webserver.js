@@ -85,6 +85,7 @@ function processRequest(request, response)
     		{
     			console.log(data);
     			console.log(data.length);
+    			console.log(mimeType);
 
     			response.writeHead(200, {'Content-Type' : mimeType, 'Content-Length' : data.length });
     			response.write(data);  

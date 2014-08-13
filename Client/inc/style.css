@@ -62,17 +62,7 @@ a:hover
 {
 	font-family: 'Raleway', sans-serif;
 	font-weight: 400;
-	font-size: 40px;
-}
-
-#controlBar
-{
-	position: fixed; 
-	bottom: 0; 
-	width: 100%; 
-	height: 50px;
-	z-index: 2;
-	background: rgba(255, 255, 255, 0.8);
+	font-size: 50px;
 }
 
 #albumsContainer
@@ -111,7 +101,7 @@ a:hover
 {
     position: fixed;
 	top: 120px;
-	bottom: 50px;
+	bottom: 80px;
 	width: 100%;
 	z-index: 1;
 	display: none;
@@ -130,7 +120,8 @@ a:hover
 #loadingScreen
 {
 	position: fixed; 
-	top: 0;
+	top: 0px;
+	left: 0px;
 	width: 100%;
 	height: 100%;
 	text-align: center;
@@ -181,7 +172,7 @@ a:hover
 	float: left;
 	
 	width: 50%;
-	height: 100%;
+	height: 95%;
 
 	text-align: center;
 
@@ -205,7 +196,7 @@ a:hover
 	margin-top: 7px;
 }
 
-.playButtonImage
+.playButtonSmallImg
 {
 	width: 18px;
 	height: 18px;
@@ -216,9 +207,74 @@ a:hover
 	transition: background-color 200ms linear;
 }
 
-.playButtonImage:hover
+.playButtonSmallImg:hover
 {
 	background-color: rgba(128, 128, 128, 0.5);
+}
+
+#controlBar
+{
+	position: fixed; 
+	bottom: 0px;
+	left: 0px; 
+	width: 100%; 
+	height: 80px;
+	z-index: 2;
+
+	background-image: url('/images/ampBackground.png');
+	background-size: cover;
+
+	transition: opacity 200ms linear;
+
+	opacity: 0.8;
+}
+
+#controlBar:hover
+{
+	opacity: 1.0;
+}
+
+#playButton
+{
+	position: fixed;
+
+	width: 116px;
+	height: 27px;
+
+   	left: 50px;
+	bottom: 19px;
+
+	border-top: 1px solid #5b6a73;
+	background: linear-gradient(to bottom, #000000, #232729);
+   	
+   	padding: 5px 5px;
+   	border-radius: 3px;
+
+   	box-shadow: rgba(0,0,0,1) 0 1px 0;
+   	text-shadow: rgba(0,0,0,.4) 0 1px 0;
+   	color: white;
+   	
+   	font-size: 20px;
+   	font-family: Georgia, serif;
+   	
+   	text-align: center;
+   	vertical-align: middle;
+}
+
+#playButton:hover
+{
+	cursor: pointer;
+	background: linear-gradient(to bottom, #000000, #232735);
+}
+
+#playButtonImg
+{
+	width: 50px;
+	height: 50px;
+	
+	margin-top: -11px;
+	
+	-webkit-filter: invert(100%);
 }
 
 .trackEntry
@@ -264,3 +320,4 @@ a:hover
 {
 	display: none;
 }
+

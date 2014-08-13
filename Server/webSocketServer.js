@@ -112,6 +112,7 @@ function onWSConnection(webSock)
 						sendData(reply);
 					});
 			}
+		}
 	}
 
 	function sendData(data)
