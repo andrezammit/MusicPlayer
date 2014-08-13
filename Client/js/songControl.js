@@ -24,12 +24,27 @@ MusicPlayer.songControl = (function()
 	{
 		updateControlButtons();
 		musicPlayer.updateNowPlayingTrack();
+
+		var trackTime = musicPlayer.getTrackTime();
+
+		var totalTime = $("#totalTime");
+		totalTime.html(trackTime);
 	}
 
 	function onPause()
 	{
 		updateControlButtons();
 		musicPlayer.updateNowPlayingTrack();
+	}
+
+	function getFormattedTime(totalSeconds)
+	{
+		var minutes = Math.floor(totalSeconds / 60);
+
+		var minsInSecs = minutes * 60;
+		var seconds = Math.floor(totalSeconds) - minsInSecs;
+
+		return minutes + ':' + seconds;
 	}
 
 	function onTimeUpdate()
@@ -39,13 +54,16 @@ MusicPlayer.songControl = (function()
 		var progSeconds = Math.ceil(audioElement.currentTime);
 		var progPercent = Math.ceil(audioElement.currentTime / audioElement.duration * 100);
 
-		console.log(progPercent + '%');
-
 		if (progPercent > 75 && !_nextSongPreloaded)
 		{
 			_nextSongPreloaded = true;
 			preLoadNextTrack();
 		}
+
+		var formattedTime = getFormattedTime(audioElement.currentTime);
+
+		var currentTime = $("#currentTime");
+		currentTime.html(formattedTime);
 	}
 
 	function onTrackEnded()

@@ -406,6 +406,20 @@ MusicPlayer.engine = (function()
 		songControl.playSong(trackID);
 	}
 
+	function getTrackTime()
+	{
+		for (var cnt = 0; cnt < _currentAlbumTracks.length; cnt++)
+		{
+			if (_currentAlbumTracks[cnt][0] == _currentTrackID)
+			{
+				var trackElement = _currentAlbumTracks[cnt][1];
+				return trackElement.find(".time").html();
+			}
+		}
+
+		return '';
+	}
+
 	return {
 		connectWebSocket: function() 
 		{
@@ -466,6 +480,11 @@ MusicPlayer.engine = (function()
 		getNextTrackID: function()
 		{
 			return getNextTrackID();
-		}
+		},
+
+		getTrackTime: function()
+		{
+			return getTrackTime();
+		},
 	};
 }());
