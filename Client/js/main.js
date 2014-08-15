@@ -184,7 +184,8 @@ MusicPlayer.engine = (function()
 	function alignHeaderText(anchor, callback)
 	{
 		var header = $("#header");
-		header.css('padding-left', anchor.css('margin-left'));
+		header.css('margin-left', anchor.css('margin-left'));
+		header.css('width', anchor.css('width'));
 
 		if (callback)
 			callback();
@@ -345,7 +346,7 @@ MusicPlayer.engine = (function()
 			var trackID = _albumTracks[cnt][0];
 			var trackElement = _albumTracks[cnt][1];
 
-			var playImage = trackElement.find(".playButtonImage");
+			var playImage = trackElement.find(".playButtonSmallImg");
 			var audioElement = getAudioElement();
 
 			if (audioElement.paused || trackID != _currentTrackID)
