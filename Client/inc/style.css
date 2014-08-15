@@ -47,11 +47,16 @@ a:hover
 	position: fixed;
 	top: 0px;
 
-	height: 50px;
+	height: 60px;
 	width: 100%;
 
-	padding-top: 35px;
-	padding-bottom: 35px;
+	margin-top: 30px;
+	margin-bottom: 17px;
+
+	padding-bottom: 12px;
+
+	border-bottom: 1px solid;
+	border-bottom-color: lightgrey;
 
 	z-index: 1;
 
@@ -100,11 +105,12 @@ a:hover
 #albumViewContainer 
 {
     position: fixed;
-	top: 120px;
+	top: 103px;
 	bottom: 80px;
 	width: 100%;
 	z-index: 1;
 	display: none;
+	background: rgba(255, 255, 255, 0.7);
 }
 
 #albumView
@@ -112,8 +118,7 @@ a:hover
 	position: absolute;
 	bottom: 0px;
 	width: 100%; 
-	height: 100%;
-	background: rgba(255, 255, 255, 0.7);
+	height: 98%;
 	display: none;
 }
 
@@ -193,13 +198,13 @@ a:hover
 {
 	float: left;
 	width: 20px;
-	margin-top: 7px;
+	margin-top: 10px;
 }
 
 .playButtonSmallImg
 {
-	width: 18px;
-	height: 18px;
+	width: 16px;
+	height: 16px;
 	border: 1px solid;
 	border-radius: 50%;
 	border-color: black;
@@ -234,14 +239,28 @@ a:hover
 	opacity: 1.0;
 }
 
+#bkButton
+{
+   	left: 25px;
+}
+
 #playButton
+{
+   	left: 91px;
+}
+
+#fwButton
+{
+   	left: 223px;
+}
+
+.ctrlBtn
 {
 	position: fixed;
 
 	width: 116px;
 	height: 27px;
 
-   	left: 50px;
 	bottom: 19px;
 
 	border-top: 1px solid #5b6a73;
@@ -261,13 +280,13 @@ a:hover
    	vertical-align: middle;
 }
 
-#playButton:hover
+.ctrlBtn:hover
 {
 	cursor: pointer;
-	background: linear-gradient(to bottom, #000000, #232735);
+	background: linear-gradient(to bottom, #000000, #666C6F);
 }
 
-#playButtonImg
+.ctrlBtn img
 {
 	width: 50px;
 	height: 50px;
@@ -275,6 +294,11 @@ a:hover
 	margin-top: -11px;
 	
 	-webkit-filter: invert(100%);
+}
+
+.smallCtrlBtn
+{
+	width: 50px;
 }
 
 .trackEntry
