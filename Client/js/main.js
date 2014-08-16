@@ -142,7 +142,7 @@ MusicPlayer.engine = (function()
 
 		msgHandlers['getTracksReply'] = function(data)
 		{
-			callback(data.trackList);
+			callback(data.replyData);
 		}
 	}
 
@@ -203,7 +203,7 @@ MusicPlayer.engine = (function()
 			callback();
 	}
 
-	function showAlbumTracks(trackList)
+	function showAlbumTracks(replyData)
 	{
 		var trackTemplate = $(".templates").find('.trackEntry')[0];
 
@@ -211,7 +211,8 @@ MusicPlayer.engine = (function()
 			return;
 
 		var trackContainer = $('#tracks');
-		
+		var trackList = replyData.trackList;
+
 		_albumTracks = [];
 		trackContainer.empty();
 
@@ -223,7 +224,7 @@ MusicPlayer.engine = (function()
 					return;
 
 				var newTrack = new TrackEntry(trackTemplate);
-				newTrack.setInfo(track._id, track.track, track.song, track.time);
+				newTrack.setInfo(track, replyData.artist, replyData.album);
 			
 				var newTrackElement = newTrack.getElement();
 
@@ -376,6 +377,23 @@ MusicPlayer.engine = (function()
 				playImage.attr('alt', 'Pause');
 			}
 		}
+
+		updateControlBarInfo();
+	}
+
+	function updateControlBarInfo()
+	{
+		getTrackElement(_currentTrackID, 
+			function(trackElement)
+			{
+				var song = trackElement.find(".song").html();
+				var artist = trackElement.attr("artist");
+				var album = trackElement.attr("album");
+
+				var songInfo = song + '<br />' + artist + '<br />' + album;
+
+				$("#songInfo").html(songInfo);
+			});
 	}
 
 	function isTrackInCurrentAlbum(trackID)

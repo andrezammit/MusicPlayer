@@ -44,6 +44,9 @@ MusicPlayer.songControl = (function()
 		var minsInSecs = minutes * 60;
 		var seconds = Math.floor(totalSeconds) - minsInSecs;
 
+		if (seconds < 10)
+			seconds = '0' + seconds;
+
 		return minutes + ':' + seconds;
 	}
 

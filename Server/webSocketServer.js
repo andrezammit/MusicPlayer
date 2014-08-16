@@ -108,7 +108,9 @@ function onWSConnection(webSock)
 							return;
 						}
 
-						var reply = { command: 'getTracksReply', trackCount: docs.length, trackList: docs };
+						var replyData = { artist: query.albumArtist, album: query.album, trackList: docs };
+
+						var reply = { command: 'getTracksReply', replyData: replyData };
 						sendData(reply);
 					});
 			}

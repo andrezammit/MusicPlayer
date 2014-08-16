@@ -7,10 +7,16 @@ function TrackEntry(templateElement)
 	var _time;
 	var _track;
 
+	var _album;
+	var _artist;
+
 	var _clone = $(templateElement).clone();
 
 	function getElement()
 	{
+		_clone.attr("artist", _artist);
+		_clone.attr("album", _album);
+
 		_clone.find(".track").html(_track);
 		_clone.find(".song").html(_song);
 		_clone.find(".time").html(_time);
@@ -36,12 +42,15 @@ function TrackEntry(templateElement)
 			return getElement();
 		},
 
-		setInfo: function(id, track, song, time)
+		setInfo: function(track, artist, album)
 		{
-			_id = id;
-			_song = song;
-			_time = time;
-			_track = track;
+			_id = track._id;
+			_song = track.song;
+			_time = track.time;
+			_track = track.track;
+
+			_artist = artist;
+			_album = album;
 		},
 	};
 }
