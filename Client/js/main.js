@@ -56,6 +56,18 @@ MusicPlayer.engine = (function()
 			{
 				songControl.togglePlay();
 			});
+
+		$("#fwButton").click(
+			function()
+			{
+				songControl.playNextSong();
+			});
+
+		$("#bkButton").click(
+			function()
+			{
+				songControl.playLastSong();
+			});
 	}
 
 	function getAudioElement()
@@ -393,6 +405,22 @@ MusicPlayer.engine = (function()
 		return -1;
 	}
 
+	function getLastTrackID()
+	{
+		for (var cnt = 0; cnt < _currentAlbumTracks.length; cnt++)
+		{
+			if (_currentAlbumTracks[cnt][0] != _currentTrackID)
+				continue;
+			
+			if (cnt == 0)
+				break;
+
+			return _currentAlbumTracks[cnt - 1][0]; 		
+		}
+
+		return -1;
+	}
+
 	function playSong(trackID)
 	{
 		if (trackID == _currentTrackID)
@@ -468,6 +496,11 @@ MusicPlayer.engine = (function()
 			_currentTrackID = trackID;
 		},
 
+		getCurrentTrackID: function()
+		{
+			return _currentTrackID;
+		},
+
 		playSong: function(trackID)
 		{
 			playSong(trackID);
@@ -481,6 +514,11 @@ MusicPlayer.engine = (function()
 		getNextTrackID: function()
 		{
 			return getNextTrackID();
+		},
+
+		getLastTrackID: function()
+		{
+			return getLastTrackID();
 		},
 
 		getTrackTime: function()

@@ -7,16 +7,16 @@ MusicPlayer.songControl = (function()
 
 	function updateControlButtons()
 	{
-		var playButton = $('#playButton');
+		var playButton = $('#playButtonImg');
 		var audioElement = musicPlayer.getAudioElement();
 		
 		if (audioElement.paused)
 		{
-			playButton.text('Play');
+			playButton.attr('src', 'images/play.png');
 		}
 		else
 		{
-			playButton.text('Pause');
+			playButton.attr('src', 'images/pause.png');
 		}
 	};
 
@@ -50,8 +50,6 @@ MusicPlayer.songControl = (function()
 	function onTimeUpdate()
 	{
 		var audioElement = musicPlayer.getAudioElement();
-
-		var progSeconds = Math.ceil(audioElement.currentTime);
 		var progPercent = Math.ceil(audioElement.currentTime / audioElement.duration * 100);
 
 		if (progPercent > 75 && !_nextSongPreloaded)
@@ -142,6 +140,36 @@ MusicPlayer.songControl = (function()
 		audioElement.play();
 	}
 
+	function playNextSong()
+	{
+		var trackID = musicPlayer.getNextTrackID();
+
+		// If the track ID is -1 then it's the end of the album.
+		if (trackID == -1)
+			return;
+
+		playSong(trackID);
+	}
+
+	function playLastSong()
+	{
+		var audioElement = musicPlayer.getAudioElement();
+		var progSeconds = Math.ceil(audioElement.currentTime);
+
+		if (progSeconds > 5)
+		{
+			playSong(musicPlayer.getCurrentTrackID());
+			return;
+		}
+
+		var trackID = musicPlayer.getLastTrackID();
+
+		if (trackID == -1)
+			return;
+
+		playSong(trackID);
+	}
+
 	return {
 		togglePlay: function()
 		{
@@ -160,6 +188,16 @@ MusicPlayer.songControl = (function()
 		playSong: function(trackID)
 		{
 			playSong(trackID);
+		},
+
+		playNextSong: function()
+		{
+			playNextSong();
+		},
+
+		playLastSong: function()
+		{
+			playLastSong();
 		},
 
 		setupAudioElement: function(callback)
