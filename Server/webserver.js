@@ -12,7 +12,8 @@ extensions =
     ".png" : "image/png",
     ".gif" : "image/gif",
     ".jpg" : "image/jpeg",
-    ".mp3" : "audio/mpeg"
+    ".mp3" : "audio/mpeg",
+    ".woff" : "application/font-woff",
 };
 
 function getFileNotFoundResponse(requestPath)
@@ -21,7 +22,7 @@ function getFileNotFoundResponse(requestPath)
 }
 
 function processFileRequest(request, callback)
-{
+{	
 	var url_parts = url.parse(request.url, true);
 	var requestPath = url_parts.pathname;
 

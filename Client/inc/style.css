@@ -1,3 +1,10 @@
+@font-face 
+{
+  font-family: 'digital-7regular';
+  font-style: normal;
+  font-weight: normal;
+  src: url(/fonts/digital-7-webfont.woff) format('woff');
+}
 *
 {
 	font-family: 'Roboto', sans-serif;
@@ -322,7 +329,7 @@ a:hover
    	text-align: center;
    	vertical-align: middle;
 
-   	font-family: 'Orbitron', sans-serif;
+   	font-family: 'digital-7regular', sans-serif;
 	font-weight: 400;
 }
 
@@ -331,10 +338,10 @@ a:hover
 	position: absolute;
 
 	left: 15px;
-	top: 3px;
+	top: 2px;
 
 	font-family: inherit;
-	font-size: 40px;
+	font-size: 55px;
 
 	color: white;
 
@@ -346,12 +353,28 @@ a:hover
 	position: absolute;
 
 	font-family: inherit;
-	font-size: 12px;
+	font-size: 16px;
 
 	text-align: left;
 
 	top: 5px;
 	left: 138px;
+
+	opacity: 0.6;
+}
+
+#songProgress
+{
+	position: absolute;
+
+	left: 15px;
+	right: 15px;
+	bottom: 5px;
+
+	height: 1px;
+
+	border-top: 1px solid;
+	border-color: white;
 
 	opacity: 0.6;
 }
