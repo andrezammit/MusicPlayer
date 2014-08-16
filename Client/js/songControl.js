@@ -25,10 +25,9 @@ MusicPlayer.songControl = (function()
 		updateControlButtons();
 		musicPlayer.updateNowPlayingTrack();
 
-		var trackTime = musicPlayer.getTrackTime();
+		var trackTime = musicPlayer.getTrackSeconds();
 
-		var totalTime = $("#totalTime");
-		totalTime.html(trackTime);
+		$("#currentPlaying").attr('totalTime', trackTime);
 	}
 
 	function onPause()
@@ -53,7 +52,9 @@ MusicPlayer.songControl = (function()
 	function onTimeUpdate()
 	{
 		var audioElement = musicPlayer.getAudioElement();
-		var progPercent = Math.ceil(audioElement.currentTime / audioElement.duration * 100);
+
+		var totalSeconds = parseInt($("#currentPlaying").attr('totalTime'));
+		var progPercent = audioElement.currentTime / totalSeconds * 100;
 
 		if (progPercent > 75 && !_nextSongPreloaded)
 		{
@@ -65,6 +66,9 @@ MusicPlayer.songControl = (function()
 
 		var currentTime = $("#currentTime");
 		currentTime.html(formattedTime);
+
+		var songProgress = $("#songProgress");
+		songProgress.css('width', progPercent + '%');
 	}
 
 	function onTrackEnded()
@@ -124,6 +128,8 @@ MusicPlayer.songControl = (function()
 
 	function playSong(trackID)
 	{
+		_nextTrackElement = null;
+
 		var audioElement = musicPlayer.getAudioElement();
 
 		if (trackID)
@@ -206,7 +212,7 @@ MusicPlayer.songControl = (function()
 		setupAudioElement: function(callback)
 		{
 			var audioElement = musicPlayer.getAudioElement();
-    		audioElement.volume = 0.1;
+    		//audioElement.volume = 0.1;
 
     		bindAudioElementEvents();
 

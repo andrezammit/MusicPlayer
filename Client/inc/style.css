@@ -291,6 +291,11 @@ a:hover
 	background: linear-gradient(to bottom, #000000, #666C6F);
 }
 
+.ctrlBtn:active
+{
+	border-top: 0px;
+}
+
 .ctrlBtn img
 {
 	width: 50px;
@@ -312,7 +317,7 @@ a:hover
 
 	left: 450px;
 
-	width: 380px;
+	width: 40%;
 	height: 50px;
 
 	bottom: 8px;
@@ -364,7 +369,7 @@ a:hover
 	opacity: 0.6;
 }
 
-#songProgress
+#totalProgress
 {
 	position: absolute;
 
@@ -377,7 +382,32 @@ a:hover
 	border-top: 1px solid;
 	border-color: white;
 
-	opacity: 0.6;
+	opacity: 0.2;
+}
+
+#progressContainer
+{
+	position: absolute;
+
+	left: 15px;
+	right: 15px;
+	bottom: 5px;
+
+	height: 1px;
+}
+
+#songProgress
+{
+	position: absolute;
+
+	bottom: 0px;
+
+	height: 1px;
+
+	border-top: 1px solid;
+	border-color: white;
+
+	opacity: 1;
 }
 
 .trackEntry

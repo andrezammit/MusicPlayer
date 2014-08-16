@@ -3,7 +3,7 @@
     <title>MusicPlayer</title>
 
   	<link rel="stylesheet" type="text/css" href="inc/style.css">
-    <link href='http://fonts.googleapis.com/css?family=Roboto|Raleway|Orbitron' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Roboto|Raleway' rel='stylesheet' type='text/css'>
 
   	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     
@@ -69,10 +69,11 @@
       <div id="ampDisplay">
         <div id="currentTime"></div>
         <div id="songInfo"></div>
-        <div id="songProgress"></div>
+        <div id="totalProgress"></div>
+        <div id="progressContainer">
+          <div id="songProgress"></div>
+        </div>
       </div>
-
-      <div id="totalTime"></div>
   	</div>
 
     <audio id="currentPlaying">

@@ -453,6 +453,25 @@ MusicPlayer.engine = (function()
 		songControl.playSong(trackID);
 	}
 
+	function getTrackSeconds()
+	{
+		for (var cnt = 0; cnt < _currentAlbumTracks.length; cnt++)
+		{
+			if (_currentAlbumTracks[cnt][0] == _currentTrackID)
+			{
+				var trackElement = _currentAlbumTracks[cnt][1];
+				var trackTime = trackElement.find(".time").html();
+
+				var result = trackTime.split(':');
+				var seconds = parseInt(result[0]) * 60 + parseInt(result[1]);
+
+				return parseInt(seconds);
+			}
+		}
+
+		return 0;
+	}
+
 	function getTrackTime()
 	{
 		for (var cnt = 0; cnt < _currentAlbumTracks.length; cnt++)
@@ -542,6 +561,11 @@ MusicPlayer.engine = (function()
 		getTrackTime: function()
 		{
 			return getTrackTime();
+		},
+
+		getTrackSeconds: function()
+		{
+			return getTrackSeconds();
 		},
 	};
 }());
