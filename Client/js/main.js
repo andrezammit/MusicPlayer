@@ -69,6 +69,13 @@ MusicPlayer.engine = (function()
 				songControl.playLastSong();
 			});
 
+		$("#seekBar").change( 
+			function() 
+			{ 
+            	var audioElement = getAudioElement();
+            	audioElement.currentTime = $(this).val(); 
+        	});
+
  		$(".knob").knob(
  		{
             release: function (value) 
@@ -88,9 +95,24 @@ MusicPlayer.engine = (function()
 				this.g.rotate(-125 * Math.PI / 180);
 				this.g.rotate(this.v * Math.PI / 72);
 
-				this.g.drawImage(img, -img.width / 2, -img.width / 2);
+				this.g.drawImage(img, -img.width / 2, -img.height / 2);
 
 				this.g.restore();
+
+                this.cursorExt = 0.3;
+
+                var a = this.arc(this.cv)  // Arc
+                    , pa                   // Previous arc
+                    , r = 1;
+
+                this.g.lineWidth = this.lineWidth;
+
+                this.g.beginPath();
+                this.g.strokeStyle = r ? this.o.fgColor : this.fgColor ;
+                this.g.arc(this.xy, this.xy, this.radius - this.lineWidth + 1 + this.lineWidth * 2 / 3, a.s, a.e, a.d);
+                this.g.stroke();
+
+                return false;
             }
         });
 

@@ -28,6 +28,7 @@ MusicPlayer.songControl = (function()
 		var trackTime = musicPlayer.getTrackSeconds();
 
 		$("#currentPlaying").attr('totalTime', trackTime);
+		$("#seekBar").attr('max', trackTime);
 	}
 
 	function onPause()
@@ -68,6 +69,10 @@ MusicPlayer.songControl = (function()
 		currentTime.html(formattedTime);
 
 		var songProgress = $("#songProgress");
+
+		if (progPercent > 100)
+			progPercent = 0;
+		
 		songProgress.css('width', progPercent + '%');
 	}
 
