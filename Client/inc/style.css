@@ -467,3 +467,20 @@ a:hover
 {
 	display: none;
 }
+
+#seekBar 
+{
+	opacity: 0;
+	width: 100%;
+	height: 3px;
+}
+
+#seekBar:hover
+{
+	cursor: pointer;
+}
+
+#seekBar::-webkit-slider-thumb 
+{
+	opacity: 0;
+}
