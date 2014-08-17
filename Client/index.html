@@ -7,6 +7,8 @@
 
   	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     
+    <script src="js/jquery.knob.js"></script>
+
     <script src="js/songControl.js"></script>
     <script src="js/templates.js"></script>
     <script src="js/connect.js"></script>
@@ -73,6 +75,12 @@
         <div id="progressContainer">
           <div id="songProgress"></div>
         </div>
+      </div>
+
+      <div id="volumeContainer">
+          <img src="images/volumeKnob.png" id="volumeKnobImg">
+
+          <input class="knob" data-width="84px" data-displayInput=false data-thickness=".1" data-step="5" data-fgColor="#ffec03" data-angleOffset="-125" data-angleArc="250" value="100">
       </div>
   	</div>
 

@@ -68,6 +68,32 @@ MusicPlayer.engine = (function()
 			{
 				songControl.playLastSong();
 			});
+
+ 		$(".knob").knob(
+ 		{
+            release: function (value) 
+            {
+            	var audioElement = getAudioElement();
+            	audioElement.volume = value / 100;
+            },
+          
+            draw: function () 
+            {
+				var img = document.getElementById("volumeKnobImg");
+
+				this.g.save();
+
+				this.g.translate(this.w / 2, this.h / 2);
+		
+				this.g.rotate(-125 * Math.PI / 180);
+				this.g.rotate(this.v * Math.PI / 72);
+
+				this.g.drawImage(img, -img.width / 2, -img.width / 2);
+
+				this.g.restore();
+            }
+        });
+
 	}
 
 	function getAudioElement()

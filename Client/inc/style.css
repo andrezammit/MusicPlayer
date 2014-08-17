@@ -454,3 +454,16 @@ a:hover
 	display: none;
 }
 
+#volumeContainer
+{
+	position: absolute;
+
+	right: 0;
+	width: 80px; 
+	margin-top: 8px;
+}
+
+#volumeKnobImg
+{
+	display: none;
+}
