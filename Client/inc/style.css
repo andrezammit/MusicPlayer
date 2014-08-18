@@ -249,27 +249,27 @@ a:hover
 
 #bkButton
 {
-   	left: 25px;
+   	left: 0px;
 }
 
 #playButton
 {
-   	left: 91px;
+   	left: 66px;
 }
 
 #fwButton
 {
-   	left: 223px;
+   	left: 199px;
 }
 
 .ctrlBtn
 {
-	position: fixed;
+	position: absolute;
 
 	width: 116px;
 	height: 27px;
 
-	bottom: 19px;
+	bottom: 0px;
 
 	border-top: 1px solid #5b6a73;
 	background: linear-gradient(to bottom, #000000, #232729);
@@ -315,7 +315,7 @@ a:hover
 {
 	position: fixed;
 
-	left: 450px;
+	left: 31%;
 
 	width: 40%;
 	height: 50px;
@@ -458,7 +458,7 @@ a:hover
 {
 	position: absolute;
 
-	right: 0;
+	right: 1%;
 	width: 80px; 
 	margin-top: 8px;
 }
@@ -483,4 +483,13 @@ a:hover
 #seekBar::-webkit-slider-thumb 
 {
 	opacity: 0;
+}
+
+#controlBtns
+{
+	position: fixed;
+   	left: 2%;
+   	bottom: 19px;
+   	height: 38px;
+   	width: 200px;
 }
