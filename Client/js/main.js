@@ -78,7 +78,7 @@ MusicPlayer.engine = (function()
 
  		$(".knob").knob(
  		{
-            release: function (value) 
+            change: function (value) 
             {
             	var audioElement = getAudioElement();
             	audioElement.volume = value / 100;
@@ -93,7 +93,7 @@ MusicPlayer.engine = (function()
 				this.g.translate(this.w / 2, this.h / 2);
 		
 				this.g.rotate(-125 * Math.PI / 180);
-				this.g.rotate(this.v * Math.PI / 72);
+				this.g.rotate(this.cv * Math.PI / 72);
 
 				this.g.drawImage(img, -img.width / 2, -img.height / 2);
 
@@ -349,12 +349,25 @@ MusicPlayer.engine = (function()
 
 	function onAlbumHover(artist, album, year)
 	{
-		var headerTag = $("#albumName");
+		var headerTag = $("#albumName, #albumYear");
 		
 		headerTag.fadeOut(40,
 			function()
 			{
-				headerTag.text(artist + ' - ' + album + ' (' + year + ')');
+				var albumText = artist;
+
+				if (album)
+					albumText += ' - ' + album;
+
+				$("#albumName").text(albumText);
+
+				var yearText = '';
+
+				if (year)
+					yearText = year;
+
+				$("#albumYear").text(yearText);
+
 				headerTag.fadeIn();
 			});
 	}
@@ -366,14 +379,7 @@ MusicPlayer.engine = (function()
 		if ($("#albumViewContainer").is(":visible"))
 			return;
 
-		var headerTag = $("#albumName");
-		
-		headerTag.fadeOut(40,
-			function()
-			{
-				headerTag.text('MusicPlayer');
-				headerTag.fadeIn();
-			});
+		onAlbumHover("MusicPlayer")
 	}
 
 	function closeTracks()

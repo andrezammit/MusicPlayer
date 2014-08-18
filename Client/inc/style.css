@@ -73,9 +73,25 @@ a:hover
 
 #albumName
 {
+	display: inline-block;
+
 	font-family: 'Raleway', sans-serif;
 	font-weight: 400;
 	font-size: 50px;
+}
+
+#albumYear
+{
+	display: inline-block;
+	position: relative;
+
+	left: 7px;
+
+	color: lightgrey;
+
+	font-family: 'Raleway', sans-serif;
+	font-weight: 400;
+	font-size: 30px;
 }
 
 #albumsContainer
