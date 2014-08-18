@@ -332,7 +332,7 @@ MusicPlayer.engine = (function()
 					return;
 
 				var newAlbum = new AlbumEntry(albumTemplate);
-				newAlbum.setInfo(album.albumArtist, album.album, album.artwork);
+				newAlbum.setInfo(album.albumArtist, album.album, album.artwork, album.year);
 
 				var newAlbumElement = newAlbum.getElement();
 				albumContainer.append(newAlbumElement);
@@ -347,14 +347,14 @@ MusicPlayer.engine = (function()
 			});
 	}
 
-	function onAlbumHover(artist, album)
+	function onAlbumHover(artist, album, year)
 	{
 		var headerTag = $("#albumName");
 		
 		headerTag.fadeOut(40,
 			function()
 			{
-				headerTag.text(artist + ' - ' + album);
+				headerTag.text(artist + ' - ' + album + ' (' + year + ')');
 				headerTag.fadeIn();
 			});
 	}
@@ -545,9 +545,9 @@ MusicPlayer.engine = (function()
 			setupHandlers();
 		},
 
-		onAlbumHover: function(artist, album)
+		onAlbumHover: function(artist, album, year)
 		{
-			onAlbumHover(artist, album);
+			onAlbumHover(artist, album, year);
 		},
 
 		onAlbumOut: function()

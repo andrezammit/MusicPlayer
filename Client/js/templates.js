@@ -57,6 +57,7 @@ function TrackEntry(templateElement)
 
 function AlbumEntry(templateElement)
 {
+	var _year;
 	var _album;
 	var _artwork;
 	var _albumArtist;
@@ -78,7 +79,7 @@ function AlbumEntry(templateElement)
 			albumLink.hover(
 				function()
 				{
-					musicPlayer.onAlbumHover(_albumArtist, _album);
+					musicPlayer.onAlbumHover(_albumArtist, _album, _year);
 				},
 				function()
 				{
@@ -101,8 +102,9 @@ function AlbumEntry(templateElement)
 			return getElement();
 		},
 
-		setInfo: function(albumArtist, album, artwork)
+		setInfo: function(albumArtist, album, artwork, year)
 		{
+			_year = year;
 			_album = album;
 			_artwork = artwork;
 			_albumArtist = albumArtist;
