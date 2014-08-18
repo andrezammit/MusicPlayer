@@ -213,6 +213,11 @@ function TagParser(includeArtwork)
 	////////////////////////////////////////////////////////////////////////////
 	// Flow
 
+	this.getTagSize = function()
+	{
+		return _tagSize;
+	}
+
 	this.getTag = function(fullPath, callback)
 	{
 		_tag.path = fullPath;

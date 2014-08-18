@@ -103,6 +103,9 @@ function getFileFromID(id, callback)
     collection.find({ _id: id }).toArray(
         function(error, docs)
         {
+            if (!docs)
+                return;
+
             callback(docs[0].path);
         });
 }

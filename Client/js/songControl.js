@@ -72,7 +72,7 @@ MusicPlayer.songControl = (function()
 
 		if (progPercent > 100)
 			progPercent = 0;
-		
+
 		songProgress.css('width', progPercent + '%');
 	}
 

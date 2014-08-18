@@ -2,13 +2,16 @@ var fs = require('fs');
 var url = require('url');
 var http = require('http');
 var path = require('path');
+
 var database = require('./database');
+var TagParser = require('./TagParser');
 
 function processRequest(request, response)
 {
 	var header = {};
 	var returnCode = 200;
 
+	var tagSize = 0;
 	var fileSize = 0;
 
 	function getFileFromIDDone(filePath)
@@ -18,9 +21,16 @@ function processRequest(request, response)
 		if (!stats)
 			return;
 
-		fileSize = stats.size;
+		var tagParser = new TagParser(false);
 
-		fs.open(filePath, 'r', openFileDone);
+		tagParser.getTag(filePath, 
+			function(error, tag)
+			{
+				tagSize = tagParser.getTagSize() + 10;
+				fileSize = stats.size - tagSize;
+
+				fs.open(filePath, 'r', openFileDone);
+			});
 	}
 
 	function setHeader(start, end, chunkSize)
@@ -37,6 +47,7 @@ function processRequest(request, response)
 	function openFileDone(error, fd)
 	{
 		var chunkSize = 0;
+		var startRead = 0;
 
 		if (!request.headers || !request.headers.range)
 		{
@@ -61,10 +72,12 @@ function processRequest(request, response)
 
 			setHeader(start, end, chunkSize);
 			returnCode = 206;
+
+			startRead = start + tagSize;
 		}
 
 		buffer = new Buffer(chunkSize);
-		fs.read(fd, buffer, 0, chunkSize, start, readFileDone);
+		fs.read(fd, buffer, 0, chunkSize, startRead, readFileDone);
 	}
 
 	function readFileDone(error, bytesRead, buffer)
