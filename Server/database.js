@@ -166,7 +166,7 @@ function getAlbums(offset, albumsToGet, callback)
 {
     var albums = [];
 
-    collection.find( { }, { albumArtist: 1, album: 1, year: 1 } ).sort({ year: 1 }).toArray(
+    collection.find( { }, { albumArtist: 1, album: 1, year: 1 } ).sort({ albumArtist: 1, year: 1, album: 1 }).toArray(
         function(error, docs)
         {
             if (!docs)
