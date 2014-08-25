@@ -1,4 +1,8 @@
 var fs = require('fs');
+var images = require('images');
+var lwip = require('lwip');
+var tufu = require('tufu');
+
 var trackTime = require('./trackTime');
 
 var minTagMinorVer = 1;
@@ -220,6 +224,8 @@ function TagParser(includeArtwork)
 
 	this.getTag = function(fullPath, callback)
 	{
+		console.log('Extracting ID3 tag from: ' + fullPath);
+
 		_tag.path = fullPath;
 		_callback = callback;
 
@@ -501,6 +507,39 @@ function TagParser(includeArtwork)
 		}
 
 		_tag.time = time;
+
+		if (_tag.artwork)
+		{
+			console.log('Creating artwork thumbnail from: ' + _tag.path);
+
+			var randNumber = Math.floor(Math.random() * (10000));
+			var tmpPath = '.\\' + randNumber + '.jpg';
+
+			var buffer = new Buffer(_tag.artwork, 'base64');
+			images(buffer).save(tmpPath, 'jpg');
+
+			lwip.open(tmpPath, 
+				function(error, image)
+				{
+					image.batch().resize(200).toBuffer('jpg', 
+						function(error, newBuffer)
+						{
+							_tag.artworkSmall = newBuffer.toString('base64');
+
+							// Delete temporary artwork jpeg.
+							fs.unlink(tmpPath);
+
+							console.log('Done extracting ID3 tag from: ' + _tag.path);
+
+							// We have everything, return from getTag.
+							_callback(null, _tag);
+						});
+				});
+
+			return;
+		}
+
+		console.log('Done extracting ID3 tag from: ' + _tag.path);
 
 		// We have everything, return from getTag.
 		_callback(null, _tag);
