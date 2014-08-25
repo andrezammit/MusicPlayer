@@ -71,7 +71,6 @@ function extractTags(fileList, callback)
     function getTagDone(tag)
     {
         tagList.push(tag);
-        console.log(tag);
 
         if (++filesDone == listSize)
         {
