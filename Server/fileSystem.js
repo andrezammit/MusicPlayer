@@ -74,6 +74,8 @@ function extractTags(fileList, callback)
 
         if (++filesDone == listSize)
         {
+            tagParser.deleteImageCache();
+
             callback(tagList);
             return;
         }
@@ -101,7 +103,7 @@ function getTag(fullPath, callback)
     if (fileExt !== '.mp3')
         return;
 
-    new tagParser(false).getTag(fullPath, 
+    new tagParser(false, true).getTag(fullPath, 
         function(error, tag)
         {
             if (error)
