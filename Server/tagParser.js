@@ -1,7 +1,9 @@
 var fs = require('fs');
 var images = require('images');
 var lwip = require('lwip');
-var tufu = require('tufu');
+var rimraf = require('rimraf');
+
+var imageCacheDir = '.\\artwork_cache\\';
 
 var trackTime = require('./trackTime');
 
@@ -18,6 +20,15 @@ var byteSize = 8;
 
 var tagHeaderSize = 10;
 var frameHeaderSize = 10;
+
+function deleteImageCache()
+{
+	rimraf(imageCacheDir,
+		function()
+		{
+			console.log('Removed image cache directory.');
+		});
+}
 
 function trimNullChar(string)
 {
@@ -49,16 +60,20 @@ function readUntilNullChar(buffer, offset)
 	return result;
 }
 
-function TagParser(includeArtwork)
+function TagParser(includeArtwork, artworkThumb)
 {
 	if (!includeArtwork)
 		includeArtwork = false;
+
+	if (!artworkThumb)
+		artworkThumb = false;
 
 	var _tagSize = 0;
 	var _tagOffset = 0;
 	var _tagMinorVer = 3;
 
-	var _includeArtwork = includeArtwork;
+	var _artworkThumb = artworkThumb;
+	var _includeArtwork = _artworkThumb || includeArtwork;
 
 	var _fd = null;
 
@@ -508,37 +523,47 @@ function TagParser(includeArtwork)
 
 		_tag.time = time;
 
-		if (_tag.artwork)
+		if (_tag.artwork && _artworkThumb == true)
 		{
-			console.log('Creating artwork thumbnail from: ' + _tag.path);
-
-			var randNumber = Math.floor(Math.random() * (10000));
-			var tmpPath = '.\\' + randNumber + '.jpg';
-
-			var buffer = new Buffer(_tag.artwork, 'base64');
-			images(buffer).save(tmpPath, 'jpg');
-
-			lwip.open(tmpPath, 
-				function(error, image)
-				{
-					image.batch().resize(200).toBuffer('jpg', 
-						function(error, newBuffer)
-						{
-							_tag.artworkSmall = newBuffer.toString('base64');
-
-							// Delete temporary artwork jpeg.
-							fs.unlink(tmpPath);
-
-							console.log('Done extracting ID3 tag from: ' + _tag.path);
-
-							// We have everything, return from getTag.
-							_callback(null, _tag);
-						});
-				});
-
+			resizeArtwork(getTagDone)
 			return;
 		}
 
+		getTagDone();
+	}
+
+	function resizeArtwork(callback)
+	{
+		console.log('Creating artwork thumbnail from: ' + _tag.path);
+
+		if (!fs.existsSync(imageCacheDir))
+			fs.mkdirSync(imageCacheDir);
+
+		var randNumber = Math.floor(Math.random() * (10000));
+		var tmpPath = imageCacheDir + randNumber + '.jpg';
+
+		var buffer = new Buffer(_tag.artwork, 'base64');
+		images(buffer).save(tmpPath, 'jpg');
+
+		lwip.open(tmpPath, 
+			function(error, image)
+			{
+				image.batch().resize(200).toBuffer('jpg', 
+					function(error, newBuffer)
+					{
+						_tag.artworkSmall = newBuffer.toString('base64');
+
+						// If we didn't want the original artwork we can release it.
+						if (includeArtwork == false)
+							_tag.artwork = null;
+
+						callback();
+					});
+			});
+	}
+
+	function getTagDone()
+	{
 		console.log('Done extracting ID3 tag from: ' + _tag.path);
 
 		// We have everything, return from getTag.
@@ -547,3 +572,4 @@ function TagParser(includeArtwork)
 }
 
 module.exports = TagParser;
+module.exports.deleteImageCache = deleteImageCache;
