@@ -21,7 +21,7 @@ function onWSConnection(webSock)
 				database.getTags(query.offset, query.tagsToGet, 
 					function(docs)
 					{
-						if (!docs)
+						if (docs && docs.length > 0)
 						{
 							var reply = { command: 'getTagsReply', error: getNoTagsResponse() };
 							sendData(reply);
@@ -73,7 +73,7 @@ function onWSConnection(webSock)
 						var albumsDone = 0;
 						for (var cnt = 0; cnt < docs.length; cnt++)
 						{
-							getAlbumArtwork(docs[cnt], 
+							getCachedArtwork(docs[cnt], 
 								function(tag, artwork)
 								{
 									if (artwork)
@@ -146,6 +146,15 @@ function getNoMoreTracksReply()
 	return 'No more tracks in this album.';
 }
 
+function getCachedArtwork(tag, callback)
+{
+	database.getCachedArtwork(tag.artworkHash, 
+		function(artwork)
+		{
+			callback(tag, artwork);
+		})
+}
+
 function getAlbumArtwork(tag, callback)
 {
 	database.getAlbumTracks(tag.albumArtist, tag.album,
@@ -166,10 +175,10 @@ function getAlbumArtwork(tag, callback)
 					return;
 				}
 
-				new tagParser(true).getTag(docs[index].path, 
+				new tagParser(false, true).getTag(docs[index].path, 
 					function(error, tmpTag)
 					{
-						if (error || !tmpTag.artwork)
+						if (error || !tmpTag.artworkSmall)
 						{
 							getArtworkFromFile(++index);
 							return;
