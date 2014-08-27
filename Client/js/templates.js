@@ -90,7 +90,9 @@ function AlbumEntry(templateElement)
 
 		var albumArtwork = _clone.find(".albumImageSmall");
 
-		albumArtwork.attr('src', 'data:image/jpeg;base64,' + _artwork);
+		if (_artwork)
+			albumArtwork.attr('src', 'data:image/jpeg;base64,' + _artwork);
+		
 		albumArtwork.attr('alt', _albumArtist + ' - ' + _album);
 
 		return _clone;

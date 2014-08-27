@@ -231,11 +231,12 @@ MusicPlayer.engine = (function()
 	{
 		var albumContainer = $("#albumsContainer");
 		var albumTemplate = $(".templates").find(".albumEntry");
+
 		var albumContainerParent = albumContainer.parent();		
 
 		var albumsToFit = Math.floor(albumContainerParent.width() / albumTemplate.width());
-
 		var containerWidth = albumsToFit * albumTemplate.width();
+		
 		albumContainer.css('width', containerWidth);
 
 		alignHeaderText(albumContainer, callback)
@@ -246,6 +247,10 @@ MusicPlayer.engine = (function()
 		var header = $("#header");
 		header.css('margin-left', anchor.css('margin-left'));
 		header.css('width', anchor.css('width'));
+
+		var albumViewContainer = $("#albumViewContainer");
+		albumViewContainer.css('margin-left', anchor.css('margin-left'));
+		albumViewContainer.css('width', anchor.css('width'));
 
 		if (callback)
 			callback();
