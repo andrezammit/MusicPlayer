@@ -56,12 +56,12 @@ a:hover
 	top: 0px;
 
 	height: 60px;
-	width: 100%;
 
-	margin-top: 30px;
+	padding-top: 30px;
 	margin-bottom: 17px;
 
 	padding-bottom: 12px;
+	padding-left: 20px;
 
 	border-bottom: 1px solid;
 	border-bottom-color: lightgrey;
@@ -87,7 +87,7 @@ a:hover
 
 	left: 7px;
 
-	color: lightgrey;
+	color: grey;
 
 	font-family: 'Raleway', sans-serif;
 	font-weight: 400;
@@ -131,7 +131,10 @@ a:hover
     position: fixed;
 	top: 103px;
 	bottom: 80px;
-	width: 100%;
+
+	margin-left: 7px;
+	padding-left: 10px;
+
 	z-index: 1;
 	display: none;
 	background: rgba(255, 255, 255, 0.7);
