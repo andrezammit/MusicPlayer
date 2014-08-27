@@ -1,11 +1,12 @@
 var fs = require('fs');
-var images = require('images');
 var lwip = require('lwip');
+var images = require('images');
 var rimraf = require('rimraf');
-
-var imageCacheDir = '.\\artwork_cache\\';
+var crypto = require('crypto');
 
 var trackTime = require('./trackTime');
+
+var imageCacheDir = '.\\artwork_cache\\';
 
 var minTagMinorVer = 1;
 var maxTagMinorVar = 4;
@@ -490,6 +491,8 @@ function TagParser(includeArtwork, artworkThumb)
 			break;
 		}
 
+		frameData = null;
+
 		callback();
 	}
 
@@ -525,6 +528,9 @@ function TagParser(includeArtwork, artworkThumb)
 
 		if (_tag.artwork && _artworkThumb == true)
 		{
+			if (!fs.existsSync(imageCacheDir))
+				fs.mkdirSync(imageCacheDir);
+
 			resizeArtwork(getTagDone)
 			return;
 		}
@@ -536,28 +542,57 @@ function TagParser(includeArtwork, artworkThumb)
 	{
 		console.log('Creating artwork thumbnail from: ' + _tag.path);
 
-		if (!fs.existsSync(imageCacheDir))
-			fs.mkdirSync(imageCacheDir);
+		var stringToHash = _tag.albumArtist + _tag.album;
+		
+		var md5sum = crypto.createHash('md5');
 
-		var randNumber = Math.floor(Math.random() * (10000));
-		var tmpPath = imageCacheDir + randNumber + '.jpg';
+    	md5sum.update(stringToHash, 'ascii');
+    	_tag.artworkHash = md5sum.digest('hex');
+    	
+    	md5sum = null;
 
-		var buffer = new Buffer(_tag.artwork, 'base64');
-		images(buffer).save(tmpPath, 'jpg');
+		var tmpPath = imageCacheDir + _tag.artworkHash + '.jpg';
 
-		lwip.open(tmpPath, 
-			function(error, image)
+		if (fs.existsSync(tmpPath))
+		{
+			// Artwork already cached.
+			
+			_tag.artwork = null;
+			callback();
+
+			return;
+		}
+
+		var pngBuffer = new Buffer(_tag.artwork, 'base64');
+		var jpgBuffer = new images(pngBuffer).encode('jpg');
+
+		fs.writeFile(tmpPath, jpgBuffer,
+			function(error)
 			{
-				image.batch().resize(200).toBuffer('jpg', 
-					function(error, newBuffer)
+				pngBuffer = null;
+				jpgBuffer = null;
+
+				if (error)
+					throw error;
+
+				var resizer = new lwip.open(tmpPath, 
+					function(error, image)
 					{
-						_tag.artworkSmall = newBuffer.toString('base64');
+						image.batch().resize(200).toBuffer('jpg', 
+							function(error, newBuffer)
+							{
+								_tag.artworkSmall = newBuffer.toString('base64');
 
-						// If we didn't want the original artwork we can release it.
-						if (includeArtwork == false)
-							_tag.artwork = null;
+								// If we didn't want the original artwork we can release it.
+								if (includeArtwork == false)
+									_tag.artwork = null;
 
-						callback();
+								image = null;
+								resizer = null;
+								newBuffer = null;
+
+								callback();
+							});
 					});
 			});
 	}

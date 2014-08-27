@@ -1,5 +1,4 @@
 var dbEngine = require('tingodb')();
-var crypto = require('crypto');
 
 var db;
 var collection;
@@ -9,49 +8,29 @@ function cacheArtwork(tag, callback)
 {
     if (!tag.artworkSmall)
     {
-        callback(tag, '')
+        callback(tag)
         return;
     }
 
-    var md5sum = crypto.createHash('md5');
+    var doc = { hash: tag.artworkHash, artworkSmall: tag.artworkSmall };
 
-    md5sum.update(tag.artworkSmall, 'binary');
-    var hash = md5sum.digest('hex');
-
-    artworkCache.find({ hash: hash }, { _id: 1 }).toArray(
-        function(error, docs)
+    artworkCache.insert(doc, { w: 1 },
+        function(error, result)
         {
             if (error)
                 console.log(error);
 
-            if (docs && docs.length > 0)
-            {
-                // Artwork is already cached.
-                callback(tag, hash);
-
-                return;
-            }
-
-            var doc = { hash: hash, artworkSmall: tag.artworkSmall };
-
-            artworkCache.insert(doc, { w: 1 },
-                function(error, result)
-                {
-                    if (error)
-                        console.log(error);
-
-                    callback(tag, hash);
-                });
+            callback(tag);
         });
 }
 
-function saveTag(tag, hash, callback)
+function saveTag(tag, callback)
 {
     var tmpArtist = tag.albumArtist || tag.artist;
 
-    console.log('Saving: ' + tmpArtist + ' - ' + tag.song + ' - ' + tag.album + ' - ' + tag.track + ' - ' + tag.time + ' - ' + tag.year + ' - ' + hash);
+    console.log('Saving: ' + tmpArtist + ' - ' + tag.song + ' - ' + tag.album + ' - ' + tag.track + ' - ' + tag.time + ' - ' + tag.year + ' - ' + tag.artworkHash);
 
-    var doc = { artist: tag.artist, albumArtist: tag.albumArtist, song: tag.song, album: tag.album, track: parseInt(tag.track), time: tag.time, year: parseInt(tag.year), path: tag.path, artworkHash: hash };
+    var doc = { artist: tag.artist, albumArtist: tag.albumArtist, song: tag.song, album: tag.album, track: parseInt(tag.track), time: tag.time, year: parseInt(tag.year), path: tag.path, artworkHash: tag.artworkHash };
 
     collection.insert(doc, { w: 1 }, 
         function(error, result) 
@@ -105,9 +84,9 @@ function saveTags(tagList, callback)
         var tmpTag = tagList[cnt];
 
         cacheArtwork(tmpTag,
-            function(tmpTag, hash)
+            function(tmpTag)
             {
-                saveTag(tmpTag, hash,
+                saveTag(tmpTag,
                     function()
                     {
                         if (++tagsSaved == listSize)
