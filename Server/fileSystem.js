@@ -17,29 +17,31 @@ function processFile(dir, fileList, fileIndex, results, callback)
     }
 
     var fullPath = dir + '\\' + fileEntry;
-    var fileStat = fs.statSync(fullPath);
+    fs.stat(fullPath,
+        function(error, stats)
+        {
+            if (!stats)
+                return;
 
-    if (fileStat === null)
-        return;
-
-    if (fileStat.isDirectory())
-    {
-        scan(fullPath, 
-            function(error, tmpResults)
+            if (stats.isDirectory())
             {
-                results = results.concat(tmpResults);
-                processFile(dir, fileList, fileIndex, results, callback);
-            });
-    }
-    else
-    {
-        var fileExt = path.extname(fullPath);
+                scan(fullPath, 
+                    function(error, tmpResults)
+                    {
+                        results = results.concat(tmpResults);
+                        processFile(dir, fileList, fileIndex, results, callback);
+                    });
+            }
+            else
+            {
+                var fileExt = path.extname(fullPath);
 
-        if (fileExt === '.mp3')
-            results.push(fullPath);
-        
-        processFile(dir, fileList, fileIndex, results, callback);
-    }
+                if (fileExt === '.mp3')
+                    results.push(fullPath);
+                
+                processFile(dir, fileList, fileIndex, results, callback);
+            }
+        });
 }
 
 function scan(dir, callback)

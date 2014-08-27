@@ -16,20 +16,22 @@ function processRequest(request, response)
 
 	function getFileFromIDDone(filePath)
 	{
-		var stats = fs.statSync(filePath);
-
-		if (!stats)
-			return;
-
-		var tagParser = new TagParser(false);
-
-		tagParser.getTag(filePath, 
-			function(error, tag)
+		fs.stat(filePath,
+			function(error, stats)
 			{
-				tagSize = tagParser.getTagSize() + 10;
-				fileSize = stats.size - tagSize;
+				if (!stats)
+					return;
 
-				fs.open(filePath, 'r', openFileDone);
+				var tagParser = new TagParser(false);
+
+				tagParser.getTag(filePath, 
+					function(error, tag)
+					{
+						tagSize = tagParser.getTagSize() + 10;
+						fileSize = stats.size - tagSize;
+
+						fs.open(filePath, 'r', openFileDone);
+					});
 			});
 	}
 

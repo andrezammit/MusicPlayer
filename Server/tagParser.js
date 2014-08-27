@@ -516,32 +516,34 @@ function TagParser(includeArtwork, artworkThumb)
 
 	function getTrackTimeDone(error, time)
 	{	
-		fs.closeSync(_fd);
-		
-		if (error)
-		{
-			_callback(error);
-			return;
-		}
+		fs.close(_fd,
+			function()
+			{
+				if (error)
+				{
+					_callback(error);
+					return;
+				}
 
-		_tag.time = time;
+				_tag.time = time;
 
-		if (_tag.artwork && _artworkThumb == true)
-		{
-			if (!fs.existsSync(imageCacheDir))
-				fs.mkdirSync(imageCacheDir);
+				if (_tag.artwork && _artworkThumb == true)
+				{
+					fs.mkdir(imageCacheDir,
+						function(error)
+						{
+							resizeArtwork(getTagDone)
+						});
 
-			resizeArtwork(getTagDone)
-			return;
-		}
+					return;
+				}
 
-		getTagDone();
+				getTagDone();
+			});
 	}
 
 	function resizeArtwork(callback)
 	{
-		console.log('Creating artwork thumbnail from: ' + _tag.path);
-
 		var stringToHash = _tag.albumArtist + _tag.album;
 		
 		var md5sum = crypto.createHash('md5');
@@ -551,59 +553,66 @@ function TagParser(includeArtwork, artworkThumb)
     	
     	md5sum = null;
 
-		var tmpPath = imageCacheDir + _tag.artworkHash + '.jpg';
-
-		if (fs.existsSync(tmpPath))
-		{
-			// Artwork already cached.
-			
-			_tag.artwork = null;
-			callback();
-
-			return;
-		}
-
-		var pngBuffer = new Buffer(_tag.artwork, 'base64');
-		var jpgBuffer = new images(pngBuffer).encode('jpg');
-
-		fs.writeFile(tmpPath, jpgBuffer,
-			function(error)
-			{
-				pngBuffer = null;
-				jpgBuffer = null;
-
-				if (error)
-					throw error;
-
-				var resizer = new lwip.open(tmpPath, 
-					function(error, image)
-					{
-						image.batch().resize(200).toBuffer('jpg', 
-							function(error, newBuffer)
-							{
-								_tag.artworkSmall = newBuffer.toString('base64');
-
-								// If we didn't want the original artwork we can release it.
-								if (includeArtwork == false)
-									_tag.artwork = null;
-
-								image = null;
-								resizer = null;
-								newBuffer = null;
-
-								callback();
-							});
-					});
-			});
+		resizeArtworkWorker(_tag, callback);
 	}
 
 	function getTagDone()
 	{
+		// If we didn't want the original artwork we can release it.
+		if (includeArtwork == false && _tag.artwork)
+			_tag.artwork = null;
+
 		console.log('Done extracting ID3 tag from: ' + _tag.path);
 
 		// We have everything, return from getTag.
 		_callback(null, _tag);
 	}
+}
+
+var arrImagesToResize = [];
+
+function resizeArtworkWorker(tag, callback)
+{
+	if (arrImagesToResize.indexOf(tag.artworkHash) > -1)
+	{
+		callback();
+		return;
+	}
+
+	console.log('Creating artwork thumbnail from: ' + tag.path);
+
+	arrImagesToResize.push(tag.artworkHash);
+
+	var pngBuffer = new Buffer(tag.artwork, 'base64');
+	var jpgBuffer = new images(pngBuffer).encode('jpg');
+
+	var tmpPath = imageCacheDir + tag.artworkHash + '.jpg';
+
+	fs.writeFile(tmpPath, jpgBuffer,
+		function(error)
+		{
+			pngBuffer = null;
+			jpgBuffer = null;
+
+			if (error)
+				throw error;
+
+			var resizer = new lwip.open(tmpPath, 
+				function(error, image)
+				{
+					image.batch().resize(200).toBuffer('jpg', 
+						function(error, newBuffer)
+						{
+							tag.artworkSmall = newBuffer.toString('base64');
+
+							image = null;
+							resizer = null;
+							newBuffer = null;
+
+							callback();
+						});
+				});
+		});
 }
 
 module.exports = TagParser;

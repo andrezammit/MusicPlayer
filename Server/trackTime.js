@@ -302,24 +302,31 @@ function TrackTime(fd, fullPath, tagOffset)
 
 	function readVBRHeaderDone()
 	{
-		var trackTime = getTimeString();
-		_callback(null, trackTime);
+		getTotalTime(getTimeAsString);
 	}
 
-	function getTimeString()
+	function getTotalTime(callback)
 	{
 		var time = 0;
 
 		if (_isVBR)
 		{
 			time = _vbrFrames * (_samplesPerFrame / _samplingRate);
-		}
-		else
-		{
-			var stat = fs.statSync(_fullPath);
-			time = (stat.size - _tagOffset) / ((_bitRate * 1000) / 8);
+			callback(time);
+			
+			return;
 		}
 
+		fs.stat(_fullPath,
+			function(error, stats)
+			{
+				time = (stats.size - _tagOffset) / ((_bitRate * 1000) / 8);
+				callback(time);
+			});
+	}
+
+	function getTimeAsString(time)
+	{
 		time = Math.floor(time);
 
 		var minutes = Math.floor(time / 60);
@@ -328,7 +335,8 @@ function TrackTime(fd, fullPath, tagOffset)
 		if (seconds < 10)
 			seconds = '0' + seconds;
 
-		return minutes + ':' + seconds;
+		var trackTime = minutes + ':' + seconds;
+		_callback(null, trackTime);
 	}
 }
 
