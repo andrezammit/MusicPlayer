@@ -65,6 +65,8 @@ function scan(dir, callback)
 function extractTags(fileList, callback) 
 {
     var filesDone = 0;
+    var filesStarted = 0;
+
     var listSize = fileList.length;
 
     var tagList = [];
@@ -82,14 +84,15 @@ function extractTags(fileList, callback)
             return;
         }
 
-        if (filesDone % bunchOfTags == 0)
-            setTimeout(getSomeTags, 0, filesDone);
+        setTimeout(getTag, 0, fileList[filesStarted++], getTagDone);
     };
 
     function getSomeTags(startIndex)
     {
         var remainingFiles = listSize - startIndex;
         thisBunch = startIndex + Math.min(remainingFiles, bunchOfTags);
+
+        filesStarted = thisBunch;
 
         for (var cnt = startIndex; cnt < thisBunch; cnt++)
             setTimeout(getTag, 0, fileList[cnt], getTagDone);
