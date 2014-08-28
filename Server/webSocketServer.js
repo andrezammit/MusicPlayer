@@ -111,10 +111,14 @@ function onWSConnection(webSock)
 							return;
 						}
 
-						var replyData = { artist: query.albumArtist, album: query.album, trackList: docs };
+						new tagParser(true, false).getTag(docs[0].path, 
+							function(error, tag)
+							{
+								var replyData = { artist: query.albumArtist, album: query.album, trackList: docs, artwork: tag.artwork };
 
-						var reply = { command: 'getTracksReply', replyData: replyData };
-						sendData(reply);
+								var reply = { command: 'getTracksReply', replyData: replyData };
+								sendData(reply);
+							});
 					});
 			}
 		}

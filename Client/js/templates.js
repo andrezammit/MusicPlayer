@@ -73,7 +73,7 @@ function AlbumEntry(templateElement)
 			albumLink.click(
 				function()
 				{
-					musicPlayer.chooseAlbum(_albumArtist, _album, albumLink[0]);
+					musicPlayer.chooseAlbum(_albumArtist, _album);
 				});
 
 			albumLink.hover(

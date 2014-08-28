@@ -8,7 +8,6 @@ MusicPlayer.engine = (function()
 	var msgHandlers = {};
 
 	var _currentTrackID = null;
-	var _chosenAlbumTag = null;
 
 	var _albumTracks = [];
 	var _currentAlbumTracks = [];
@@ -287,10 +286,10 @@ MusicPlayer.engine = (function()
 			}(trackList[cnt]));
 		}
 
-		var albumImage = $(_chosenAlbumTag).find('img');
+		var albumImag = $("#albumImageLarge");
 
-		html = '<img src="' + albumImage.attr('src') + '" id="albumImageLarge" />';
-		$("#artwork").html(html);
+		albumImag.attr('src', 'data:image/jpeg;base64,' + replyData.artwork);
+		albumImag.attr('alt', replyData.artist + ' - ' + replyData.album);
 
 		$.when($("#albumViewContainer").show(),
 			$("#albumView").slideToggle(400)).done(
@@ -566,9 +565,8 @@ MusicPlayer.engine = (function()
 			onAlbumOut();
 		},
 
-		chooseAlbum: function(artist, album, tag)
+		chooseAlbum: function(artist, album)
 		{
-			_chosenAlbumTag = tag;
 			getAlbumTracks(artist, album, showAlbumTracks);
 		},
 
