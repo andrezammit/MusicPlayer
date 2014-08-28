@@ -75,13 +75,18 @@ MusicPlayer.engine = (function()
             	audioElement.currentTime = $(this).val(); 
         	});
 
+		function onVolumeChange(value)
+		{
+	    	console.log('Volume: ' + value);
+
+	    	var audioElement = getAudioElement();
+	    	audioElement.volume = value / 100;
+		}
+
  		$(".knob").knob(
  		{
-            change: function (value) 
-            {
-            	var audioElement = getAudioElement();
-            	audioElement.volume = value / 100;
-            },
+ 			release: onVolumeChange,
+            change: onVolumeChange,
           
             draw: function () 
             {
