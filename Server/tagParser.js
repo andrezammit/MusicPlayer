@@ -553,7 +553,51 @@ function TagParser(includeArtwork, artworkThumb)
     	
     	md5sum = null;
 
-		resizeArtworkWorker(_tag, callback);
+		resizeArtworkWorker(callback);
+	}
+
+	function resizeArtworkWorker(callback)
+	{
+		if (arrImagesToResize.indexOf(_tag.artworkHash) > -1)
+		{
+			callback();
+			return;
+		}
+
+		console.log('Creating artwork thumbnail from: ' + _tag.path);
+
+		arrImagesToResize.push(_tag.artworkHash);
+
+		var pngBuffer = new Buffer(_tag.artwork, 'base64');
+		var jpgBuffer = new images(pngBuffer).encode('jpg');
+
+		var tmpPath = imageCacheDir + _tag.artworkHash + '.jpg';
+
+		fs.writeFile(tmpPath, jpgBuffer,
+			function(error)
+			{
+				pngBuffer = null;
+				jpgBuffer = null;
+
+				if (error)
+					throw error;
+
+				var resizer = new lwip.open(tmpPath, 
+					function(error, image)
+					{
+						image.batch().resize(200).toBuffer('jpg', 
+							function(error, newBuffer)
+							{
+								_tag.artworkSmall = newBuffer.toString('base64');
+
+								image = null;
+								resizer = null;
+								newBuffer = null;
+
+								callback();
+							});
+					});
+			});
 	}
 
 	function getTagDone()
@@ -571,49 +615,15 @@ function TagParser(includeArtwork, artworkThumb)
 
 var arrImagesToResize = [];
 
-function resizeArtworkWorker(tag, callback)
+function dumpImagesArray()
 {
-	if (arrImagesToResize.indexOf(tag.artworkHash) > -1)
-	{
-		callback();
-		return;
-	}
-
-	console.log('Creating artwork thumbnail from: ' + tag.path);
-
-	arrImagesToResize.push(tag.artworkHash);
-
-	var pngBuffer = new Buffer(tag.artwork, 'base64');
-	var jpgBuffer = new images(pngBuffer).encode('jpg');
-
-	var tmpPath = imageCacheDir + tag.artworkHash + '.jpg';
-
-	fs.writeFile(tmpPath, jpgBuffer,
-		function(error)
+	arrImagesToResize.forEach(
+		function(item)
 		{
-			pngBuffer = null;
-			jpgBuffer = null;
-
-			if (error)
-				throw error;
-
-			var resizer = new lwip.open(tmpPath, 
-				function(error, image)
-				{
-					image.batch().resize(200).toBuffer('jpg', 
-						function(error, newBuffer)
-						{
-							tag.artworkSmall = newBuffer.toString('base64');
-
-							image = null;
-							resizer = null;
-							newBuffer = null;
-
-							callback();
-						});
-				});
+			console.log(item);
 		});
 }
 
 module.exports = TagParser;
 module.exports.deleteImageCache = deleteImageCache;
+module.exports.dumpImagesArray = dumpImagesArray;
