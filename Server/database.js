@@ -244,6 +244,12 @@ function getAlbumTracks(albumArtist, album, callback)
 
 function getCachedArtwork(hash, callback)
 {
+    if (!hash)
+    {
+        callback();
+        return;
+    }
+
     artworkCache.find({ hash: hash }, { artworkSmall: 1 }).toArray(
         function(error, docs)
         {
