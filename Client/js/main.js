@@ -119,7 +119,6 @@ MusicPlayer.engine = (function()
                 return false;
             }
         });
-
 	}
 
 	function getAudioElement()
@@ -423,18 +422,20 @@ MusicPlayer.engine = (function()
 			var trackElement = _albumTracks[cnt][1];
 
 			var playImage = trackElement.find(".playButtonSmallImg");
+			var gradientElement = trackElement.find(".trackGradient");
+
 			var audioElement = getAudioElement();
 
 			if (audioElement.paused || trackID != _currentTrackID)
 			{
-				trackElement.css('background', 'rgba(255, 255, 255, 0)');
+				gradientElement.css('opacity', '0');
 
 				playImage.attr('src', 'images/play.png');
 				playImage.attr('alt', 'Play');
 			}
 			else
 			{
-				trackElement.css('background', 'rgba(255, 255, 255, 0.2)');
+				gradientElement.css('opacity', '1');
 
 				playImage.attr('src', 'images/pause.png');
 				playImage.attr('alt', 'Pause');

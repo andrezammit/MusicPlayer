@@ -129,7 +129,7 @@ a:hover
 #albumViewContainer 
 {
     position: fixed;
-    
+
 	top: 103px;
 	bottom: 80px;
 
@@ -223,7 +223,6 @@ a:hover
 
 .playButtonSmall
 {
-	float: left;
 	width: 20px;
 	margin-top: 10px;
 }
@@ -235,6 +234,10 @@ a:hover
 	border: 1px solid;
 	border-radius: 50%;
 	border-color: black;
+
+	top: 4px;
+
+	position: relative;
 
 	transition: background-color 200ms linear;
 }
@@ -432,6 +435,19 @@ a:hover
 .trackEntry
 {
 	transition: background 400ms linear;
+	position: relative;
+}
+
+.trackEntry .trackGradient
+{
+	position: absolute;
+		
+	opacity: 0;
+	width: 100%;
+
+	transition: opacity 400ms linear;
+
+	background: linear-gradient(to right, rgba(0,0,0,0) 0%, rgba(255, 255, 255, 0.65) 23%, rgba(255, 255, 255, 0.65) 81%, rgba(0,0,0,0) 100%);
 }
 
 .trackEntry div
@@ -439,6 +455,8 @@ a:hover
 	height: 35px;
 	line-height: 35px;
 	display: inline-block;
+
+	position: relative;
 }
 
 .track
