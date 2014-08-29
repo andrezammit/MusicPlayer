@@ -249,7 +249,7 @@ MusicPlayer.engine = (function()
 	{
 		var header = $("#header");
 		header.css('margin-left', anchor.css('margin-left'));
-		header.css('width', anchor.css('width'));
+		header.css('width', parseInt(anchor.css('width')) - parseInt(header.css('padding-left')));
 
 		var albumViewContainer = $("#albumViewContainer");
 		albumViewContainer.css('margin-left', anchor.css('margin-left'));
