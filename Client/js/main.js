@@ -12,6 +12,8 @@ MusicPlayer.engine = (function()
 	var _albumTracks = [];
 	var _currentAlbumTracks = [];
 
+	var _currentVolume = 1;
+
 	(function()
 	{
 		$(window).resize(
@@ -44,6 +46,11 @@ MusicPlayer.engine = (function()
 
 	function setupHandlers()
 	{
+		window.onscroll = function(event) 
+		{
+			console.log(window.scrollY);
+    	};
+
 		$("#closeTracksLink").click(
 			function()
 			{
@@ -81,6 +88,8 @@ MusicPlayer.engine = (function()
 
 	    	var audioElement = getAudioElement();
 	    	audioElement.volume = value / 100;
+
+	    	_currentVolume = audioElement.volume;
 		}
 
  		$(".knob").knob(
@@ -248,12 +257,15 @@ MusicPlayer.engine = (function()
 	function alignHeaderText(anchor, callback)
 	{
 		var header = $("#header");
-		header.css('margin-left', anchor.css('margin-left'));
-		header.css('width', parseInt(anchor.css('width')) - parseInt(header.css('padding-left')));
-
 		var albumViewContainer = $("#albumViewContainer");
+
+		var width = parseInt(anchor.css('width')) - parseInt(header.css('padding-left'));
+
+		header.css('margin-left', anchor.css('margin-left'));
+		header.css('width', width);
+
 		albumViewContainer.css('margin-left', anchor.css('margin-left'));
-		albumViewContainer.css('width', anchor.css('width'));
+		albumViewContainer.css('width', width);
 
 		if (callback)
 			callback();
@@ -516,7 +528,7 @@ MusicPlayer.engine = (function()
 		if (!isTrackInCurrentAlbum(trackID))
 			_currentAlbumTracks = _albumTracks;
 
-		songControl.playSong(trackID);
+		songControl.fadeOutSong(trackID);
 	}
 
 	function getTrackSeconds()
@@ -631,6 +643,11 @@ MusicPlayer.engine = (function()
 		getTrackSeconds: function()
 		{
 			return getTrackSeconds();
+		},
+
+		getCurrentVolume: function()
+		{
+			return _currentVolume;
 		},
 	};
 }());

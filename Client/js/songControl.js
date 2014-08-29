@@ -131,12 +131,24 @@ MusicPlayer.songControl = (function()
 		audioElement.bind('play', onPlay);
 	}
 
+	function fadeOutSong(trackID)
+	{
+		var audioElement = musicPlayer.getAudioElement();
+		
+		$(audioElement).animate({ volume: 0 }, 500, 'swing',
+			function()
+			{
+				playSong(trackID);
+			});
+	}
+
 	function playSong(trackID)
 	{
 		_nextTrackElement = null;
 
 		var audioElement = musicPlayer.getAudioElement();
-
+		audioElement.volume = musicPlayer.getCurrentVolume();
+		
 		if (trackID)
 		{
 			$(audioElement).attr('trackID', trackID);
@@ -162,7 +174,7 @@ MusicPlayer.songControl = (function()
 		if (trackID == -1)
 			return;
 
-		playSong(trackID);
+		fadeOutSong(trackID);
 	}
 
 	function playLastSong()
@@ -181,7 +193,7 @@ MusicPlayer.songControl = (function()
 		if (trackID == -1)
 			return;
 
-		playSong(trackID);
+		fadeOutSong(trackID);
 	}
 
 	return {
@@ -192,11 +204,21 @@ MusicPlayer.songControl = (function()
 			if (audioElement.paused)
 			{
 				audioElement.play();
+				$(audioElement).animate({ volume: musicPlayer.getCurrentVolume() }, 500);
 			}
 			else
 			{
-				audioElement.pause();
+				$(audioElement).animate({ volume: 0 }, 500, 'swing',
+					function()
+					{
+						audioElement.pause();
+					});
 			}
+		},
+
+		fadeOutSong: function(trackID)
+		{
+			fadeOutSong(trackID);
 		},
 
 		playSong: function(trackID)
