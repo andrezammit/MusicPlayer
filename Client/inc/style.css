@@ -106,6 +106,8 @@ a:hover
 #albums
 {
 	text-align: left;
+
+	transition: 300ms -webkit-filter linear;
 }
 
 .albumEntry
@@ -124,6 +126,7 @@ a:hover
 #albumImageLarge
 {
 	display: none;
+	transition: 300ms opacity linear;
 }
 
 #albumViewContainer 

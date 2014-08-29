@@ -296,18 +296,18 @@ MusicPlayer.engine = (function()
 		albumImag.attr('alt', replyData.artist + ' - ' + replyData.album);
 
 		$.when($("#albumViewContainer").show(),
-			$("#albumView").slideToggle(400)).done(
+			$("#albumView").slideToggle(300)).done(
 			function()
 			{
 				updateNowPlayingTrack();
 
+				$("#albums").css('webkitFilter', 'blur(20px)');
 				$("body").css('overflow', 'hidden');
-				$("#albums").css('webkitFilter', 'blur(20px)')
 
 				resizeArtwork($("#albumImageLarge"), 
 					function()
 					{
-						$("#albumImageLarge").fadeIn();
+						$("#albumImageLarge").show();
 					});
 			});
 	}
@@ -392,10 +392,12 @@ MusicPlayer.engine = (function()
 
 	function closeTracks()
 	{
-		$("body").css('overflow', 'auto');
-		$("#albums").css('webkitFilter', 'blur(0px)');
+		$("#albumImageLarge").hide();
 
-		$("#albumView").slideToggle(400, 
+		$("#albums").css('webkitFilter', 'blur(0px)');
+		$("body").css('overflow', 'auto');
+
+		$("#albumView").slideToggle(300, 
 			function()
 			{
 				$("#albumViewContainer").toggle();
