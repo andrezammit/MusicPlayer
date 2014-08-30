@@ -527,12 +527,17 @@ function TagParser(includeArtwork, artworkThumb)
 
 				_tag.time = time;
 
-				if (_tag.artwork && _artworkThumb == true)
+				if (_tag.artwork)
 				{
+					var width = 800;
+
+					if (_artworkThumb == true)
+						width = 200;
+
 					fs.mkdir(imageCacheDir,
 						function(error)
 						{
-							resizeArtwork(getTagDone)
+							resizeArtwork(width, getTagDone)
 						});
 
 					return;
@@ -542,7 +547,7 @@ function TagParser(includeArtwork, artworkThumb)
 			});
 	}
 
-	function resizeArtwork(callback)
+	function resizeArtwork(width, callback)
 	{
 		var stringToHash = _tag.albumArtist + _tag.album;
 		
@@ -553,10 +558,10 @@ function TagParser(includeArtwork, artworkThumb)
     	
     	md5sum = null;
 
-		resizeArtworkWorker(callback);
+		resizeArtworkWorker(width, callback);
 	}
 
-	function resizeArtworkWorker(callback)
+	function resizeArtworkWorker(width, callback)
 	{
 		if (arrImagesToResize.indexOf(_tag.artworkHash) > -1)
 		{
@@ -585,10 +590,17 @@ function TagParser(includeArtwork, artworkThumb)
 				var resizer = new lwip.open(tmpPath, 
 					function(error, image)
 					{
-						image.batch().resize(200).toBuffer('jpg', 
+						image.batch().resize(width).toBuffer('jpg', 
 							function(error, newBuffer)
 							{
-								_tag.artworkSmall = newBuffer.toString('base64');
+								if (artworkThumb == true)
+								{
+									_tag.artworkSmall = newBuffer.toString('base64');
+								}
+								else
+								{
+									_tag.artwork = newBuffer.toString('base64');
+								}
 
 								image = null;
 								resizer = null;
