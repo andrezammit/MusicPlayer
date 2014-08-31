@@ -257,12 +257,15 @@ MusicPlayer.engine = (function()
 	function alignHeaderText(anchor, callback)
 	{
 		var header = $("#header");
+		var albumName = $("#albumName");
 		var albumViewContainer = $("#albumViewContainer");
 
 		var width = parseInt(anchor.css('width')) - parseInt(header.css('padding-left'));
 
 		header.css('margin-left', anchor.css('margin-left'));
 		header.css('width', width);
+		
+		albumName.css('max-width', width - 100);
 
 		albumViewContainer.css('margin-left', anchor.css('margin-left'));
 		albumViewContainer.css('width', width);
@@ -367,6 +370,22 @@ MusicPlayer.engine = (function()
 			});
 	}
 
+	function resizeTextToFit(element, callback)
+	{
+		element.textfill(
+			{
+				maxFontPixels: 50,
+				explicitWidth: parseInt($("#albumName").css('max-width')),
+				explicitHeight: 60,
+				complete: 
+					function()
+					{
+						if (callback)
+							callback();
+					}
+			});
+	}
+
 	function onAlbumHover(artist, album, year)
 	{
 		var headerTag = $("#albumName, #albumYear");
@@ -379,16 +398,20 @@ MusicPlayer.engine = (function()
 				if (album)
 					albumText += ' - ' + album;
 
-				$("#albumName").text(albumText);
+				$("#albumName span").text(albumText);
 
 				var yearText = '';
 
 				if (year)
 					yearText = year;
 
-				$("#albumYear").text(yearText);
+				$("#albumYear span").text(yearText);
 
-				headerTag.fadeIn();
+				resizeTextToFit($("#albumName"),
+					function()
+					{
+						headerTag.fadeIn(400);
+					});
 			});
 	}
 

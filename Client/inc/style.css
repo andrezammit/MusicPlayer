@@ -73,8 +73,19 @@ a:hover
 
 #albumName
 {
-	display: inline-block;
+	display: table-cell;
+	vertical-align: bottom;
 
+	position: relative;
+
+	height: 60px;
+	line-height: 60px;
+
+	overflow: hidden;
+}
+
+#albumName span
+{
 	font-family: 'Raleway', sans-serif;
 	font-weight: 400;
 	font-size: 50px;
@@ -82,11 +93,17 @@ a:hover
 
 #albumYear
 {
-	display: inline-block;
+	display: table-cell;
+	vertical-align: bottom;
+	
 	position: relative;
 
 	left: 7px;
+	bottom: 13px;
+}
 
+#albumYear span
+{
 	color: grey;
 
 	font-family: 'Raleway', sans-serif;
