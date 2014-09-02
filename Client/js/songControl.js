@@ -81,7 +81,10 @@ MusicPlayer.songControl = (function()
 		_nextSongPreloaded = false;
 
 		if (!_nextTrackElement)
+		{
+			musicPlayer.clearControlBar();
 			return;
+		}
 
 		var audioElement = $("#currentPlaying");
 		

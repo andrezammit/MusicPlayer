@@ -46,10 +46,10 @@ MusicPlayer.engine = (function()
 
 	function setupHandlers()
 	{
-		window.onscroll = function(event) 
+/*		window.onscroll = function(event) 
 		{
 			console.log(window.scrollY);
-    	};
+    	};*/
 
 		$("#closeTracksLink").click(
 			function()
@@ -587,6 +587,12 @@ MusicPlayer.engine = (function()
 		return '';
 	}
 
+	function clearControlBar()
+	{
+		$("#songInfo").html('');
+		$("#currentTime").html('');
+	}
+
 	return {
 		connectWebSocket: function() 
 		{
@@ -671,6 +677,11 @@ MusicPlayer.engine = (function()
 		getCurrentVolume: function()
 		{
 			return _currentVolume;
+		},
+
+		clearControlBar: function()
+		{
+			return clearControlBar();
 		},
 	};
 }());
