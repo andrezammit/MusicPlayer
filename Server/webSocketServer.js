@@ -114,8 +114,6 @@ function onWSConnection(webSock)
 						new tagParser(true, false).getTag(docs[0].path, 
 							function(error, tag)
 							{
-								tagParser.deleteImageCache();
-								
 								var replyData = { artist: query.albumArtist, album: query.album, trackList: docs, artwork: tag.artwork };
 
 								var reply = { command: 'getTracksReply', replyData: replyData };

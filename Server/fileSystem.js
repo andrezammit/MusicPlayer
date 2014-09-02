@@ -78,8 +78,6 @@ function extractTags(fileList, callback)
 
         if (++filesDone == listSize)
         {
-            tagParser.deleteImageCache();
-
             callback(tagList);
             return;
         }

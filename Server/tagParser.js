@@ -1,12 +1,9 @@
 var fs = require('fs');
 var lwip = require('lwip');
 var images = require('images');
-var rimraf = require('rimraf');
 var crypto = require('crypto');
 
 var trackTime = require('./trackTime');
-
-var imageCacheDir = '.\\artwork_cache\\';
 
 var minTagMinorVer = 1;
 var maxTagMinorVar = 4;
@@ -21,15 +18,6 @@ var byteSize = 8;
 
 var tagHeaderSize = 10;
 var frameHeaderSize = 10;
-
-function deleteImageCache()
-{
-	rimraf(imageCacheDir,
-		function()
-		{
-			console.log('Removed image cache directory.');
-		});
-}
 
 function trimNullChar(string)
 {
@@ -534,12 +522,7 @@ function TagParser(includeArtwork, artworkThumb)
 					if (_artworkThumb == true)
 						width = 200;
 
-					fs.mkdir(imageCacheDir,
-						function(error)
-						{
-							resizeArtwork(width, getTagDone)
-						});
-
+					resizeArtwork(width, getTagDone);
 					return;
 				}
 
@@ -569,45 +552,37 @@ function TagParser(includeArtwork, artworkThumb)
 			return;
 		}
 
-		console.log('Creating artwork thumbnail from: ' + _tag.path);
+		console.log('Resizing artwork for: ' + _tag.path);
 
 		arrImagesToResize.push(_tag.artworkHash);
 
 		var pngBuffer = new Buffer(_tag.artwork, 'base64');
 		var jpgBuffer = new images(pngBuffer).encode('jpg');
 
-		var tmpPath = imageCacheDir + _tag.artworkHash + '.jpg';
+		pngBuffer = null;
 
-		fs.writeFile(tmpPath, jpgBuffer,
-			function(error)
+		var resizer = new lwip.load(jpgBuffer, jpgBuffer.length, 'jpgBuffer',
+			function(error, image)
 			{
-				pngBuffer = null;
 				jpgBuffer = null;
 
-				if (error)
-					throw error;
-
-				var resizer = new lwip.open(tmpPath, 
-					function(error, image)
+				image.batch().resize(width).toBuffer('jpg', 
+					function(error, newBuffer)
 					{
-						image.batch().resize(width).toBuffer('jpg', 
-							function(error, newBuffer)
-							{
-								if (artworkThumb == true)
-								{
-									_tag.artworkSmall = newBuffer.toString('base64');
-								}
-								else
-								{
-									_tag.artwork = newBuffer.toString('base64');
-								}
+						if (artworkThumb == true)
+						{
+							_tag.artworkSmall = newBuffer.toString('base64');
+						}
+						else
+						{
+							_tag.artwork = newBuffer.toString('base64');
+						}
 
-								image = null;
-								resizer = null;
-								newBuffer = null;
+						image = null;
+						resizer = null;
+						newBuffer = null;
 
-								callback();
-							});
+						callback();
 					});
 			});
 	}
@@ -637,5 +612,4 @@ function dumpImagesArray()
 }
 
 module.exports = TagParser;
-module.exports.deleteImageCache = deleteImageCache;
 module.exports.dumpImagesArray = dumpImagesArray;

@@ -1,8 +1,8 @@
 var fileSystem = require('./fileSystem');
 var database = require('./database');
 var webServer = require('./webserver');
-var webServer = require('./webSocketServer');
-var webServer = require('./mp3Server');
+var webSocketServer = require('./webSocketServer');
+var mp3Server = require('./mp3Server');
 
 function saveTagsDone(tagCount)
 {
@@ -38,4 +38,13 @@ function scanDone(error, fileList)
     fileSystem.extractTags(fileList, extractTagsDone)
 }
 
-fileSystem.scan('H:\\Music\\Music\\Cesare Cremonini\\Bagùs', scanDone);
+//fileSystem.scan('H:\\Music\\Music', scanDone);
+//fileSystem.scan('H:\\Music\\Music\\Foo Fighters', scanDone);
+
+// new tagParser(true).getTag('H:\\Music\\Music\\Foo Fighters\\In Your Honor [Disc 1]\\1-01 In Your Honor.mp3', getTagDone);
+
+// function getTagDone(error, tag)
+// {
+//     console.log(tag);
+// }
+
