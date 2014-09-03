@@ -312,7 +312,7 @@ MusicPlayer.engine = (function()
 		albumImag.attr('alt', replyData.artist + ' - ' + replyData.album);
 
 		clearAnyExpandedAlbums();
-		
+
 		$.when($("#albumViewContainer").show(),
 			$("#albumView").slideToggle(300)).done(
 			function()
@@ -452,6 +452,9 @@ MusicPlayer.engine = (function()
 
 	function onAlbumHover(artist, album, year, event)
 	{
+		if ($("#albumViewContainer").is(":visible"))
+			return;
+		
 		clearAnyExpandedAlbums();
 
 		var headerTag = $("#albumName, #albumYear");
