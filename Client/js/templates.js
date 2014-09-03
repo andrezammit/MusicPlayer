@@ -66,26 +66,19 @@ function AlbumEntry(templateElement)
 
 	function getElement()
 	{
-		var albumLink = _clone.find(".albumLink");
-				
-		(function(album)
+		(function()
 		{
-			albumLink.click(
+			_clone.click(
 				function()
 				{
 					musicPlayer.chooseAlbum(_albumArtist, _album);
 				});
 
-			albumLink.hover(
-				function()
+			_clone.mouseover(
+				function(event)
 				{
-					musicPlayer.onAlbumHover(_albumArtist, _album, _year);
-				},
-				function()
-				{
-					musicPlayer.onAlbumOut();
+					musicPlayer.onAlbumHover(_albumArtist, _album, _year, event);
 				});
-
 		})();
 
 		var albumArtwork = _clone.find(".albumImageSmall");

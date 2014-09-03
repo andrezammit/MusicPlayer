@@ -11,6 +11,7 @@ MusicPlayer.engine = (function()
 
 	var _albumTracks = [];
 	var _currentAlbumTracks = [];
+	var _expandedAlbumEntries = [];
 
 	var _currentVolume = 1;
 
@@ -310,6 +311,8 @@ MusicPlayer.engine = (function()
 		albumImag.attr('src', 'data:image/jpeg;base64,' + replyData.artwork);
 		albumImag.attr('alt', replyData.artist + ' - ' + replyData.album);
 
+		clearAnyExpandedAlbums();
+		
 		$.when($("#albumViewContainer").show(),
 			$("#albumView").slideToggle(300)).done(
 			function()
@@ -386,10 +389,79 @@ MusicPlayer.engine = (function()
 			});
 	}
 
-	function onAlbumHover(artist, album, year)
+	function expandAlbumEntry(albumEntry)
 	{
-		var headerTag = $("#albumName, #albumYear");
+		var albumEntryHover = albumEntry.clone();
+
+		albumEntryHover.attr('class', 'albumEntryHover');
+		albumEntryHover.data('albumEntry', albumEntry);
+		albumEntryHover.offset(albumEntry.offset());
+
+		var albumImageSmall = albumEntryHover.find(".albumImageSmall");
 		
+		(function()
+		{
+			albumEntryHover.mouseout(
+				function(event)
+				{
+					onAlbumOut(event);
+				});
+
+			albumEntryHover.click(
+				function(event)
+				{
+					var index = _expandedAlbumEntries.indexOf(albumEntryHover);
+					
+					var albumEntry = _expandedAlbumEntries[index].data('albumEntry');
+					albumEntry.click();
+				});
+		})();
+
+		$("body").append(albumEntryHover);
+
+		albumEntryHover.show();
+		albumEntryHover.css('height', 210);
+		albumEntryHover.css('width', 210);
+
+		_expandedAlbumEntries.push(albumEntryHover);
+	}
+
+	function clearAnyExpandedAlbums()
+	{
+		for (var cnt = 0; cnt < _expandedAlbumEntries.length; cnt++)
+		{
+			var albumEntryHover = _expandedAlbumEntries[cnt];
+			deflateAlbumEntry(albumEntryHover);
+		}
+	}
+
+	function deflateAlbumEntry(albumEntry)
+	{
+		if (albumEntry.attr('class') != "albumEntryHover")
+			return;
+
+		albumEntry.remove();
+
+		var index = _expandedAlbumEntries.indexOf(albumEntry);
+
+		if (index == -1)
+			return;
+
+		_expandedAlbumEntries.splice(index, 1);
+	}
+
+	function onAlbumHover(artist, album, year, event)
+	{
+		clearAnyExpandedAlbums();
+
+		var headerTag = $("#albumName, #albumYear");
+	
+		if (event)
+		{
+			var albumEntry = $(event.target);
+			expandAlbumEntry(albumEntry);
+		}
+
 		headerTag.fadeOut(40,
 			function()
 			{
@@ -415,12 +487,18 @@ MusicPlayer.engine = (function()
 			});
 	}
 
-	function onAlbumOut()
+	function onAlbumOut(event)
 	{
 		// If an album is open we don't want to change the header.
 
 		if ($("#albumViewContainer").is(":visible"))
 			return;
+
+		if (event)
+		{
+			var fromElement = $(event.currentTarget);
+			deflateAlbumEntry(fromElement);
+		}
 
 		onAlbumHover("MusicPlayer")
 	}
@@ -604,14 +682,14 @@ MusicPlayer.engine = (function()
 			setupHandlers();
 		},
 
-		onAlbumHover: function(artist, album, year)
+		onAlbumHover: function(artist, album, year, event)
 		{
-			onAlbumHover(artist, album, year);
+			onAlbumHover(artist, album, year, event);
 		},
 
-		onAlbumOut: function()
+		onAlbumOut: function(event)
 		{
-			onAlbumOut();
+			onAlbumOut(event);
 		},
 
 		chooseAlbum: function(artist, album)
