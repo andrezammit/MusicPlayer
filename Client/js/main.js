@@ -508,10 +508,6 @@ MusicPlayer.engine = (function()
 
 	function updateHeaderInfo(event)
 	{
-		if (!event)
-			return;
-
-		var albumEntry = $(event.currentTarget);
 		var headerTag = $("#albumName, #albumYear");
 
 		var album;
@@ -520,6 +516,8 @@ MusicPlayer.engine = (function()
 
 		if (event)
 		{
+			var albumEntry = $(event.currentTarget);
+
 			album = albumEntry.data('album');
 			artist = albumEntry.data('artist');
 			year = albumEntry.data('year');
