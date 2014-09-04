@@ -151,12 +151,12 @@ a:hover
 	z-index: 1;
 
 	background: white;
-	
+
 	cursor: hand;
 
 	box-shadow: 0px 0px 20px #000;
 
-	transition: width 400ms, height 400ms;
+	transition: all 200ms linear;
 }
 
 .albumImageSmall
@@ -166,7 +166,7 @@ a:hover
 
 	background: white;
 
-	transition: width 400ms, height 400ms;
+	transition: all 200ms linear;
 }
 
 #albumImageLarge
