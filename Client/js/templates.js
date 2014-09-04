@@ -59,7 +59,7 @@ function AlbumEntry(templateElement)
 {
 	var _year;
 	var _album;
-	var _artwork;
+	var _blobURL;
 	var _albumArtist;
 
 	var _clone = $(templateElement).clone();
@@ -83,8 +83,8 @@ function AlbumEntry(templateElement)
 
 		var albumArtwork = _clone.find(".albumImageSmall");
 
-		if (_artwork)
-			albumArtwork.attr('src', 'data:image/jpeg;base64,' + _artwork);
+		if (_blobURL)
+			albumArtwork.attr('src', _blobURL);
 		
 		albumArtwork.attr('alt', _albumArtist + ' - ' + _album);
 
@@ -101,11 +101,11 @@ function AlbumEntry(templateElement)
 			return getElement();
 		},
 
-		setInfo: function(albumArtist, album, artwork, year)
+		setInfo: function(albumArtist, album, blobURL, year)
 		{
 			_year = year;
 			_album = album;
-			_artwork = artwork;
+			_blobURL = blobURL;
 			_albumArtist = albumArtist;
 		},
 	};

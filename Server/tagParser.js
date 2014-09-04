@@ -571,11 +571,11 @@ function TagParser(includeArtwork, artworkThumb)
 					{
 						if (artworkThumb == true)
 						{
-							_tag.artworkSmall = newBuffer.toString('base64');
+							_tag.artworkSmall = newBuffer.toString('binary');
 						}
 						else
 						{
-							_tag.artwork = newBuffer.toString('base64');
+							_tag.artwork = newBuffer.toString('binary');
 						}
 
 						image = null;

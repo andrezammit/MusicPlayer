@@ -370,8 +370,19 @@ MusicPlayer.engine = (function()
 				if (!album)
 					return;
 
+				if (album.artwork)
+				{
+					var dataURL = 'data:image/jpeg;' + album.artwork;
+					var artworkBuffer = getBufferFromDataURL(dataURL);
+
+					var arrayBuffer = artworkBuffer.buffer;
+					var artworkBlob = new Blob([arrayBuffer], { type: artworkBuffer.mimeType });
+
+					album.blobURL = URL.createObjectURL(artworkBlob);
+				}
+
 				var newAlbum = new AlbumEntry(albumTemplate);
-				newAlbum.setInfo(album.albumArtist, album.album, album.artwork, album.year);
+				newAlbum.setInfo(album.albumArtist, album.album, album.blobURL, album.year);
 
 				var newAlbumElement = newAlbum.getElement();
 				albumContainer.append(newAlbumElement);
@@ -725,6 +736,34 @@ MusicPlayer.engine = (function()
 	{
 		$("#songInfo").html('');
 		$("#currentTime").html('');
+	}
+
+	function getBufferFromDataURL(dataURL) 
+	{
+		function stringToBuffer(sourceStr) 
+		{
+			var buffer = new ArrayBuffer(sourceStr.length);
+			var arrayBuffer = new Uint8Array(buffer);
+
+			for (var cnt = 0; cnt < arrayBuffer.length; cnt++) 
+				arrayBuffer[cnt] = sourceStr.charCodeAt(cnt);
+
+			return arrayBuffer;
+		}
+
+		var mimeStart = dataURL.indexOf(':')+1;
+		var mimeEnd = dataURL.indexOf(';');
+
+		var mimeType = dataURL.substr(mimeStart, mimeEnd - mimeStart);
+		mimeType.trim();
+
+		var dataStart = dataURL.indexOf(';') + 1;
+		var data = dataURL.substr(dataStart);
+
+		return {
+			mimeType: mimeType,
+			buffer: stringToBuffer(data)
+		}
 	}
 
 	return {
