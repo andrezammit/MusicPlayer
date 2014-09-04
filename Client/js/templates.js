@@ -14,8 +14,8 @@ function TrackEntry(templateElement)
 
 	function getElement()
 	{
-		_clone.attr("artist", _artist);
-		_clone.attr("album", _album);
+		_clone.data("artist", _artist);
+		_clone.data("album", _album);
 
 		_clone.find(".track").html(_track);
 		_clone.find(".song").html(_song);
