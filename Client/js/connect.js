@@ -17,10 +17,5 @@ MusicPlayer.connect = (function()
 		{
 			webSock.send(JSON.stringify(query));
 		},
-
-		chooseAlbum: function(artist, album)
-		{
-			getAlbumTracks(artist, album, showAlbumTracks);
-		},
 	};
 }());
