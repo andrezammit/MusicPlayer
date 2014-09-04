@@ -191,8 +191,16 @@ MusicPlayer.engine = (function()
 		}
 	}
 
-	function getAlbumTracks(artist, album, callback)
+	function getAlbumTracks(event, callback)
 	{
+		if (!event)
+			callback();
+
+		var albumEntry = $(event.currentTarget);
+
+		var album = albumEntry.data('album');
+		var artist = artist = albumEntry.data('artist')
+
 		getTracks();
 
 		function getTracks()
@@ -203,7 +211,7 @@ MusicPlayer.engine = (function()
 
 		msgHandlers['getTracksReply'] = function(data)
 		{
-			callback(data.replyData);
+			callback(event, data.replyData);
 		}
 	}
 
@@ -275,8 +283,11 @@ MusicPlayer.engine = (function()
 			callback();
 	}
 
-	function showAlbumTracks(replyData)
+	function showAlbumTracks(event, replyData)
 	{
+		if (!event || !replyData)
+			return;
+
 		var trackTemplate = $(".templates").find('.trackEntry')[0];
 
 		if (!trackTemplate)
@@ -312,6 +323,8 @@ MusicPlayer.engine = (function()
 		albumImag.attr('alt', replyData.artist + ' - ' + replyData.album);
 
 		clearAnyExpandedAlbums();
+
+		onAlbumHover(event, false);
 
 		$.when($("#albumViewContainer").show(),
 			$("#albumView").slideToggle(300)).done(
@@ -389,8 +402,12 @@ MusicPlayer.engine = (function()
 			});
 	}
 
-	function expandAlbumEntry(albumEntry)
+	function expandAlbumEntry(event)
 	{
+		if (!event)
+			return;
+
+		var albumEntry = $(event.currentTarget);
 		var albumEntryHover = albumEntry.clone();
 
 		albumEntryHover.attr('class', 'albumEntryHover');
@@ -462,19 +479,43 @@ MusicPlayer.engine = (function()
 		_expandedAlbumEntries.splice(index, 1);
 	}
 
-	function onAlbumHover(artist, album, year, event)
+	function onAlbumHover(event, expandAlbum)
 	{
 		if ($("#albumViewContainer").is(":visible"))
 			return;
 
+		if (!event)
+			expandAlbum = false;
+
 		clearAnyExpandedAlbums();
 
-		var headerTag = $("#albumName, #albumYear");
+		if (expandAlbum === true)
+			expandAlbumEntry(event);
 	
+		updateHeaderInfo(event);
+	}
+
+	function updateHeaderInfo(event)
+	{
+		if (!event)
+			return;
+
+		var albumEntry = $(event.currentTarget);
+		var headerTag = $("#albumName, #albumYear");
+
+		var album;
+		var artist;
+		var year;
+
 		if (event)
 		{
-			var albumEntry = $(event.currentTarget);
-			expandAlbumEntry(albumEntry);
+			album = albumEntry.data('album');
+			artist = albumEntry.data('artist');
+			year = albumEntry.data('year');
+		}
+		else
+		{
+			artist = "MusicPlayer";
 		}
 
 		headerTag.fadeOut(100,
@@ -515,7 +556,7 @@ MusicPlayer.engine = (function()
 			deflateAlbumEntry(fromElement);
 		}
 
-		onAlbumHover("MusicPlayer")
+		onAlbumHover(null, false);
 	}
 
 	function closeTracks()
@@ -697,9 +738,9 @@ MusicPlayer.engine = (function()
 			setupHandlers();
 		},
 
-		onAlbumHover: function(artist, album, year, event)
+		onAlbumHover: function(event)
 		{
-			onAlbumHover(artist, album, year, event);
+			onAlbumHover(event, true);
 		},
 
 		onAlbumOut: function(event)
@@ -707,9 +748,9 @@ MusicPlayer.engine = (function()
 			onAlbumOut(event);
 		},
 
-		chooseAlbum: function(artist, album)
+		chooseAlbum: function(event)
 		{
-			getAlbumTracks(artist, album, showAlbumTracks);
+			getAlbumTracks(event, showAlbumTracks);
 		},
 
 		closeTracks: function()

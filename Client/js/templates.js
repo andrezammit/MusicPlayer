@@ -69,15 +69,15 @@ function AlbumEntry(templateElement)
 		(function()
 		{
 			_clone.click(
-				function()
+				function(event)
 				{
-					musicPlayer.chooseAlbum(_albumArtist, _album);
+					musicPlayer.chooseAlbum(event);
 				});
 
 			_clone.mouseover(
 				function(event)
 				{
-					musicPlayer.onAlbumHover(_albumArtist, _album, _year, event);
+					musicPlayer.onAlbumHover(event);
 				});
 		})();
 
@@ -87,6 +87,10 @@ function AlbumEntry(templateElement)
 			albumArtwork.attr('src', 'data:image/jpeg;base64,' + _artwork);
 		
 		albumArtwork.attr('alt', _albumArtist + ' - ' + _album);
+
+		_clone.data("artist", _albumArtist);
+		_clone.data("album", _album);
+		_clone.data("year", _year);
 
 		return _clone;
 	}
