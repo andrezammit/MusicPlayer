@@ -446,6 +446,8 @@ MusicPlayer.engine = (function()
 
 		$("body").append(albumEntryHover);
 
+		albumEntryHover.data('originalPos', divPosition);
+
 		albumEntryHover.css('left', divPosition.left);
 		albumEntryHover.css('top', divPosition.top);
 
@@ -453,6 +455,8 @@ MusicPlayer.engine = (function()
 
 		var right = divPosition.left + 200 + 5;
 		var bottom = divPosition.top + 200 + 5;
+
+		albumEntryHover.css('box-shadow', '0px 0px 20px #000');
 
 		albumEntryHover.css('left', divPosition.left - 5);
 		albumEntryHover.css('top', divPosition.top - 5);
@@ -472,19 +476,33 @@ MusicPlayer.engine = (function()
 		}
 	}
 
-	function deflateAlbumEntry(albumEntry)
+	function deflateAlbumEntry(albumEntryHover)
 	{
-		if (albumEntry.attr('class') != "albumEntryHover")
+		if (albumEntryHover.attr('class') != "albumEntryHover")
 			return;
 
-		albumEntry.remove();
+		albumEntryHover.one('transitionend', 
+			function()
+			{
+				albumEntryHover.remove();
 
-		var index = _expandedAlbumEntries.indexOf(albumEntry);
+				var index = _expandedAlbumEntries.indexOf(albumEntryHover);
 
-		if (index == -1)
-			return;
+				if (index == -1)
+					return;
 
-		_expandedAlbumEntries.splice(index, 1);
+				_expandedAlbumEntries.splice(index, 1);
+			});
+
+		var originalPos = albumEntryHover.data('originalPos');
+
+		albumEntryHover.css('left', originalPos.left);
+		albumEntryHover.css('top', originalPos.top);
+
+		albumEntryHover.css('width', 200);
+		albumEntryHover.css('height', 200);
+
+		albumEntryHover.css('box-shadow', '0px 0px 0px #000');
 	}
 
 	function onAlbumHover(event, expandAlbum)

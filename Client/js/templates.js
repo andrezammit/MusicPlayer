@@ -93,8 +93,8 @@ function AlbumEntry(templateElement)
 
 		if (_blobURL)
 			imageURL = _blobURL;
-		
-			albumArtwork.attr('src', imageURL);
+
+		albumArtwork.attr('src', imageURL);
 		
 		albumArtwork.attr('alt', _albumArtist + ' - ' + _album);
 
