@@ -134,7 +134,11 @@ a:hover
 	width: 200px;
 	height: 200px;
 
+	opacity: 0;
+
 	display: inline-block;
+
+	transition: 200ms opacity linear;
 }
 
 .albumEntry:hover

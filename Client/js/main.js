@@ -28,7 +28,6 @@ MusicPlayer.engine = (function()
 	function onWebSockOpen()
 	{
 		console.log('Connected!');
-		startGettingAlbums();
 	}
 
 	function onWebSockMessage(event)
@@ -166,7 +165,7 @@ MusicPlayer.engine = (function()
 		function getAlbums()
 		{
 			var albumsRemaning = _albumCount - _albumOffset;
-			var albumsToGet = Math.min(100, albumsRemaning);
+			var albumsToGet = Math.min(20, albumsRemaning);
 
 			var query = { call: 'getAlbums', offset: _albumOffset, albumsToGet: albumsToGet };
 			connect.sendQuery(query);
@@ -180,12 +179,10 @@ MusicPlayer.engine = (function()
 			_albumList = _albumList.concat(data.albumData);
 
 			_progressCallback(_albumProgress, _albumCount);
+			_callback(data.albumData);
 
 			if (_albumOffset >= _albumCount)
-			{
-				_callback(_albumList);
 				return;
-			}
 
 			getAlbums();
 		}
@@ -361,7 +358,7 @@ MusicPlayer.engine = (function()
 		var albumTemplate = $(".templates").find('.albumEntry')[0];
 
 		var albumContainer = $('#albums');
-		albumContainer.empty();
+		//albumContainer.empty();
 
 		for (cnt = 0; cnt < albumList.length; cnt++)
 		{
@@ -773,6 +770,11 @@ MusicPlayer.engine = (function()
 		setupHandlers: function()
 		{
 			setupHandlers();
+		},
+
+		startGettingAlbums: function()
+		{
+			startGettingAlbums();
 		},
 
 		onAlbumHover: function(event)

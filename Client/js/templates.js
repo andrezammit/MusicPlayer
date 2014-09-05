@@ -66,8 +66,16 @@ function AlbumEntry(templateElement)
 
 	function getElement()
 	{
+		var albumArtwork = _clone.find(".albumImageSmall");
+
 		(function()
 		{
+			albumArtwork.bind('load', 
+				function() 
+				{
+					_clone.css('opacity', 1)
+				});
+
 			_clone.click(
 				function(event)
 				{
@@ -80,8 +88,6 @@ function AlbumEntry(templateElement)
 					musicPlayer.onAlbumHover(event);
 				});
 		})();
-
-		var albumArtwork = _clone.find(".albumImageSmall");
 
 		if (_blobURL)
 			albumArtwork.attr('src', _blobURL);

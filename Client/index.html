@@ -18,11 +18,12 @@
     <script type="text/javascript">
 
     var musicPlayer = MusicPlayer.engine;
+    musicPlayer.connectWebSocket();
 
     $(document).ready(
     	function() 
     	{
-        musicPlayer.connectWebSocket();
+        musicPlayer.startGettingAlbums();
         musicPlayer.setupAudioElement();
         musicPlayer.setupHandlers();
 		});
