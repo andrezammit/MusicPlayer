@@ -445,6 +445,7 @@ MusicPlayer.engine = (function()
 		})();
 
 		$("body").append(albumEntryHover);
+		_expandedAlbumEntries.push(albumEntryHover);
 
 		albumEntryHover.data('originalPos', divPosition);
 
@@ -463,8 +464,6 @@ MusicPlayer.engine = (function()
 
 		albumEntryHover.css('width', 210);
 		albumEntryHover.css('height', 210);
-
-		_expandedAlbumEntries.push(albumEntryHover);
 	}
 
 	function clearAnyExpandedAlbums()
@@ -474,25 +473,45 @@ MusicPlayer.engine = (function()
 			var albumEntryHover = _expandedAlbumEntries[cnt];
 			deflateAlbumEntry(albumEntryHover);
 		}
+
+		//_expandedAlbumEntries.length = 0;
+	}
+
+	function removeAlbumEntryHover(albumEntryHover)
+	{
+		albumEntryHover.remove();
+
+		var index = _expandedAlbumEntries.indexOf(albumEntryHover);
+
+		if (index == -1)
+			return;
+
+		_expandedAlbumEntries.splice(index, 1);
 	}
 
 	function deflateAlbumEntry(albumEntryHover)
-	{
+	{		
 		if (albumEntryHover.attr('class') != "albumEntryHover")
 			return;
 
-		albumEntryHover.one('transitionend', 
-			function()
-			{
-				albumEntryHover.remove();
+		(function()
+		{
+			albumEntryHover.one('transitionend', 
+				function()
+				{
+					removeAlbumEntryHover(albumEntryHover)
+				});
+		})();
 
-				var index = _expandedAlbumEntries.indexOf(albumEntryHover);
+		// Check if the element got a chance to expand more than the original size.
+		// If the element is still 200x200, it won't have any transition to carry out
+		// and the transitionend event will never fire.
 
-				if (index == -1)
-					return;
-
-				_expandedAlbumEntries.splice(index, 1);
-			});
+		if (albumEntryHover.width() == 200)
+		{
+			removeAlbumEntryHover(albumEntryHover);
+			return;
+		}
 
 		var originalPos = albumEntryHover.data('originalPos');
 
