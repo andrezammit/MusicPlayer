@@ -444,8 +444,8 @@ MusicPlayer.engine = (function()
 				});
 		})();
 
-		$("body").append(albumEntryHover);
 		_expandedAlbumEntries.push(albumEntryHover);
+		$("body").append(albumEntryHover);
 
 		albumEntryHover.data('originalPos', divPosition);
 
@@ -473,20 +473,29 @@ MusicPlayer.engine = (function()
 			var albumEntryHover = _expandedAlbumEntries[cnt];
 			deflateAlbumEntry(albumEntryHover);
 		}
-
-		//_expandedAlbumEntries.length = 0;
 	}
 
 	function removeAlbumEntryHover(albumEntryHover)
 	{
-		albumEntryHover.remove();
+		function findAlbumEntryHover(albumEntryHover)
+		{
+			for (var cnt = 0; cnt < _expandedAlbumEntries.length; cnt++)
+			{
+				if (_expandedAlbumEntries[cnt] == albumEntryHover)
+					return cnt;
+			}
 
-		var index = _expandedAlbumEntries.indexOf(albumEntryHover);
+			return -1;
+		}
+
+		var index = findAlbumEntryHover(albumEntryHover);
 
 		if (index == -1)
 			return;
 
 		_expandedAlbumEntries.splice(index, 1);
+
+		albumEntryHover.remove();
 	}
 
 	function deflateAlbumEntry(albumEntryHover)
@@ -499,7 +508,7 @@ MusicPlayer.engine = (function()
 			albumEntryHover.one('transitionend', 
 				function()
 				{
-					removeAlbumEntryHover(albumEntryHover)
+					removeAlbumEntryHover(albumEntryHover);
 				});
 		})();
 
