@@ -49,7 +49,7 @@ function readUntilNullChar(buffer, offset)
 	return result;
 }
 
-function TagParser(includeArtwork, artworkThumb)
+function TagParser(includeArtwork, artworkThumb, checkArtworkCache)
 {
 	if (!includeArtwork)
 		includeArtwork = false;
@@ -57,12 +57,16 @@ function TagParser(includeArtwork, artworkThumb)
 	if (!artworkThumb)
 		artworkThumb = false;
 
+	if (!checkArtworkCache)
+		checkArtworkCache = false;
+
 	var _tagSize = 0;
 	var _tagOffset = 0;
 	var _tagMinorVer = 3;
 
 	var _artworkThumb = artworkThumb;
 	var _includeArtwork = _artworkThumb || includeArtwork;
+	var _checkArtworkCache = checkArtworkCache;
 
 	var _fd = null;
 
@@ -546,7 +550,7 @@ function TagParser(includeArtwork, artworkThumb)
 
 	function resizeArtworkWorker(width, callback)
 	{
-		if (arrImagesToResize.indexOf(_tag.artworkHash) > -1)
+		if (_checkArtworkCache && arrImagesToResize.indexOf(_tag.artworkHash) > -1)
 		{
 			callback();
 			return;
