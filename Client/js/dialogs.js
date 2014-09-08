@@ -4,13 +4,19 @@ MusicPlayer.dialogs = (function()
 {
 	function initDialogs()
 	{
-		var closeDialogButtons = $(".dialogs").find(".closeDialog");
+		var closeDialogButtons = $(".dialogs").find(".closeDialog, .cancelBtn");
 		
 		closeDialogButtons.click(
 			function()
 			{
 				getDialogContainer().fadeOut();
-				$(this).parent().fadeOut();
+				
+				var parents = $(this).parentsUntil($("#dialogContainer"));
+				var dialog = parents[parents.length - 1];
+
+				$(dialog).fadeOut();
+
+				$("body").css('overflow', 'auto');
 			});
 	}
 
@@ -32,6 +38,8 @@ MusicPlayer.dialogs = (function()
 		
 		var blobkURL = musicPlayer.getBlobURLFromData(songInfo.artwork);
 		editSongDlg.find("#editArtwork").attr('src', blobkURL);
+
+		$("body").css('overflow', 'hidden');
 
 		getDialogContainer().fadeIn(400, 
 			function()

@@ -137,7 +137,7 @@ MusicPlayer.engine = (function()
 	function resizeDialogs()
 	{
 		var height = $("#dialogContainer").height();
-		$(".modalContent").css('max-height', height - 100);
+		$(".modalContent").css('max-height', height - 135);
 	}
 
 	function getAudioElement()
