@@ -4,6 +4,7 @@ MusicPlayer.engine = (function()
 {
 	var connect = MusicPlayer.connect;
 	var songControl = MusicPlayer.songControl;
+	var dialogs = MusicPlayer.dialogs;
 
 	var msgHandlers = {};
 
@@ -46,6 +47,8 @@ MusicPlayer.engine = (function()
 
 	function setupHandlers()
 	{
+		dialogs.initDialogs();
+
 /*		window.onscroll = function(event) 
 		{
 			console.log(window.scrollY);
@@ -314,10 +317,22 @@ MusicPlayer.engine = (function()
 			}(trackList[cnt]));
 		}
 
-		var albumImag = $("#albumImageLarge");
+		var albumImage = $("#albumImageLarge");
 
-		albumImag.attr('src', 'data:image/jpeg;base64,' + replyData.artwork);
-		albumImag.attr('alt', replyData.artist + ' - ' + replyData.album);
+		if (replyData.artwork)
+		{
+			var dataURL = 'data:image/jpeg;' + replyData.artwork;
+			var artworkBuffer = getBufferFromDataURL(dataURL);
+
+			var arrayBuffer = artworkBuffer.buffer;
+			var artworkBlob = new Blob([arrayBuffer], { type: artworkBuffer.mimeType });
+
+			var blobURL = URL.createObjectURL(artworkBlob);
+		
+			albumImage.attr('src', blobURL);
+		}
+
+		albumImage.attr('alt', replyData.artist + ' - ' + replyData.album);
 
 		clearAnyExpandedAlbums();
 
@@ -807,6 +822,17 @@ MusicPlayer.engine = (function()
 		}
 	}
 
+	function showSongInfo(id)
+	{
+		var query = { call: 'getSongInfo', id: id };
+		connect.sendQuery(query);
+
+		msgHandlers['getSongInfoReply'] = function(data)
+		{
+			dialogs.editSong(data.songInfo);
+		}
+	}
+
 	return {
 		connectWebSocket: function() 
 		{
@@ -901,6 +927,11 @@ MusicPlayer.engine = (function()
 		clearControlBar: function()
 		{
 			return clearControlBar();
+		},
+
+		showSongInfo: function(id)
+		{
+			showSongInfo(id);
 		},
 	};
 }());

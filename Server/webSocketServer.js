@@ -14,6 +14,8 @@ function onWSConnection(webSock)
 	{
 		var query = JSON.parse(message);
 
+		console.log(query.call);
+
 		switch (query.call)
 		{
 		case 'getTags':
@@ -117,6 +119,21 @@ function onWSConnection(webSock)
 								var replyData = { artist: query.albumArtist, album: query.album, trackList: docs, artwork: tag.artwork };
 
 								var reply = { command: 'getTracksReply', replyData: replyData };
+								sendData(reply);
+							});
+					});
+			}
+			break;
+
+		case 'getSongInfo':
+			{
+				database.getFileFromID(query.id, 
+					function(filePath)
+					{
+						new tagParser(true, false).getTag(filePath, 
+							function(error, tag)
+							{
+								var reply = { command: 'getSongInfoReply', songInfo: tag };
 								sendData(reply);
 							});
 					});

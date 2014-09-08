@@ -10,6 +10,7 @@
     <script src="js/jquery.knob.js"></script>
     <script src="js/jquery.textfill.min.js"></script>
 
+    <script src="js/dialogs.js"></script>
     <script src="js/songControl.js"></script>
     <script src="js/templates.js"></script>
     <script src="js/connect.js"></script>
@@ -116,5 +117,35 @@
         <div class="track"></div><div class="song"></div><div class="time"></div>
       </div>
     </div>
+
+    <div class="dialogs">
+      <div id="dialogContainer">
+        <div id="editSong">
+            <h3>Edit Song</h3>
+            <div class="closeDialog">
+              <img src="images/close.png" />
+            </div>
+            <div class="modalContent">
+            <form>
+              <div class="label">Artist:</div>
+              <input type="text" id="artist" />
+              
+              <div class="label">Album artist:</div>
+              <input type="text" id="albumArtist" />
+
+              <div class="label">Title:</div>
+              <input type="text" id="title" />
+              
+              <div class="label">Album:</div>
+              <input type="text" id="album" />
+              
+              <div class="label">Year:</div>
+              <input type="text" id="year" />
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </body>
 </html>
