@@ -120,7 +120,7 @@
 
     <div class="dialogs">
       <div id="dialogContainer">
-        <div id="editSong">
+        <div id="editSong" class="resizingDlg">
             <h3>Edit Song</h3>
             <div class="closeDialog">
               <img src="images/close.png" />
@@ -139,8 +139,14 @@
               <div class="label">Album:</div>
               <input type="text" id="album" />
               
+              <div class="label">Track:</div>
+              <input type="text" id="track" />
+
               <div class="label">Year:</div>
               <input type="text" id="year" />
+
+              <div class="label">Artwork:</div>
+              <img id="editArtwork" />
             </form>
           </div>
         </div>

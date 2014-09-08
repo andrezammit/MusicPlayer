@@ -24,9 +24,21 @@ MusicPlayer.dialogs = (function()
 		var editSongDlg = $(".dialogs").find("#editSong");
 
 		editSongDlg.find("#artist").val(songInfo.artist);
+		editSongDlg.find("#albumArtist").val(songInfo.albumArtist);
+		editSongDlg.find("#album").val(songInfo.album);
+		editSongDlg.find("#year").val(songInfo.year);
+		editSongDlg.find("#title").val(songInfo.song);
+		editSongDlg.find("#track").val(songInfo.track);
 		
-		getDialogContainer().fadeIn();
-		editSongDlg.fadeIn();
+		var blobkURL = musicPlayer.getBlobURLFromData(songInfo.artwork);
+		editSongDlg.find("#editArtwork").attr('src', blobkURL);
+
+		getDialogContainer().fadeIn(400, 
+			function()
+			{
+				musicPlayer.resizeDialogs();
+				editSongDlg.fadeIn();
+			});
 	}
 
 	return {

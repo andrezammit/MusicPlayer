@@ -21,6 +21,7 @@ MusicPlayer.engine = (function()
 		$(window).resize(
 			function()
 			{
+				resizeDialogs();
 				resizeArtwork($("#albumImageLarge"));
 				resizeAlbumContainer();
 	   		});
@@ -131,6 +132,12 @@ MusicPlayer.engine = (function()
                 return false;
             }
         });
+	}
+
+	function resizeDialogs()
+	{
+		var height = $("#dialogContainer").height();
+		$(".resizingDlg").css('height', height - 30);
 	}
 
 	function getAudioElement()
@@ -321,14 +328,7 @@ MusicPlayer.engine = (function()
 
 		if (replyData.artwork)
 		{
-			var dataURL = 'data:image/jpeg;' + replyData.artwork;
-			var artworkBuffer = getBufferFromDataURL(dataURL);
-
-			var arrayBuffer = artworkBuffer.buffer;
-			var artworkBlob = new Blob([arrayBuffer], { type: artworkBuffer.mimeType });
-
-			var blobURL = URL.createObjectURL(artworkBlob);
-		
+			var blobURL = getBlobURLFromData(replyData.artwork);
 			albumImage.attr('src', blobURL);
 		}
 
@@ -371,9 +371,7 @@ MusicPlayer.engine = (function()
 	function displayAlbums(albumList)
 	{
 		var albumTemplate = $(".templates").find('.albumEntry')[0];
-
 		var albumContainer = $('#albums');
-		//albumContainer.empty();
 
 		for (cnt = 0; cnt < albumList.length; cnt++)
 		{
@@ -383,15 +381,7 @@ MusicPlayer.engine = (function()
 					return;
 
 				if (album.artwork)
-				{
-					var dataURL = 'data:image/jpeg;' + album.artwork;
-					var artworkBuffer = getBufferFromDataURL(dataURL);
-
-					var arrayBuffer = artworkBuffer.buffer;
-					var artworkBlob = new Blob([arrayBuffer], { type: artworkBuffer.mimeType });
-
-					album.blobURL = URL.createObjectURL(artworkBlob);
-				}
+					album.blobURL = getBlobURLFromData(album.artwork);
 
 				var newAlbum = new AlbumEntry(albumTemplate);
 				newAlbum.setInfo(album.albumArtist, album.album, album.blobURL, album.year);
@@ -822,6 +812,17 @@ MusicPlayer.engine = (function()
 		}
 	}
 
+	function getBlobURLFromData(data)
+	{
+		var dataURL = 'data:image/jpeg;' + data;
+		var artworkBuffer = getBufferFromDataURL(dataURL);
+
+		var arrayBuffer = artworkBuffer.buffer;
+		var artworkBlob = new Blob([arrayBuffer], { type: artworkBuffer.mimeType });
+
+		return URL.createObjectURL(artworkBlob);
+	}
+
 	function showSongInfo(id)
 	{
 		var query = { call: 'getSongInfo', id: id };
@@ -932,6 +933,16 @@ MusicPlayer.engine = (function()
 		showSongInfo: function(id)
 		{
 			showSongInfo(id);
+		},
+
+		getBlobURLFromData: function(data)
+		{
+			return getBlobURLFromData(data);
+		},
+
+		resizeDialogs: function()
+		{
+			return resizeDialogs();
 		},
 	};
 }());
