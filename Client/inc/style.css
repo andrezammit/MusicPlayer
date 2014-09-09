@@ -279,7 +279,9 @@ a:hover
 .playButtonSmall
 {
 	width: 20px;
-	margin-top: 10px;
+	top: 10px;
+
+	position: absolute;
 }
 
 .playButtonSmallImg
@@ -289,10 +291,6 @@ a:hover
 	border: 1px solid;
 	border-radius: 50%;
 	border-color: black;
-
-	top: 4px;
-
-	position: relative;
 
 	transition: background-color 200ms linear;
 }
@@ -495,6 +493,8 @@ a:hover
 {
 	transition: background 400ms linear;
 	position: relative;
+
+	height: 35px;
 }
 
 .trackEntry .trackGradient
@@ -502,6 +502,8 @@ a:hover
 	position: absolute;
 		
 	opacity: 0;
+
+	height: 35px;
 	width: 100%;
 
 	transition: opacity 400ms linear;
@@ -511,32 +513,43 @@ a:hover
 
 .trackEntry div
 {
-	height: 35px;
 	line-height: 35px;
 	display: inline-block;
 
-	position: relative;
+	position: absolute;
 }
 
 .track
 {
+	top: 1px;
+	left: 20px;
+
 	width: 25px;
 	text-align: center;
+	
 	font-size: small;
 }
 
 .song
 {
+	left: 50px;
 	text-align: left;
 }
 
 .time
 {
-	float: right;
+	right: 20px;
 	width: 40px;
+
 	text-align: right;
-	margin-right: 15px;
+
 	font-size: small;
+}
+
+.trackEntry .menuLink
+{
+	right: 5px;
+	display: none;
 }
 
 #footer
