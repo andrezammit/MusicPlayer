@@ -36,8 +36,8 @@ MusicPlayer.dialogs = (function()
 		editSongDlg.find("#title").val(songInfo.song);
 		editSongDlg.find("#track").val(songInfo.track);
 		
-		var blobkURL = musicPlayer.getBlobURLFromData(songInfo.artwork);
-		editSongDlg.find("#editArtwork").attr('src', blobkURL);
+		var blobURL = musicPlayer.getBlobURLFromData(songInfo.artwork);
+		editSongDlg.find("#editArtwork").attr('src', blobURL);
 
 		$("body").css('overflow', 'hidden');
 
