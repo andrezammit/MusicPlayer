@@ -9,7 +9,9 @@
     
     <script src="js/jquery.knob.js"></script>
     <script src="js/jquery.textfill.min.js"></script>
+    <script src="js/jquery.contextMenu/jquery.contextMenu.js"></script>
 
+    <script src="js/menus.js"></script>
     <script src="js/dialogs.js"></script>
     <script src="js/songControl.js"></script>
     <script src="js/templates.js"></script>
@@ -114,7 +116,7 @@
         <a class="playButtonSmall">
           <img class="playButtonSmallImg" src="images/play.png" alt="Play" />
         </a>
-        <div class="track"></div><div class="song"></div><div class="time"></div>
+        <div class="track"></div><div class="song"></div><div class="time"></div><div class="menuLink"><img class="trackMenuButton" src="images/downArrow.png" alt="Menu" /></div>
       </div>
     </div>
 
@@ -155,5 +157,11 @@
       </div>
     </div>
 
+    <div class="menus">
+      <div id="trackMenu">
+        <div>Edit</div>
+        <div>Delete</div>
+      </div>
+    </div>
   </body>
 </html>

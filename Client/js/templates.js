@@ -1,5 +1,7 @@
 var MusicPlayer = window.MusicPlayer || {};
 
+var menus = MusicPlayer.menus;
+
 function TrackEntry(templateElement)
 {
 	var _id;
@@ -22,16 +24,72 @@ function TrackEntry(templateElement)
 		_clone.find(".time").html(_time);
 
 		var playLink = _clone.find(".playButtonSmall");
+		var menuLink = _clone.find(".menuLink");
 
 		(function(trackID)
 		{
+			var menuOpen = false;
+
 			playLink.click(
 				function()
 				{
 					musicPlayer.playSong(_id);
 				});
 
+			menuLink.click(
+				function()
+				{
+					menus.showTrackMenu(_clone, _id);
+				});
+
+			_clone.mouseover(
+				function(event)
+				{
+					menuLink.show();
+				});
+
+			_clone.mouseout(
+				function(event)
+				{
+					if (menuOpen)
+						return;
+					
+					menuLink.hide();
+				});
+
+			_clone.bind('menuOpened', 
+				function()
+				{
+					menuOpen = true;
+
+					menuLink.show();
+					menuLink.toggleClass('menuOpen');
+				});
+
+			_clone.bind('menuClosed', 
+				function()
+				{
+					menuOpen = false;
+
+					menuLink.hide();
+					menuLink.toggleClass('menuOpen');
+				});
+
+			// _clone.bind('contextmenu',
+			// 	function(event)
+			// 	{
+			// 		if (event.which != 3)
+			// 			return;
+
+   //   				event.preventDefault();
+			// 		createContextMenu();
+			// 	});
 		})(_id);
+
+		function createContextMenu()
+		{
+		   
+		}
 
 		return _clone;
 	}

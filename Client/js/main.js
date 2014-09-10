@@ -5,6 +5,7 @@ MusicPlayer.engine = (function()
 	var connect = MusicPlayer.connect;
 	var songControl = MusicPlayer.songControl;
 	var dialogs = MusicPlayer.dialogs;
+	var menus = MusicPlayer.menus;
 
 	var msgHandlers = {};
 
@@ -49,6 +50,23 @@ MusicPlayer.engine = (function()
 	function setupHandlers()
 	{
 		dialogs.initDialogs();
+
+		$(".menus").mouseup(
+			function (event)
+			{
+		    	var container = $(".menus");
+
+			    if (container.is(event.target))
+			    {
+			    	var menu = $(".menuOpen");
+			     	
+			     	menu.trigger('menuClosed');
+			     	menu.hide();
+
+			        container.hide();
+			    }
+			});
+	
 
 /*		window.onscroll = function(event) 
 		{
@@ -823,7 +841,7 @@ MusicPlayer.engine = (function()
 		return URL.createObjectURL(artworkBlob);
 	}
 
-	function showSongInfo(id)
+	function editSong(id)
 	{
 		var query = { call: 'getSongInfo', id: id };
 		connect.sendQuery(query);
@@ -930,9 +948,9 @@ MusicPlayer.engine = (function()
 			return clearControlBar();
 		},
 
-		showSongInfo: function(id)
+		editSong: function(id)
 		{
-			showSongInfo(id);
+			editSong(id);
 		},
 
 		getBlobURLFromData: function(data)
