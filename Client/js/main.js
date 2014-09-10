@@ -357,7 +357,7 @@ MusicPlayer.engine = (function()
 		onAlbumHover(event, false);
 
 		$.when($("#albumViewContainer").show(),
-			$("#albumView").slideToggle(300)).done(
+			$("#albumView").slideToggle(500)).done(
 			function()
 			{
 				updateNowPlayingTrack();
