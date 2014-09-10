@@ -2,6 +2,14 @@ var MusicPlayer = window.MusicPlayer || {};
 
 MusicPlayer.menus = (function()
 {
+	function hideMenu(menu)
+	{
+		$(".menus").hide();
+		
+		menu.trigger('menuClosed');
+		menu.hide();
+	}
+
 	function showTrackMenu(offsetElement, id)
 	{
 		var offsetElement = $(offsetElement);
@@ -16,7 +24,9 @@ MusicPlayer.menus = (function()
 		trackMenu.find("#edit").click(
 			function()
 			{
+				hideMenu(trackMenu);
 				musicPlayer.editSong(id);
+
 			});
 
 		trackMenu.on('menuClosed',

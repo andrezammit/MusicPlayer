@@ -2,6 +2,8 @@ var MusicPlayer = window.MusicPlayer || {};
 
 MusicPlayer.songControl = (function()
 {
+	var dialogs = MusicPlayer.dialogs;
+
 	var _nextTrackElement = null;
 	var _nextSongPreloaded = false;
 
@@ -231,6 +233,8 @@ MusicPlayer.songControl = (function()
 
 		playNextSong: function()
 		{
+			musicPlayer.showSongInfo(28);
+
 			playNextSong();
 		},
 
