@@ -336,7 +336,7 @@ MusicPlayer.engine = (function()
 			
 				var newTrackElement = newTrack.getElement();
 
-				_albumTracks.push([track._id, newTrackElement]);
+				_albumTracks.push([track._id, newTrackElement, track]);
 				trackContainer.append(newTrackElement);
 
 			}(trackList[cnt]));
@@ -648,13 +648,13 @@ MusicPlayer.engine = (function()
 			});
 	}
 
-	function getTrackElement(trackID, callback)
+	function getTrackObject(trackID, callback)
 	{
-		for (var cnt = 0; cnt < _albumTracks.length; cnt++)
+		for (var cnt = 0; cnt < _currentAlbumTracks.length; cnt++)
 		{
-			if (_albumTracks[cnt][0] == trackID)
+			if (_currentAlbumTracks[cnt][0] == trackID)
 			{
-				callback(_albumTracks[cnt][1]);
+				callback(_currentAlbumTracks[cnt]);
 				return;
 			}
 		}
@@ -693,12 +693,14 @@ MusicPlayer.engine = (function()
 
 	function updateControlBarInfo()
 	{
-		getTrackElement(_currentTrackID, 
-			function(trackElement)
+		getTrackObject(_currentTrackID, 
+			function(trackObject)
 			{
-				var song = trackElement.find(".song").html();
-				var artist = trackElement.data("artist");
-				var album = trackElement.data("album");
+				var trackInfo = trackObject[2];
+
+				var song = trackInfo.song;
+				var artist = trackInfo.albumArtist;
+				var album = trackInfo.album;
 
 				var songInfo = song + '<br />' + artist + '<br />' + album;
 
@@ -769,8 +771,8 @@ MusicPlayer.engine = (function()
 		{
 			if (_currentAlbumTracks[cnt][0] == _currentTrackID)
 			{
-				var trackElement = _currentAlbumTracks[cnt][1];
-				var trackTime = trackElement.find(".time").html();
+				var trackInfo = _currentAlbumTracks[cnt][2];
+				var trackTime = trackInfo.time;
 
 				var result = trackTime.split(':');
 				var seconds = parseInt(result[0]) * 60 + parseInt(result[1]);
@@ -780,20 +782,6 @@ MusicPlayer.engine = (function()
 		}
 
 		return 0;
-	}
-
-	function getTrackTime()
-	{
-		for (var cnt = 0; cnt < _currentAlbumTracks.length; cnt++)
-		{
-			if (_currentAlbumTracks[cnt][0] == _currentTrackID)
-			{
-				var trackElement = _currentAlbumTracks[cnt][1];
-				return trackElement.find(".time").html();
-			}
-		}
-
-		return '';
 	}
 
 	function clearControlBar()
