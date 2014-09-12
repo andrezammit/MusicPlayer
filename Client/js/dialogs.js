@@ -15,8 +15,6 @@ MusicPlayer.dialogs = (function()
 				var dialog = parents[parents.length - 1];
 
 				$(dialog).fadeOut();
-
-				$("body").css('overflow', 'auto');
 			});
 	}
 

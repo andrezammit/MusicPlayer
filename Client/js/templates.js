@@ -53,7 +53,7 @@ function TrackEntry(templateElement)
 				{
 					if (menuOpen)
 						return;
-					
+
 					menuLink.hide();
 				});
 
@@ -64,6 +64,8 @@ function TrackEntry(templateElement)
 
 					menuLink.show();
 					menuLink.toggleClass('menuOpen');
+					
+					_clone.toggleClass('selected');
 				});
 
 			_clone.bind('menuClosed', 
@@ -73,23 +75,10 @@ function TrackEntry(templateElement)
 
 					menuLink.hide();
 					menuLink.toggleClass('menuOpen');
+					
+					_clone.toggleClass('selected');
 				});
-
-			// _clone.bind('contextmenu',
-			// 	function(event)
-			// 	{
-			// 		if (event.which != 3)
-			// 			return;
-
-   //   				event.preventDefault();
-			// 		createContextMenu();
-			// 	});
 		})(_id);
-
-		function createContextMenu()
-		{
-		   
-		}
 
 		return _clone;
 	}

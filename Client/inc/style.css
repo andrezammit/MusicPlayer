@@ -497,6 +497,11 @@ a:hover
 	height: 35px;
 }
 
+.trackEntry:hover, .selected
+{
+	background-color: rgba(128, 128, 128, 0.2);
+}
+
 .trackEntry .trackGradient
 {
 	position: absolute;
@@ -782,7 +787,7 @@ input:hover
 
 .menus
 {
-	position: absolute;
+	position: fixed;
 
 	display: none;
 

@@ -12,28 +12,33 @@ MusicPlayer.menus = (function()
 
 	function showTrackMenu(offsetElement, id)
 	{
-		var offsetElement = $(offsetElement);
+		var offset = $(offsetElement)[0].getBoundingClientRect();
 		var trackMenu = $(".menus").find("#trackMenu");
 
-		var top = offsetElement.offset().top + offsetElement.height();
-		var right = ($(window).width() - (offsetElement.offset().left + offsetElement.outerWidth()));
-		
-		trackMenu.css('top', top);
-		trackMenu.css('right', right);
+		trackMenu.css('top', offset.bottom);
+		trackMenu.css('left', offset.right - trackMenu.width());
 
-		trackMenu.find("#edit").click(
-			function()
-			{
-				hideMenu(trackMenu);
-				musicPlayer.editSong(id);
+		var editItem = trackMenu.find("#edit");
 
-			});
+		(function(id)
+		{
+			editItem.off('click');
+			trackMenu.off('menuClosed');
 
-		trackMenu.on('menuClosed',
-			function()
-			{
-				offsetElement.trigger('menuClosed');
-			})
+			editItem.click(
+				function()
+				{
+					hideMenu(trackMenu);
+					musicPlayer.editSong(id);
+
+				});
+
+			trackMenu.on('menuClosed',
+				function()
+				{
+					offsetElement.trigger('menuClosed');
+				});
+		})(id);
 
 		offsetElement.trigger('menuOpened')
 
