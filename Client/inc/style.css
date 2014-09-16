@@ -126,7 +126,7 @@ a:hover
 {
 	text-align: left;
 
-	transition: 300ms -webkit-filter linear;
+	transition: 400ms -webkit-filter linear;
 }
 
 .albumEntry
@@ -138,7 +138,7 @@ a:hover
 
 	display: inline-block;
 
-	transition: 200ms opacity linear;
+	transition: 400ms opacity linear;
 }
 
 .albumEntry:hover
@@ -160,7 +160,7 @@ a:hover
 
 	box-shadow: 0px 0px 0px #000;
 
-	transition: left 200ms linear, top 200ms linear, height 200ms, width 200ms linear, box-shadow 200ms linear;
+	transition: left 300ms linear, top 300ms linear, height 300ms, width 300ms linear, box-shadow 300ms linear;
 }
 
 .albumImageSmall
@@ -176,7 +176,7 @@ a:hover
 #albumImageLarge
 {
 	display: none;
-	transition: 300ms opacity linear;
+	transition: 400ms opacity linear;
 }
 
 #albumViewContainer 
@@ -271,6 +271,7 @@ a:hover
 	width: 43%;
 	height: 100%;
 
+	margin-top: 8px;
 	margin-left: 20px;
 
 	overflow: auto;
@@ -279,7 +280,9 @@ a:hover
 .playButtonSmall
 {
 	width: 20px;
+	
 	top: 10px;
+	left: 5px;
 
 	position: absolute;
 }
@@ -312,7 +315,7 @@ a:hover
 	background-image: url('/images/ampBackground.png');
 	background-size: cover;
 
-	transition: opacity 200ms linear;
+	transition: opacity 400ms linear;
 
 	opacity: 0.8;
 }
@@ -491,7 +494,6 @@ a:hover
 
 .trackEntry
 {
-	transition: background 400ms linear;
 	position: relative;
 
 	height: 35px;
@@ -527,7 +529,7 @@ a:hover
 .track
 {
 	top: 1px;
-	left: 20px;
+	left: 25px;
 
 	width: 25px;
 	text-align: center;
@@ -537,7 +539,7 @@ a:hover
 
 .song
 {
-	left: 50px;
+	left: 55px;
 	text-align: left;
 }
 
@@ -560,7 +562,7 @@ a:hover
 
 	display: none;
 
-	transition: background-color 200ms linear;
+	transition: background-color 400ms linear;
 }
 
 .menuOpen
@@ -708,7 +710,7 @@ a:hover
 	
 	background-color: #DE5858;
 
-	transition: background-color 200ms linear;
+	transition: background-color 400ms linear;
 }
 
 .closeDialog:hover
@@ -746,7 +748,7 @@ input
 	margin-bottom: 7px;
 	border: solid 1px #DCDCDC;
 
-  	transition: box-shadow 0.3s, border 0.3s;
+  	transition: box-shadow 0.4s, border 0.4s;
 }
 
 #editArtwork:focus,
@@ -763,7 +765,7 @@ input:hover
 	width: 100%;
 	border: solid 1px #DCDCDC;
   	
-  	transition: box-shadow 0.3s, border 0.3s;
+  	transition: box-shadow 0.4s, border 0.4s;
 }
 
 .dialogBtn
