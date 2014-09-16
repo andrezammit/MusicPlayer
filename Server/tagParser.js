@@ -498,6 +498,8 @@ function TagParser(includeArtwork, artworkThumb, checkArtworkCache)
 			if (!_tag.albumArtist)
 				_tag.albumArtist = _tag.artist;
 
+			_tag.tagSize = _tagSize;
+			
 			new trackTime(_fd, _tag.path, _tagSize).getTrackTime(getTrackTimeDone);
 
 			return;
