@@ -155,7 +155,7 @@ MusicPlayer.engine = (function()
 	function resizeDialogs()
 	{
 		var height = $("#dialogContainer").height();
-		$(".modalContent").css('max-height', height - 135);
+		$(".modalContent").css('max-height', height - 175);
 	}
 
 	function getAudioElement()
@@ -268,6 +268,8 @@ MusicPlayer.engine = (function()
 
 		artworkTag.css('height', maxHeight);   		// Set new height
 		artworkTag.css('width', width * ratio);    	// Scale width based on ratio
+
+		$("#tracks").css('height', maxHeight);
 
 		if (callback)
 			callback();
