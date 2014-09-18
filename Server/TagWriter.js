@@ -1,6 +1,7 @@
 var fs = require('fs');
-var tagParser = require('./TagParser');
 var tmp = require('tmp');
+
+var tagParser = require('./TagParser');
 
 var tagHeaderSize = 10;
 var frameHeaderSize = 10;
@@ -108,18 +109,7 @@ function TagWriter()
 		buffer.writeUInt8(0, _bufferOffset);				// Zero terminator.
 		_bufferOffset += 1;
 
-		tmpbuffer = Buffer.concat([buffer, data], buffer.length + data.length);		// Data.
-		buffer = tmpbuffer;
-
-		fs.writeFile("./BufferTest.txt", buffer, 
-			function(err) {
-    if(err) {
-        console.log(err);
-    } else {
-        console.log("The file was saved!");
-    }
-}); 
-
+		buffer = Buffer.concat([buffer, data], buffer.length + data.length);		// Data.
 		_bufferOffset += data.length;
 	}
 
@@ -167,8 +157,6 @@ function TagWriter()
 
 	function prepareData()
 	{
-		debugger;
-
 		writeFrame(_newTagBuffer, 'TALB', _newTag.album);
 		writeFrame(_newTagBuffer, 'TIT2', _newTag.song);
 		writeFrame(_newTagBuffer, 'TPE1', _newTag.artist);
@@ -198,8 +186,6 @@ function TagWriter()
 				if (error)
 					callback(error);
 
-				debugger;
-
 				_oldTag = tag;
 				_oldTagSize = tag.tagSize;
 
@@ -225,8 +211,6 @@ function TagWriter()
 		tmp.file(
 			function(error, tmpPath, fd) 
 			{
-				debugger;
-
 			  	if (error) 
 			  		throw error;
 
@@ -261,12 +245,6 @@ function TagWriter()
 		var readStream = fs.createReadStream(_fullPath, { start: _oldTagSize });
 		var writeStream = fs.createWriteStream(null, { fd: fd, mode: 'r+', start: _newTagBuffer.length });
 
-		readStream.on('open', 
-			function()
-			{
-
-			});
-
 		readStream.on('data',
 			function(chunk)
 			{
@@ -293,12 +271,6 @@ function TagWriter()
 	{
 		var readStream = fs.createReadStream(tmpPath);
 		var writeStream = fs.createWriteStream(_fullPath);
-
-		readStream.on('open', 
-			function()
-			{
-
-			});
 
 		readStream.on('data',
 			function(chunk)
