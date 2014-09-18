@@ -42,6 +42,50 @@ function saveTag(tag, callback)
         });
 }
 
+function clearArtworkIfOnlyReference(id)
+{
+    collection.find( { _id: id }, { artworkHash: 1 } ).toArray(
+        function(error, docs)
+        {
+            if (!docs)
+                return;
+
+            if (docs.length == 0)
+                return;
+
+            var artworkCount = collection.find({ artworkHash: docs[0] }).count();
+
+            if (artworkCount > 1)
+                return;
+
+            artworkCache.remove({ hash: docs[0] });
+        });
+}
+
+function updateTag(id, tag, callback)
+{
+    clearArtworkIfOnlyReference(id);
+
+    var tmpArtist = tag.albumArtist || tag.artist;
+
+    console.log('Updating: ' + tmpArtist + ' - ' + tag.song + ' - ' + tag.album + ' - ' + tag.track + ' - ' + tag.time + ' - ' + tag.year + ' - ' + tag.artworkHash);
+
+    var doc = { artist: tag.artist, albumArtist: tag.albumArtist, song: tag.song, album: tag.album, track: parseInt(tag.track), time: tag.time, year: parseInt(tag.year), path: tag.path, artworkHash: tag.artworkHash };
+
+    cacheArtwork(tag, 
+        function(tag)
+        {
+            collection.update({ _id: id, doc, { w: 1 },
+                function(error, result) 
+                {
+                    if (error)
+                        console.log(error);
+
+                    callback();
+                });
+        });
+}
+
 function setupDatabaseDone()
 {
     console.log('Finished setting up database.');
@@ -269,6 +313,7 @@ setupDatabase(setupDatabaseDone);
 
 module.exports.getTags = getTags;
 module.exports.saveTags = saveTags;
+module.exports.updateTag = updateTag;
 module.exports.getAlbums = getAlbums;
 module.exports.getAllTags = getAllTags;
 module.exports.getTagCount = getTagCount;

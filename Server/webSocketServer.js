@@ -147,7 +147,36 @@ function onWSConnection(webSock)
 							});
 					});
 			}
-		}
+			break;
+
+		case 'updateSongInfo':
+			{
+				database.getFileFromID(query.id,
+					function(filePath)
+					{
+						new tagWriter(filePath, newTag,
+							function(error)
+							{
+								 new tagParser(false, true, true).getTag(filePath, 
+								        function(error, tag)
+								        {
+								            if (error)
+								            {
+								                console.log(error);
+								                return;
+								            }
+
+								            database.updateTag(query.id, tag,
+								            	function(error)
+								            	{
+								            		var reply = { command: 'updateSongInfoReply', error: 0 };
+													sendData(reply);
+								            	});
+								        });
+							})l
+					});
+			}
+			break;
 	}
 
 	function sendData(data)
