@@ -1,48 +1,9 @@
 var fs = require('fs');
 var tagParser = require('./TagParser');
-
-var minTagMinorVer = 1;
-var maxTagMinorVar = 4;
-
-var minTagSize = 3;
-
-var ver23HeaderSize = 10;
-
-var sevenBitMask = 0x7F;
-var byteSize = 8;
+var tmp = require('tmp');
 
 var tagHeaderSize = 10;
 var frameHeaderSize = 10;
-
-function trimNullChar(string)
-{
-	if (!string || string.length == 0)
-		return string;
-
-	var lastIndex = string.length - 1;
-
-	if (string.charCodeAt(lastIndex) == 0)
-		string = string.substring(0, lastIndex);
-
-	return string;
-}
-
-function readUntilNullChar(buffer, offset)
-{
-	var result = '';
-
-	for (var cnt = offset; cnt < buffer.length; cnt++)
-	{
-		var currentByte = buffer[cnt];
-
-		if (currentByte == 0)
-			break;
-
-		result += String.fromCharCode(currentByte);
-	}
-
-	return result;
-}
 
 function TagWriter()
 {
@@ -56,6 +17,7 @@ function TagWriter()
 	var _callback;
 
 	var _newTagBuffer;
+	var _bufferOffset = 0;
 
 	////////////////////////////////////////////////////////////////////////////
 	// Helpers 
@@ -70,33 +32,95 @@ function TagWriter()
 
 	function getTagSize(tag)
 	{
-		return tag.artist.length + 1 + 
+		var tagSize = tag.artist.length + 1 + 
 			tag.album.length + 1 +
 			tag.song.length + 1 + 
 			tag.albumArtist.length + 1 + 
 			tag.track.length + 1 + 
 			tag.year.length + 1 +
-			tag.artwork.length + 
-			70 + 					// Frame headers. 
-			10;						// Tag header.
+			frameHeaderSize * 5 + 	// Frame headers. 
+			tagHeaderSize +			// Tag header.
+			10;						// Padding.
+
+		if (tag.artwork)
+			tagSize += frameHeaderSize + 
+				6;					// Artwork info.
+
+		return tagSize;
 	}
 
 	function writeFrame(buffer, frameID, data)
 	{
-		var frameSize = tag.album.length;
+		var frameSize = data.length;
 		var encodedFrame = isEncodedFrame(frameID);
 
 		if (encodedFrame)
 			frameSize++;
 
-		buffer.write(frameID);			// Frame ID.
-		buffer.write(frameSize);		// Frame size.
-		buffer.writeUint8(0);			// Flags.
+		buffer.write(frameID, _bufferOffset);				// Frame ID.
+		_bufferOffset += 4;
+
+		buffer.writeUInt32BE(frameSize, _bufferOffset);		// Frame size.
+		_bufferOffset += 4;
+
+		buffer.writeUInt16BE(0, _bufferOffset);				// Flags.
+		_bufferOffset += 2;
 
 		if (encodedFrame)
-			buffer.writeUint8(0);
+		{
+			buffer.writeUInt8(0, _bufferOffset);			// Encoding byte.
+			_bufferOffset += 1;
+		}
 
-		buffer.write(data);				// Data.
+		buffer.write(data, _bufferOffset);					// Data.
+		_bufferOffset += data.length;
+	}
+
+	function writeArtworkFrame(buffer, frameID, data)
+	{
+		var frameSize = data.length;
+
+		buffer.write(frameID, _bufferOffset);				// Frame ID.
+		_bufferOffset += 4;
+
+		buffer.writeUInt32BE(frameSize, _bufferOffset);		// Frame size.
+		_bufferOffset += 4;
+
+		buffer.writeUInt16BE(0, _bufferOffset);				// Flags.
+		_bufferOffset += 2;
+
+		var mimeType = 'PNG';
+
+		buffer.write(mimeType, _bufferOffset);				// MIME type.
+		_bufferOffset += mimeType.length;
+
+		buffer.writeUInt8(0, _bufferOffset);				// Zero terminator.
+		_bufferOffset += 1;
+
+		buffer.writeUInt8(0, _bufferOffset);				// Picture type.
+		_bufferOffset += 1;
+
+		var description = '';
+
+		buffer.write(description, _bufferOffset);			// MIME type.
+		_bufferOffset += description.length;
+
+		buffer.writeUInt8(0, _bufferOffset);				// Zero terminator.
+		_bufferOffset += 1;
+
+		tmpbuffer = Buffer.concat([buffer, data], buffer.length + data.length);		// Data.
+		buffer = tmpbuffer;
+
+		fs.writeFile("./BufferTest.txt", buffer, 
+			function(err) {
+    if(err) {
+        console.log(err);
+    } else {
+        console.log("The file was saved!");
+    }
+}); 
+
+		_bufferOffset += data.length;
 	}
 
 	function copyMissingTagData()
@@ -125,19 +149,20 @@ function TagWriter()
 
 	function prepareHeader()
 	{
-		var newSize = _newTag.artist.length + 1 + 
-			_newTag.album.length + 1 +
-			_newTag.song.length + 1 + 
-			_newTag.albumArtist.length + 1 + 
-			_newTag.track.length + 1 + 
-			_newTag.year.length + 1 +
-			_newTag.artwork.length;
+		_newTagBuffer.write('ID3');									// ID3 identifier.
+		_bufferOffset += 3;
 
-		_newTagBuffer.write('ID3');					// ID3 identifier.
-		_newTagBuffer.writeUInt8(4, 3);				// Major version.
-		_newTagBuffer.writeUInt8(0, 4);				// Minor version.
-		_newTagBuffer.writeUInt8(0, 5);				// Flags.
-		_newTagBuffer.writeUInt32BE(newSize, 6);	// Size.
+		_newTagBuffer.writeUInt8(3, _bufferOffset);					// Major version.
+		_bufferOffset += 1;
+		
+		_newTagBuffer.writeUInt8(0, _bufferOffset);					// Minor version.
+		_bufferOffset += 1;
+		
+		_newTagBuffer.writeUInt8(0, _bufferOffset);					// Flags.
+		_bufferOffset += 1;
+
+		_newTagBuffer.writeUInt32BE(_newTagBuffer.length, _bufferOffset);		// Size.
+		_bufferOffset += 4;
 	}
 
 	function prepareData()
@@ -150,7 +175,9 @@ function TagWriter()
 		writeFrame(_newTagBuffer, 'TPE2', _newTag.albumArtist);
 		writeFrame(_newTagBuffer, 'TRCK', _newTag.track);
 		writeFrame(_newTagBuffer, 'TYER', _newTag.year);
-		writeFrame(_newTagBuffer, 'APIC', _newTag.artwork);
+
+		if (_newTag.artwork)
+			writeArtworkFrame(_newTagBuffer, 'APIC', _newTag.artwork);
 	}
 
 	////////////////////////////////////////////////////////////////////////////
@@ -165,11 +192,13 @@ function TagWriter()
 
 		console.log('Saving ID3 tag to: ' + fullPath);
 
-		new tagParser(true, false, false).getTag(fullPath, 
+		new tagParser(true, false, false, false).getTag(fullPath, 
 			function(error, tag)
 			{
 				if (error)
 					callback(error);
+
+				debugger;
 
 				_oldTag = tag;
 				_oldTagSize = tag.tagSize;
@@ -183,6 +212,7 @@ function TagWriter()
 		copyMissingTagData();
 
 		_newTagBuffer = new Buffer(getTagSize(_newTag));
+		_newTagBuffer.fill(0);
 
 		prepareHeader();
 		prepareData();
@@ -195,6 +225,8 @@ function TagWriter()
 		tmp.file(
 			function(error, tmpPath, fd) 
 			{
+				debugger;
+
 			  	if (error) 
 			  		throw error;
 
