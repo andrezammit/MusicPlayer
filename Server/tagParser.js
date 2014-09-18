@@ -49,7 +49,7 @@ function readUntilNullChar(buffer, offset)
 	return result;
 }
 
-function TagParser(includeArtwork, artworkThumb, checkArtworkCache)
+function TagParser(includeArtwork, artworkThumb, checkArtworkCache, resizeArtwork)
 {
 	if (!includeArtwork)
 		includeArtwork = false;
@@ -60,6 +60,9 @@ function TagParser(includeArtwork, artworkThumb, checkArtworkCache)
 	if (!checkArtworkCache)
 		checkArtworkCache = false;
 
+	if (!resizeArtwork)
+		resizeArtwork = true;
+
 	var _tagSize = 0;
 	var _tagOffset = 0;
 	var _tagMinorVer = 3;
@@ -67,6 +70,7 @@ function TagParser(includeArtwork, artworkThumb, checkArtworkCache)
 	var _artworkThumb = artworkThumb;
 	var _includeArtwork = _artworkThumb || includeArtwork;
 	var _checkArtworkCache = checkArtworkCache;
+	var _resizeArtwork = resizeArtwork;
 
 	var _fd = null;
 
@@ -379,10 +383,13 @@ function TagParser(includeArtwork, artworkThumb, checkArtworkCache)
 					tmpDataSize -=2;
 					tmpOffset += 2;
 				}
+			
+				frameData = _dataBuffer.toString(frameEncoding, tmpOffset, tmpOffset + tmpDataSize);
 			}
 			else if (isArtworkFrame(frameID))
 			{
 				var encodingByte = _dataBuffer.readUInt8(tmpOffset);
+
 				tmpOffset += 1;
 				tmpDataSize -= 1;
 
@@ -391,17 +398,20 @@ function TagParser(includeArtwork, artworkThumb, checkArtworkCache)
 				if (_tagMinorVer == 2)
 				{
 					mimeType = _dataBuffer.toString('ascii', tmpOffset, tmpOffset + 3);
+
 					tmpOffset += 3;
 					tmpDataSize -= 3;
 				}
 				else
 				{
 					mimeType = readUntilNullChar(_dataBuffer, tmpOffset);
+
 					tmpOffset += mimeType.length + 1;
 					tmpDataSize -= mimeType.length + 1;
 				}
 
 				var pictureType = _dataBuffer.readUInt8(tmpOffset);
+
 				tmpOffset += 1;
 				tmpDataSize -= 1;
 
@@ -413,10 +423,13 @@ function TagParser(includeArtwork, artworkThumb, checkArtworkCache)
 
 				_tag.artworkType = mimeType;
 
-				frameEncoding = 'base64';
+				frameData = new Buffer(tmpDataSize);
+				 _dataBuffer.copy(frameData, 0, tmpOffset, tmpOffset + tmpDataSize);
 			}
-
-			frameData = _dataBuffer.toString(frameEncoding, tmpOffset, tmpOffset + tmpDataSize);
+			else 
+			{
+				frameData = _dataBuffer.toString(frameEncoding, tmpOffset, tmpOffset + tmpDataSize);
+			}
 		}
 
 		_tagOffset += frameSize;
@@ -436,7 +449,8 @@ function TagParser(includeArtwork, artworkThumb, checkArtworkCache)
 
 	function processFrameData(frameID, frameData, callback)
 	{
-		frameData = trimNullChar(frameData)
+		if (frameID != 'APIC' && frameID != 'PIC')
+			frameData = trimNullChar(frameData);
 
 		switch (frameID)
 		{
@@ -521,7 +535,7 @@ function TagParser(includeArtwork, artworkThumb, checkArtworkCache)
 
 				_tag.time = time;
 
-				if (_tag.artwork)
+				if (_tag.artwork && _resizeArtwork == true)
 				{
 					var width = 800;
 
@@ -562,10 +576,7 @@ function TagParser(includeArtwork, artworkThumb, checkArtworkCache)
 
 		arrImagesToResize.push(_tag.artworkHash);
 
-		var pngBuffer = new Buffer(_tag.artwork, 'base64');
-		var jpgBuffer = new images(pngBuffer).encode('jpg');
-
-		pngBuffer = null;
+		var jpgBuffer = new images(_tag.artwork).encode('jpg');
 
 		var resizer = new lwip.load(jpgBuffer, jpgBuffer.length, 'jpgBuffer',
 			function(error, image)
@@ -577,11 +588,11 @@ function TagParser(includeArtwork, artworkThumb, checkArtworkCache)
 					{
 						if (artworkThumb == true)
 						{
-							_tag.artworkSmall = newBuffer.toString('binary');
+							_tag.artworkSmall = newBuffer;
 						}
 						else
 						{
-							_tag.artwork = newBuffer.toString('binary');
+							_tag.artwork = newBuffer;
 						}
 
 						image = null;
