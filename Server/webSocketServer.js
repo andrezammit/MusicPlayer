@@ -84,6 +84,9 @@ function onWSConnection(webSock)
 										tag.artworkType = artwork.type;
 									}
 
+									if (tag.artwork)
+										tag.artwork = bufferToBinary(tag.artwork);
+
 									albumsDone++;
 
 									if (albumsDone == docs.length)
@@ -116,6 +119,9 @@ function onWSConnection(webSock)
 						new tagParser(true, false).getTag(docs[0].path, 
 							function(error, tag)
 							{
+								if (tag.artwork)
+									tag.artwork = bufferToBinary(tag.artwork);
+
 								var replyData = { artist: query.albumArtist, album: query.album, trackList: docs, artwork: tag.artwork };
 
 								var reply = { command: 'getTracksReply', replyData: replyData };
@@ -133,6 +139,9 @@ function onWSConnection(webSock)
 						new tagParser(true, false).getTag(filePath, 
 							function(error, tag)
 							{
+								if (tag.artwork)
+									tag.artwork = bufferToBinary(tag.artwork);
+
 								var reply = { command: 'getSongInfoReply', songInfo: tag };
 								sendData(reply);
 							});
@@ -205,11 +214,16 @@ function getAlbumArtwork(tag, callback)
 							return;
 						}
 
-						var artwork = { data: tmpTag.artworkSmall, type: tmpTag.artworkType }
+						var artwork = { data: bufferToBinary(tmpTag.artworkSmall), type: tmpTag.artworkType }
 						callback(tag, artwork);
 					});
 			})(index);
 		});
+}
+
+function bufferToBinary(buffer)
+{
+	return buffer.toString('binary');
 }
 
 wsServer.on('connection', onWSConnection);
