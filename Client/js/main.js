@@ -838,7 +838,17 @@ MusicPlayer.engine = (function()
 
 		msgHandlers['getSongInfoReply'] = function(data)
 		{
-			dialogs.editSong(data.songInfo);
+			dialogs.editSong(data.songInfo,
+				function(tag)
+				{
+					query = { call: 'updateSongInfo', id: id, tag: tag };
+					connect.sendQuery(query);
+				});
+		}
+
+		msgHandlers['updateSongInfoReply'] = function(data)
+		{
+			alert('updateSongInfoReply returned with error: ' + data.error);
 		}
 	}
 
