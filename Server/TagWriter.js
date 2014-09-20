@@ -44,10 +44,24 @@ function TagWriter()
 			10;						// Padding.
 
 		if (tag.artwork)
+		{
 			tagSize += frameHeaderSize + 
-				6;					// Artwork info.
+				7 +					// Artwork info.
+				tag.artwork.length;	// Artwork data.
+		}
 
 		return tagSize;
+	}
+
+	function getBufferSize(tag)
+	{
+		var tagSize = getTagSize(tag);
+		var bufferSize = tagSize;
+
+		if (tag.artwork)
+			bufferSize -= tag.artwork.length;
+
+		return bufferSize;
 	}
 
 	function writeFrame(buffer, frameID, data)
@@ -77,40 +91,45 @@ function TagWriter()
 		_bufferOffset += data.length;
 	}
 
-	function writeArtworkFrame(buffer, frameID, data)
+	function writeArtworkFrame(frameID, data)
 	{
-		var frameSize = data.length;
+		var frameSize = data.length + 7;
 
-		buffer.write(frameID, _bufferOffset);				// Frame ID.
+		_newTagBuffer.write(frameID, _bufferOffset);				// Frame ID.
 		_bufferOffset += 4;
 
-		buffer.writeUInt32BE(frameSize, _bufferOffset);		// Frame size.
+		_newTagBuffer.writeUInt32BE(frameSize, _bufferOffset);		// Frame size.
 		_bufferOffset += 4;
 
-		buffer.writeUInt16BE(0, _bufferOffset);				// Flags.
+		_newTagBuffer.writeUInt16BE(0, _bufferOffset);				// Flags.
 		_bufferOffset += 2;
 
 		var mimeType = 'PNG';
 
-		buffer.write(mimeType, _bufferOffset);				// MIME type.
-		_bufferOffset += mimeType.length;
-
-		buffer.writeUInt8(0, _bufferOffset);				// Zero terminator.
+		_newTagBuffer.writeUInt8(0, _bufferOffset);					// Encoding byte.
 		_bufferOffset += 1;
 
-		buffer.writeUInt8(0, _bufferOffset);				// Picture type.
+		_newTagBuffer.write(mimeType, _bufferOffset);				// MIME type.
+		_bufferOffset += mimeType.length;
+
+		_newTagBuffer.writeUInt8(0, _bufferOffset);					// Zero terminator.
+		_bufferOffset += 1;
+
+		_newTagBuffer.writeUInt8(0, _bufferOffset);					// Picture type.
 		_bufferOffset += 1;
 
 		var description = '';
 
-		buffer.write(description, _bufferOffset);			// MIME type.
+		_newTagBuffer.write(description, _bufferOffset);			// Description type.
 		_bufferOffset += description.length;
 
-		buffer.writeUInt8(0, _bufferOffset);				// Zero terminator.
+		_newTagBuffer.writeUInt8(0, _bufferOffset);					// Zero terminator.
 		_bufferOffset += 1;
 
-		buffer = Buffer.concat([buffer, data], buffer.length + data.length);		// Data.
+		_newTagBuffer = Buffer.concat([_newTagBuffer, data], _newTagBuffer.length + data.length);		// Data.
 		_bufferOffset += data.length;
+
+		console.log('Artwork length: ' + data.length);
 	}
 
 	function copyMissingTagData()
@@ -151,21 +170,32 @@ function TagWriter()
 		_newTagBuffer.writeUInt8(0, _bufferOffset);					// Flags.
 		_bufferOffset += 1;
 
-		_newTagBuffer.writeUInt32BE(_newTagBuffer.length, _bufferOffset);		// Size.
+		var tagSize = 0;
+		var tmpTagSize = getTagSize(_newTag);
+
+		for (var byte = 0; byte < 4; byte++)
+		{
+			var tmp = tmpTagSize & 0x7F << (7 * byte);
+			tmpTagSize -= tmp;
+
+			tagSize += tmp << byte;
+		}
+
+		_newTagBuffer.writeUInt32BE(tagSize, _bufferOffset);		// Size.
 		_bufferOffset += 4;
 	}
 
 	function prepareData()
 	{
-		writeFrame(_newTagBuffer, 'TALB', _newTag.album);
-		writeFrame(_newTagBuffer, 'TIT2', _newTag.song);
-		writeFrame(_newTagBuffer, 'TPE1', _newTag.artist);
-		writeFrame(_newTagBuffer, 'TPE2', _newTag.albumArtist);
-		writeFrame(_newTagBuffer, 'TRCK', _newTag.track);
-		writeFrame(_newTagBuffer, 'TYER', _newTag.year);
+		writeFrame(_newTagBuffer, 'TAL', _newTag.album);
+		writeFrame(_newTagBuffer, 'TT2', _newTag.song);
+		writeFrame(_newTagBuffer, 'TP1', _newTag.artist);
+		writeFrame(_newTagBuffer, 'TP2', _newTag.albumArtist);
+		writeFrame(_newTagBuffer, 'TRK', _newTag.track);
+		writeFrame(_newTagBuffer, 'TYE', _newTag.year);
 
 		if (_newTag.artwork)
-			writeArtworkFrame(_newTagBuffer, 'APIC', _newTag.artwork);
+			writeArtworkFrame('PIC', _newTag.artwork);
 	}
 
 	////////////////////////////////////////////////////////////////////////////
@@ -184,7 +214,10 @@ function TagWriter()
 			function(error, tag)
 			{
 				if (error)
+				{
 					callback(error);
+					return;
+				}
 
 				_oldTag = tag;
 				_oldTagSize = tag.tagSize;
@@ -197,7 +230,7 @@ function TagWriter()
 	{
 		copyMissingTagData();
 
-		_newTagBuffer = new Buffer(getTagSize(_newTag));
+		_newTagBuffer = new Buffer(getBufferSize(_newTag));
 		_newTagBuffer.fill(0);
 
 		prepareHeader();

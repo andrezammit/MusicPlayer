@@ -49,19 +49,19 @@ function readUntilNullChar(buffer, offset)
 	return result;
 }
 
-function TagParser(includeArtwork, artworkThumb, checkArtworkCache, resizeArtwork)
+function TagParser(includeArtwork, artworkThumb, checkArtworkCache, normalizeArtwork)
 {
-	if (!includeArtwork)
+	if (typeof includeArtwork === 'undefined')
 		includeArtwork = false;
 
-	if (!artworkThumb)
+	if (typeof artworkThumb === 'undefined')
 		artworkThumb = false;
 
-	if (!checkArtworkCache)
+	if (typeof checkArtworkCache === 'undefined')
 		checkArtworkCache = false;
 
-	if (!resizeArtwork)
-		resizeArtwork = true;
+	if (typeof normalizeArtwork === 'undefined')
+		normalizeArtwork = true;
 
 	var _tagSize = 0;
 	var _tagOffset = 0;
@@ -70,7 +70,7 @@ function TagParser(includeArtwork, artworkThumb, checkArtworkCache, resizeArtwor
 	var _artworkThumb = artworkThumb;
 	var _includeArtwork = _artworkThumb || includeArtwork;
 	var _checkArtworkCache = checkArtworkCache;
-	var _resizeArtwork = resizeArtwork;
+	var _normalizeArtwork = normalizeArtwork;
 
 	var _fd = null;
 
@@ -508,7 +508,7 @@ function TagParser(includeArtwork, artworkThumb, checkArtworkCache, resizeArtwor
 			_tagOffset + _frameHeaderSize >= _dataBuffer.length)
 		{
 			_dataBuffer = null;
-
+			
 			if (!_tag.albumArtist)
 				_tag.albumArtist = _tag.artist;
 
@@ -535,7 +535,19 @@ function TagParser(includeArtwork, artworkThumb, checkArtworkCache, resizeArtwor
 
 				_tag.time = time;
 
-				if (_tag.artwork && _resizeArtwork == true)
+				var stringToHash = _tag.albumArtist + _tag.album;
+
+				if (stringToHash.length > 0)
+				{
+					var md5sum = crypto.createHash('md5');
+
+			    	md5sum.update(stringToHash, 'ascii');
+			    	_tag.artworkHash = md5sum.digest('hex');
+			    	
+			    	md5sum = null;
+		    	}
+
+				if (_tag.artwork && _normalizeArtwork == true)
 				{
 					var width = 800;
 
@@ -552,15 +564,6 @@ function TagParser(includeArtwork, artworkThumb, checkArtworkCache, resizeArtwor
 
 	function resizeArtwork(width, callback)
 	{
-		var stringToHash = _tag.albumArtist + _tag.album;
-		
-		var md5sum = crypto.createHash('md5');
-
-    	md5sum.update(stringToHash, 'ascii');
-    	_tag.artworkHash = md5sum.digest('hex');
-    	
-    	md5sum = null;
-
 		resizeArtworkWorker(width, callback);
 	}
 

@@ -1,6 +1,7 @@
 var ws = require('ws').Server;
 var database = require('./database');
 var tagParser = require('./TagParser');
+var tagWriter = require('./tagWriter');
 
 var wsServer = new ws({ port: 3001 });
 
@@ -154,10 +155,10 @@ function onWSConnection(webSock)
 				database.getFileFromID(query.id,
 					function(filePath)
 					{
-						new tagWriter(filePath, newTag,
+						new tagWriter().saveTag(filePath, query.tag,
 							function(error)
 							{
-								 new tagParser(false, true, true).getTag(filePath, 
+								 new tagParser(false, false, false, false).getTag(filePath, 
 								        function(error, tag)
 								        {
 								            if (error)
@@ -173,10 +174,11 @@ function onWSConnection(webSock)
 													sendData(reply);
 								            	});
 								        });
-							})l
+							});
 					});
 			}
 			break;
+		}
 	}
 
 	function sendData(data)
@@ -211,7 +213,7 @@ function getCachedArtwork(tag, callback)
 		function(artwork)
 		{
 			callback(tag, artwork);
-		})
+		});
 }
 
 function getAlbumArtwork(tag, callback)
@@ -221,7 +223,7 @@ function getAlbumArtwork(tag, callback)
 		{
 			if (!docs)
 			{
-				callback()
+				callback();
 				return;
 			}
 
@@ -243,7 +245,7 @@ function getAlbumArtwork(tag, callback)
 							return;
 						}
 
-						var artwork = { data: bufferToBinary(tmpTag.artworkSmall), type: tmpTag.artworkType }
+						var artwork = { data: bufferToBinary(tmpTag.artworkSmall), type: tmpTag.artworkType };
 						callback(tag, artwork);
 					});
 			})(index);

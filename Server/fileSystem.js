@@ -106,7 +106,7 @@ function getTag(fullPath, callback)
     if (fileExt !== '.mp3')
         return;
 
-    new tagParser(false, true, true).getTag(fullPath, 
+    new tagParser(false, true, true, true).getTag(fullPath, 
         function(error, tag)
         {
             if (error)
