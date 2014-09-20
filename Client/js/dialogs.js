@@ -44,19 +44,35 @@ MusicPlayer.dialogs = (function()
 
 				var artistField = editSongDlg.find("#artist");
 
-				if (songInfo.artist != artistField.html)
-					newTag.artist = artistField.html;
+				if (songInfo.artist != artistField.val())
+					newTag.artist = artistField.val();
 
 				var albumArtistField = editSongDlg.find("#albumArtist");
 
-				if (songInfo.albumArtist != albumArtistField.html)
-					newTag.albumArtist = albumArtistField.html;
+				if (songInfo.albumArtist != albumArtistField.val())
+					newTag.albumArtist = albumArtistField.val();
 
 				var albumField = editSongDlg.find("#album");
 
-				if (songInfo.album != albumField.html)
-					newTag.album = albumField.html;
+				if (songInfo.album != albumField.val())
+					newTag.album = albumField.val();
 
+				var yearField = editSongDlg.find("#year");
+
+				if (songInfo.year != yearField.val())
+					newTag.year = yearField.val();
+
+				var titleField = editSongDlg.find("#title");
+
+				if (songInfo.song != titleField.val())
+					newTag.song = titleField.val();
+
+				var trackField = editSongDlg.find("#track");
+
+				if (songInfo.track != trackField.val())
+					newTag.track = trackField.val();
+
+				callback(newTag);
 			});
 
 		$("body").css('overflow', 'hidden');
@@ -75,9 +91,9 @@ MusicPlayer.dialogs = (function()
 			initDialogs();
 		},
 
-		editSong: function(songInfo, callback)
+		editSong: function(id, songInfo, callback)
 		{
-			editSong(songInfo, callback);
+			editSong(id, songInfo, callback);
 		},
 	};
 })();
