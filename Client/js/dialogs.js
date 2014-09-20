@@ -9,12 +9,19 @@ MusicPlayer.dialogs = (function()
 		closeDialogButtons.click(
 			function()
 			{
-				getDialogContainer().fadeOut();
-				
 				var parents = $(this).parentsUntil($("#dialogContainer"));
-				var dialog = parents[parents.length - 1];
+				var dlg = parents[parents.length - 1];
 
-				$(dialog).fadeOut();
+				closeDialog($(dlg));
+			});
+	}
+
+	function closeDialog(dlg)
+	{
+		dlg.fadeOut(400,
+			function()
+			{
+				getDialogContainer().fadeOut(400);
 			});
 	}
 
@@ -37,6 +44,7 @@ MusicPlayer.dialogs = (function()
 		var blobURL = musicPlayer.getBlobURLFromData(songInfo.artwork);
 		editSongDlg.find("#editArtwork").attr('src', blobURL);
 
+		editSongDlg.find(".okBtn").off('click');
 		editSongDlg.find(".okBtn").click(
 			function()
 			{
@@ -72,6 +80,7 @@ MusicPlayer.dialogs = (function()
 				if (songInfo.track != trackField.val())
 					newTag.track = trackField.val();
 
+				closeDialog(editSongDlg);
 				callback(newTag);
 			});
 
@@ -81,7 +90,7 @@ MusicPlayer.dialogs = (function()
 			function()
 			{
 				musicPlayer.resizeDialogs();
-				editSongDlg.fadeIn();
+				editSongDlg.fadeIn(400);
 			});
 	}
 
