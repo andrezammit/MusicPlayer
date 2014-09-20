@@ -19,10 +19,13 @@ MusicPlayer.menus = (function()
 		trackMenu.css('left', offset.right - trackMenu.width());
 
 		var editItem = trackMenu.find("#edit");
+		var deleteItem = trackMenu.find("#delete");
 
 		(function(id)
 		{
 			editItem.off('click');
+			deleteItem.off('click');
+
 			trackMenu.off('menuClosed');
 
 			editItem.click(
@@ -31,6 +34,13 @@ MusicPlayer.menus = (function()
 					hideMenu(trackMenu);
 					musicPlayer.editSong(id);
 
+				});
+
+			deleteItem.click(
+				function()
+				{
+					hideMenu(trackMenu);
+					musicPlayer.deleteSong(id);
 				});
 
 			trackMenu.on('menuClosed',

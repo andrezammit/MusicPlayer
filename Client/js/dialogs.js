@@ -94,6 +94,27 @@ MusicPlayer.dialogs = (function()
 			});
 	}
 
+	function confirmDelete(id, callback)
+	{
+		$("body").css('overflow', 'hidden');
+
+		var confirmDeletegDlg = $(".dialogs").find("#confirmDelete");
+
+		confirmDeletegDlg.find(".okBtn").off('click');
+		confirmDeletegDlg.find(".okBtn").click(
+			function()
+			{
+				callback();
+			});
+
+		getDialogContainer().fadeIn(400, 
+			function()
+			{
+				musicPlayer.resizeDialogs();
+				confirmDeletegDlg.fadeIn(400);
+			});
+	}
+
 	return {
 		initDialogs: function()
 		{
@@ -103,6 +124,11 @@ MusicPlayer.dialogs = (function()
 		editSong: function(id, songInfo, callback)
 		{
 			editSong(id, songInfo, callback);
+		},
+
+		confirmDelete: function(id, callback)
+		{
+			confirmDelete(id, callback);
 		},
 	};
 })();

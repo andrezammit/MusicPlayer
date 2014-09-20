@@ -79,7 +79,7 @@ function updateTag(id, tag, callback)
 
                     var doc = { artist: tag.artist, albumArtist: tag.albumArtist, song: tag.song, album: tag.album, track: parseInt(tag.track), time: tag.time, year: parseInt(tag.year), path: tag.path, artworkHash: tag.artworkHash };
 
-                    collection.update({ _id: parseInt(id) }, doc, { w: 1 },
+                    collection.update({ _id: parseInt(id) }, { $set: doc }, { w: 1 },
                         function(error, result) 
                         {
                             if (error)
@@ -87,6 +87,19 @@ function updateTag(id, tag, callback)
 
                             callback();
                         });
+                });
+        });
+}
+
+function deleteTag(id, callback)
+{
+    clearArtworkIfOnlyReference(id,
+        function()
+        {
+            collection.remove( { _id: 1}, { w: 1 },
+                function(error, removed)
+                {
+                    callback();
                 });
         });
 }
@@ -102,18 +115,29 @@ function clearDatabaseDone()
     console.log('Finished clearing database.');
 }
 
-function setupDatabase(callback)
+function openCollections()
 {
-    db = new dbEngine.Db('', {});
-
     collection = db.collection('Settings'); 
     artworkCache = db.collection('artworkCache');
 
     collection.ensureIndex( { _id: 1 }, { unique: true } )
     artworkCache.ensureIndex( { hash: 1 }, { unique: true } )
+}
 
-    if (callback)
-        callback();
+function setupDatabase(callback)
+{
+    db = new dbEngine.Db('', {});
+    openCollections();
+
+    db.close(
+        function()
+        {
+            db = new dbEngine.Db('', {});
+            openCollections();
+
+            if (callback)
+                callback();
+        });
 }
 
 function clearDatabase(callback)
@@ -319,6 +343,7 @@ setupDatabase(setupDatabaseDone);
 
 module.exports.getTags = getTags;
 module.exports.saveTags = saveTags;
+module.exports.deleteTag = deleteTag;
 module.exports.updateTag = updateTag;
 module.exports.getAlbums = getAlbums;
 module.exports.getAllTags = getAllTags;

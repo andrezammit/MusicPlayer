@@ -696,6 +696,25 @@ a:hover
 	transform: translateX(-50%) translateY(-50%);
 }
 
+#confirmDelete
+{
+	display: none;
+
+	top: 50%;
+	left: 50%;
+	
+	position: absolute;
+	
+	width: 500px;
+	
+	z-index: 6;
+	
+	background-color: white;
+	box-shadow: 1px 1px 20px #000000;
+
+	transform: translateX(-50%) translateY(-50%);
+}
+
 .closeDialog
 {	
 	position: fixed;

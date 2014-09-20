@@ -852,6 +852,16 @@ MusicPlayer.engine = (function()
 		}
 	}
 
+	function deleteSong(id)
+	{
+		dialogs.confirmDelete(id,
+			function()
+			{
+				query = { call: 'deleteSong', id: id };
+				connect.sendQuery(query);
+			});
+	}
+
 	return {
 		connectWebSocket: function() 
 		{
@@ -951,6 +961,11 @@ MusicPlayer.engine = (function()
 		editSong: function(id)
 		{
 			editSong(id);
+		},
+
+		deleteSong: function(id)
+		{
+			deleteSong(id);
 		},
 
 		getBlobURLFromData: function(data)
