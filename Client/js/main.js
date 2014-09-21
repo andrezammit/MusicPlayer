@@ -23,8 +23,11 @@ MusicPlayer.engine = (function()
 			function()
 			{
 				resizeDialogs();
-				resizeArtwork($("#albumImageLarge"));
 				resizeAlbumContainer();
+				resizeTextToFit($("#albumName"));
+				resizeArtwork($("#albumImageLarge"));
+
+				clearAnyExpandedAlbums();
 	   		});
 	})();
 
