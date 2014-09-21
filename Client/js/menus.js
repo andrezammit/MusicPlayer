@@ -10,13 +10,26 @@ MusicPlayer.menus = (function()
 		menu.hide();
 	}
 
-	function showTrackMenu(offsetElement, id)
+	function offsetMenu(offsetElement, menu)
 	{
 		var offset = $(offsetElement)[0].getBoundingClientRect();
-		var trackMenu = $(".menus").find("#trackMenu");
 
-		trackMenu.css('top', offset.bottom);
-		trackMenu.css('left', offset.right - trackMenu.width());
+		menu.css('top', offset.bottom);
+		menu.css('left', offset.right - menu.width());
+	}
+
+	function showMenu(offsetElement, menu)
+	{
+		offsetElement.trigger('menuOpened');
+		
+		$(".menus").show();
+		menu.show();
+	}
+
+	function showTrackMenu(offsetElement, id)
+	{
+		var trackMenu = $(".menus").find("#trackMenu");
+		offsetMenu(offsetElement, trackMenu);
 
 		var editItem = trackMenu.find("#edit");
 		var deleteItem = trackMenu.find("#delete");
@@ -50,16 +63,59 @@ MusicPlayer.menus = (function()
 				});
 		})(id);
 
-		offsetElement.trigger('menuOpened')
+		showMenu(offsetElement, trackMenu);
+	}
 
-		$(".menus").show();
-		trackMenu.show();
+	function showAddMenu(offsetElement)
+	{
+		var addMenu = $(".menus").find("#addMenu");
+
+		offsetMenu(offsetElement, addMenu);
+
+		var addFileItem = addMenu.find("#addFile");
+		var addFolderItem = addMenu.find("#addFolder");
+
+		(function()
+		{
+			addFileItem.off('click');
+			addFolderItem.off('click');
+
+			addMenu.off('menuClosed');
+
+			addFileItem.click(
+				function()
+				{
+					hideMenu(addMenu);
+					musicPlayer.addFile();
+
+				});
+
+			addFolderItem.click(
+				function()
+				{
+					hideMenu(addMenu);
+					musicPlayer.addFolder();
+				});
+
+			addMenu.on('menuClosed',
+				function()
+				{
+					offsetElement.trigger('menuClosed');
+				});
+		})();
+
+		showMenu(offsetElement, addMenu);
 	}
 
 	return {
 		showTrackMenu: function(offsetElement, id)
 		{
 			showTrackMenu(offsetElement, id);
+		},
+
+		showAddMenu: function(offsetElement)
+		{
+			showAddMenu(offsetElement);
 		},
 	};
 })();

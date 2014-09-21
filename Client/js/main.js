@@ -58,16 +58,13 @@ MusicPlayer.engine = (function()
 
 			    if (container.is(event.target))
 			    {
-			    	var menu = $(".menuOpen");
-			     	
-			     	menu.trigger('menuClosed');
-			     	menu.hide();
+			    	var parent = $(".menuOpen");
+			     	parent.trigger('menuClosed');
 
 			        container.hide();
 			    }
 			});
 	
-
 /*		window.onscroll = function(event) 
 		{
 			console.log(window.scrollY);
@@ -104,6 +101,24 @@ MusicPlayer.engine = (function()
             	audioElement.currentTime = $(this).val(); 
         	});
 
+		$("#addMusic").click(
+			function()
+			{
+				menus.showAddMenu($(this));
+			});
+
+		$(".menuBarBtn").bind('menuOpened', 
+			function()
+			{
+				$(this).toggleClass('menuOpen');
+			});
+
+		$(".menuBarBtn").bind('menuClosed', 
+			function()
+			{
+				$(this).toggleClass('menuOpen');
+			});
+
 		function onVolumeChange(value)
 		{
 	    	console.log('Volume: ' + value);
@@ -121,7 +136,7 @@ MusicPlayer.engine = (function()
           
             draw: function () 
             {
-				var img = document.getElementById("volumeKnobImg");
+				var img = $("#volumeKnobImg")[0];
 
 				this.g.save();
 

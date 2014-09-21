@@ -565,7 +565,7 @@ a:hover
 	transition: background-color 400ms linear;
 }
 
-.menuOpen
+.menuLink .menuOpen
 {
 	display: block;
 	background-color: rgb(219, 219, 219);
@@ -821,7 +821,7 @@ input:hover
 	z-index: 49;
 }
 
-.menus #trackMenu
+.menus .contextMenu
 {
 	position: fixed;
 	display: none;
@@ -841,10 +841,9 @@ input:hover
 	box-shadow: 0 0 8px 1px #969696;
 
 	z-index: 50;
-
 }
 
-.menus #trackMenu div
+.menus .contextMenu div
 {
 	padding: 5px;
 	padding-left: 20px;
@@ -853,10 +852,43 @@ input:hover
 	line-height: 13px;
 }
 
-.menus #trackMenu div:hover
+.menus .contextMenu div:hover
 {
 	cursor: hand;
 
 	color: white;
 	background-color: #6666FF;
+}
+
+#menuBar
+{
+	position: absolute;
+	
+	top: 0px;
+	right: 0px;
+	
+	z-index: 2;
+	
+	height: 35px;
+}
+
+.menuBarBtn:hover, .menuBarBtn.menuOpen
+{
+	opacity: 1;
+}
+
+.menuBarBtn
+{
+	height: 30px;
+	width: 30px;
+
+	opacity: 0.3;
+
+	transition: 200ms opacity linear;
+}
+
+.menuBarImg
+{
+	height: 100%;
+	width: 100%;
 }
