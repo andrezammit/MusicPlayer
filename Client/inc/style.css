@@ -715,6 +715,25 @@ a:hover
 	transform: translateX(-50%) translateY(-50%);
 }
 
+#filePicker
+{
+	/*display: none;*/
+
+	top: 50%;
+	left: 50%;
+	
+	position: absolute;
+	
+	width: 500px;
+	
+	z-index: 6;
+	
+	background-color: white;
+	box-shadow: 1px 1px 20px #000000;
+
+	transform: translateX(-50%) translateY(-50%);
+}
+
 .closeDialog
 {	
 	position: fixed;
@@ -891,4 +910,21 @@ input:hover
 {
 	height: 100%;
 	width: 100%;
+}
+
+#fileView
+{
+	margin-bottom: 10px;
+	border: solid 1px #DCDCDC;
+	padding: 8px;
+	height: 300px;
+	overflow: auto;
+}
+
+.fileEntry
+{
+	cursor: hand;
+
+	width: 150px;
+	padding-bottom: 2px;
 }

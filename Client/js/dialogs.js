@@ -115,6 +115,29 @@ MusicPlayer.dialogs = (function()
 			});
 	}
 
+	function filePicker(callback)
+	{
+		musicPlayer.updateFilePickerDlg('');
+
+		$("body").css('overflow', 'hidden');
+
+		var filePickerDlg = $(".dialogs").find("#filePicker");
+
+		filePickerDlg.find(".okBtn").off('click');
+		filePickerDlg.find(".okBtn").click(
+			function()
+			{
+				callback();
+			});
+
+		getDialogContainer().fadeIn(400, 
+			function()
+			{
+				musicPlayer.resizeDialogs();
+				filePickerDlg.fadeIn(400);
+			});
+	}
+
 	return {
 		initDialogs: function()
 		{
@@ -129,6 +152,11 @@ MusicPlayer.dialogs = (function()
 		confirmDelete: function(id, callback)
 		{
 			confirmDelete(id, callback);
+		},
+
+		filePicker: function(callback)
+		{
+			filePicker(callback);
 		},
 	};
 })();

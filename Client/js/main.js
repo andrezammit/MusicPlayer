@@ -875,8 +875,41 @@ MusicPlayer.engine = (function()
 		dialogs.confirmDelete(id,
 			function()
 			{
-				query = { call: 'deleteSong', id: id };
+				var query = { call: 'deleteSong', id: id };
 				connect.sendQuery(query);
+			});
+	}
+
+	function updateFilePickerDlg(path)
+	{
+		var query = { call: 'getFileListing', path: path };
+		connect.sendQuery(query);  
+
+		msgHandlers['getFileListingReply'] = function(data)
+		{
+			var fileView = $("#fileView");
+			var fileTemplate = $(".templates").find('.fileEntry')[0];
+
+			fileView.empty();
+
+			for (var cnt = 0; cnt < data.fileList.length; cnt++)
+			{
+				var file = data.fileList[cnt];
+
+				var fileEntry = new FileEntry(fileTemplate);
+				fileEntry.setInfo(file);
+
+				fileView.append(fileEntry.getElement());
+			}
+		}
+	}
+
+	function addFile()
+	{
+		dialogs.filePicker(
+			function()
+			{
+
 			});
 	}
 
@@ -994,6 +1027,16 @@ MusicPlayer.engine = (function()
 		resizeDialogs: function()
 		{
 			return resizeDialogs();
+		},
+
+		updateFilePickerDlg: function(path)
+		{
+			return updateFilePickerDlg(path);
+		},
+
+		addFile: function()
+		{
+			return addFile();
 		},
 	};
 }());

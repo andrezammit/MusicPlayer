@@ -167,3 +167,29 @@ function AlbumEntry(templateElement)
 		},
 	};
 }
+
+function FileEntry(templateElement)
+{
+	var _file = null;
+	var _clone = $(templateElement).clone();
+
+	function getElement()
+	{
+		_clone.find(".fileName").html(_file.name);
+		_clone.data("file", _file);
+
+		return _clone;
+	}
+
+	return {
+		getElement: function()
+		{
+			return getElement();
+		},
+
+		setInfo: function setInfo(file)
+		{
+			_file = file;
+		}
+	}; 
+}

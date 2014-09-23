@@ -2,6 +2,7 @@ var ws = require('ws').Server;
 var database = require('./database');
 var tagParser = require('./TagParser');
 var tagWriter = require('./tagWriter');
+var fileSystem = require('./fileSystem');
 
 var wsServer = new ws({ port: 3001 });
 
@@ -178,6 +179,16 @@ function onWSConnection(webSock)
 					});
 			}
 			break;
+
+		case 'getFileListing':
+			{
+				fileSystem.getDriveLetters(
+					function(fileList)
+					{
+						var reply = { command: 'getFileListingReply', fileList: fileList, error: 0 };
+						sendData(reply);
+					});	
+			}
 		}
 	}
 

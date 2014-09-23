@@ -119,5 +119,46 @@ function getTag(fullPath, callback)
         });
 }
 
+function getDriveLetters(callback)
+{
+    var fileEntries = [];
+    var drives = [ 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z' ];
+
+    for (var cnt = 0; cnt < drives.length; cnt++)
+    {
+        var drive = drives[cnt];
+        drive += ':\\';
+
+        var stats = null;
+
+        try
+        {
+            stats = fs.statSync(drive);
+        }
+        catch (ex)
+        {
+        }
+
+        if (stats)
+        {
+            var fileEntry = { name: drive, folder: true };
+            fileEntries.push(fileEntry);
+        }
+    }
+
+    callback(fileEntries);
+}
+
+function getFolderContents(path, callback)
+{
+    fs.readdir(path,
+        function(error, fileList)
+        {
+            callback(fileList);
+        });
+}
+
 module.exports.scan = scan;
 module.exports.extractTags = extractTags;
+module.exports.getDriveLetters = getDriveLetters;
+module.exports.getFolderContents = getFolderContents;
