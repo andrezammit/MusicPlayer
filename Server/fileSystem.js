@@ -17,6 +17,7 @@ function processFile(dir, fileList, fileIndex, results, callback)
     }
 
     var fullPath = dir + '\\' + fileEntry;
+
     fs.stat(fullPath,
         function(error, stats)
         {
@@ -141,7 +142,7 @@ function getDriveLetters(callback)
 
         if (stats)
         {
-            var fileEntry = { name: drive, folder: true };
+            var fileEntry = { name: drive, fullPath: drive, folder: true };
             fileEntries.push(fileEntry);
         }
     }
@@ -151,14 +152,50 @@ function getDriveLetters(callback)
 
 function getFolderContents(path, callback)
 {
+    if (path == '')
+    {
+        getDriveLetters(
+            function(fileEntries)
+            {
+                callback(null, fileEntries);
+            });
+
+        return;
+    }
+
     fs.readdir(path,
         function(error, fileList)
         {
-            callback(fileList);
+            if (error)
+            {
+                callback(error, null);
+                return;
+            }
+
+            var fileEntries = [];
+
+            for (var cnt = 0; cnt < fileList.length; cnt++)
+            {
+                var fullPath = path + '\\' + fileList[cnt];
+                var stats = null;
+
+                try
+                {
+                    stats = fs.statSync(fullPath);
+                }
+                catch (ex)
+                {
+                    continue;
+                }
+
+                var fileEntry = { name: fileList[cnt], fullPath: fullPath, folder: stats.isDirectory() };
+                fileEntries.push(fileEntry);
+            }
+
+            callback(null, fileEntries);
         });
 }
 
 module.exports.scan = scan;
 module.exports.extractTags = extractTags;
-module.exports.getDriveLetters = getDriveLetters;
 module.exports.getFolderContents = getFolderContents;

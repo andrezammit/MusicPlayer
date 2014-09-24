@@ -717,7 +717,7 @@ a:hover
 
 #filePicker
 {
-	/*display: none;*/
+	display: none;
 
 	top: 50%;
 	left: 50%;
@@ -925,6 +925,22 @@ input:hover
 {
 	cursor: hand;
 
-	width: 150px;
+
+	padding-left: 20px;
 	padding-bottom: 2px;
+}
+
+.fileEntry.selected
+{
+	color: white;
+
+	background-color: #6666FF;
+}
+
+.fileEntry .fileName
+{
+	width: 80%;
+	height: 21px;
+
+	overflow: hidden;
 }

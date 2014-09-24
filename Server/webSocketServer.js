@@ -182,10 +182,10 @@ function onWSConnection(webSock)
 
 		case 'getFileListing':
 			{
-				fileSystem.getDriveLetters(
-					function(fileList)
+				fileSystem.getFolderContents(query.path, 
+					function(error, fileList)
 					{
-						var reply = { command: 'getFileListingReply', fileList: fileList, error: 0 };
+						var reply = { command: 'getFileListingReply', fileList: fileList, error: error };
 						sendData(reply);
 					});	
 			}

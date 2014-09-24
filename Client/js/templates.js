@@ -178,6 +178,25 @@ function FileEntry(templateElement)
 		_clone.find(".fileName").html(_file.name);
 		_clone.data("file", _file);
 
+		(function()
+		{
+			_clone.click(
+				function(event)
+				{
+					$(".fileEntry.selected").toggleClass("selected");
+					_clone.toggleClass("selected");
+				});
+
+			_clone.dblclick(
+				function(event)
+				{
+					if (!_file.folder)
+						return;
+
+					musicPlayer.updateFilePickerDlg(_file.fullPath);
+				});
+		})();
+
 		return _clone;
 	}
 

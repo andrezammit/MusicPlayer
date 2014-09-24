@@ -887,6 +887,12 @@ MusicPlayer.engine = (function()
 
 		msgHandlers['getFileListingReply'] = function(data)
 		{
+			if (data.error)
+			{
+				alert(data.error.code);
+				return;
+			}
+
 			var fileView = $("#fileView");
 			var fileTemplate = $(".templates").find('.fileEntry')[0];
 
