@@ -893,6 +893,11 @@ MusicPlayer.engine = (function()
 				return;
 			}
 
+			if (path == '')
+				path = 'Computer';
+			
+			var currentdir = $("#currentDir").val(path);
+
 			var fileView = $("#fileView");
 			var fileTemplate = $(".templates").find('.fileEntry')[0];
 
