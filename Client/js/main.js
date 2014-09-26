@@ -928,9 +928,12 @@ MusicPlayer.engine = (function()
 	function addFile()
 	{
 		dialogs.filePicker(
-			function()
+			function(selectedFile)
 			{
+				if (!selectedFile)
+					return;
 
+				console.log(selectedFile);
 			});
 	}
 

@@ -104,6 +104,7 @@ MusicPlayer.dialogs = (function()
 		confirmDeletegDlg.find(".okBtn").click(
 			function()
 			{
+				closeDialog(confirmDeletegDlg);
 				callback();
 			});
 
@@ -148,7 +149,10 @@ MusicPlayer.dialogs = (function()
 		filePickerDlg.find(".okBtn").click(
 			function()
 			{
-				callback();
+				var selectedFile = filePickerDlg.find(".selected").data('file');
+				
+				closeDialog(editSongDlg);
+				callback(selectedFile);
 			});
 
 		getDialogContainer().fadeIn(400, 
