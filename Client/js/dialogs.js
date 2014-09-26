@@ -151,7 +151,13 @@ MusicPlayer.dialogs = (function()
 			{
 				var selectedFile = filePickerDlg.find(".selected").data('file');
 				
-				closeDialog(editSongDlg);
+				if (selectedFile.folder)
+				{
+					musicPlayer.updateFilePickerDlg(selectedFile.fullPath);
+					return;
+				}
+
+				closeDialog(filePickerDlg);
 				callback(selectedFile);
 			});
 
