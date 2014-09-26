@@ -123,6 +123,27 @@ MusicPlayer.dialogs = (function()
 
 		var filePickerDlg = $(".dialogs").find("#filePicker");
 
+		filePickerDlg.find("#goUp").off('click');
+		filePickerDlg.find("#goUp").click(
+			function()
+			{
+				var newPath = '';
+				var currentDir = $("#currentDir").data('path');
+				
+				// If length is 3 (C:\) then the path is just the drive letter.
+				if (currentDir.length == 3)
+				{
+					newPath = '';
+				}
+				else
+				{
+					var pos = currentDir.lastIndexOf('\\');
+					newPath = currentDir.slice(0, pos);
+				}
+
+				musicPlayer.updateFilePickerDlg(newPath);
+			});
+
 		filePickerDlg.find(".okBtn").off('click');
 		filePickerDlg.find(".okBtn").click(
 			function()

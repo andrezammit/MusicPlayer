@@ -949,6 +949,11 @@ input:hover
 	display: inline-block;
 }
 
+#goUp:hover
+{
+	cursor: hand;
+}
+
 #currentDir
 {
 	margin-left: 6px;

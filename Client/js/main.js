@@ -894,9 +894,19 @@ MusicPlayer.engine = (function()
 			}
 
 			if (path == '')
+			{
 				path = 'Computer';
+			}
+			else if (path.length == 2 && path.charAt(path.length - 1) != '\\')
+			{
+				// Make sure drive has a backslash after it.
+				path += '\\';
+			}
+
+			var currentDir = $("#currentDir");
 			
-			var currentdir = $("#currentDir").val(path);
+			currentDir.val(path);
+			currentDir.data('path', path);
 
 			var fileView = $("#fileView");
 			var fileTemplate = $(".templates").find('.fileEntry')[0];
