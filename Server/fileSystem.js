@@ -176,7 +176,13 @@ function getFolderContents(path, callback)
 
             for (var cnt = 0; cnt < fileList.length; cnt++)
             {
-                var fullPath = path + '\\' + fileList[cnt];
+                var fullPath = path;
+
+                if (fullPath.charAt(fullPath.length - 1) != '\\')
+                    fullPath += '\\';
+
+                fullPath += fileList[cnt];
+
                 var stats = null;
 
                 try
