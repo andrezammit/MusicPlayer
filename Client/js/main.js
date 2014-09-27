@@ -886,9 +886,9 @@ MusicPlayer.engine = (function()
 		}
 	}
 
-	function updateFilePickerDlg(path)
+	function updateFilePickerDlg(path, showFiles, filter)
 	{
-		var query = { call: 'getFileListing', showFiles: true, filter: ['.mp3'], path: path };
+		var query = { call: 'getFileListing', showFiles: showFiles, filter: filter, path: path };
 		connect.sendQuery(query);  
 
 		msgHandlers['getFileListingReply'] = function(data)
@@ -924,7 +924,7 @@ MusicPlayer.engine = (function()
 				var file = data.fileList[cnt];
 
 				var fileEntry = new FileEntry(fileTemplate);
-				fileEntry.setInfo(file);
+				fileEntry.setInfo(file, showFiles, filter);
 
 				fileView.append(fileEntry.getElement());
 			}
@@ -933,7 +933,7 @@ MusicPlayer.engine = (function()
 
 	function addSong()
 	{
-		dialogs.filePicker(
+		dialogs.filePicker(true, ['.mp3'],
 			function(selectedFile)
 			{
 				if (!selectedFile)
@@ -948,7 +948,31 @@ MusicPlayer.engine = (function()
 				console.log(selectedFile);
 			});
 
-		msgHandlers['addFilesReply'] = function(data)
+		msgHandlers['addSongReply'] = function(data)
+		{
+			alert('Added ' + data.savedCount + ' songs.');
+			location.reload(true);
+		}
+	}
+
+	function addFolder()
+	{
+		dialogs.filePicker(false, null,
+			function(selectedItem)
+			{
+				if (!selectedItem)
+					return;
+
+				var selectedFiles = [];
+				selectedItems.push(selectedItem);
+
+				var query = { call: 'addFolder', fileList: selectedItems };
+				connect.sendQuery(query);
+
+				console.log(selectedItem);
+			});
+
+		msgHandlers['addFolderReply'] = function(data)
 		{
 			alert('Added ' + data.savedCount + ' songs.');
 			location.reload(true);
@@ -1071,14 +1095,19 @@ MusicPlayer.engine = (function()
 			return resizeDialogs();
 		},
 
-		updateFilePickerDlg: function(path)
+		updateFilePickerDlg: function(path, showFiles, filter)
 		{
-			return updateFilePickerDlg(path);
+			return updateFilePickerDlg(path, showFiles, filter);
 		},
 
 		addSong: function()
 		{
 			return addSong();
+		},
+
+		addFolder: function()
+		{
+			return addFolder();
 		},
 	};
 }());

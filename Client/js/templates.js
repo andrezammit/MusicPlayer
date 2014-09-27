@@ -193,7 +193,8 @@ function FileEntry(templateElement)
 					if (!_file.folder)
 						return;
 
-					musicPlayer.updateFilePickerDlg(_file.fullPath);
+					musicPlayer.updateFilePickerDlg(_file.fullPath, _showFiles, _filter);
+
 				});
 		})();
 
@@ -206,9 +207,11 @@ function FileEntry(templateElement)
 			return getElement();
 		},
 
-		setInfo: function setInfo(file)
+		setInfo: function setInfo(file, showFiles, filter)
 		{
 			_file = file;
+			_showFiles = showFiles;
+			_filter = filter;
 		}
 	}; 
 }

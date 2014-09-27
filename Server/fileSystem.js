@@ -202,7 +202,7 @@ function getFolderContents(folder, filter, showFiles, callback)
                     var fileExt = path.extname(fullPath);
 
                     if (filter.indexOf(fileExt) == -1)
-                    continue;
+                        continue;
                 }
 
                 var fileEntry = { name: fileList[cnt], fullPath: fullPath, folder: stats.isDirectory() };

@@ -116,9 +116,9 @@ MusicPlayer.dialogs = (function()
 			});
 	}
 
-	function filePicker(callback)
+	function filePicker(showFiles, filter, callback)
 	{
-		musicPlayer.updateFilePickerDlg('');
+		musicPlayer.updateFilePickerDlg('', showFiles, filter);
 
 		$("body").css('overflow', 'hidden');
 
@@ -153,7 +153,7 @@ MusicPlayer.dialogs = (function()
 				
 				if (selectedFile.folder)
 				{
-					musicPlayer.updateFilePickerDlg(selectedFile.fullPath);
+					musicPlayer.updateFilePickerDlg(selectedFile.fullPath, showFiles, filter);
 					return;
 				}
 
@@ -185,9 +185,9 @@ MusicPlayer.dialogs = (function()
 			confirmDelete(id, callback);
 		},
 
-		filePicker: function(callback)
+		filePicker: function(showFiles, filter, callback)
 		{
-			filePicker(callback);
+			filePicker(showFiles, filter, callback);
 		},
 	};
 })();
