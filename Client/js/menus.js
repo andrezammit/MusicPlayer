@@ -86,7 +86,7 @@ MusicPlayer.menus = (function()
 				function()
 				{
 					hideMenu(addMenu);
-					musicPlayer.addFile();
+					musicPlayer.addSong();
 				});
 
 			addFolderItem.click(

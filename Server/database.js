@@ -96,7 +96,7 @@ function deleteTag(id, callback)
     clearArtworkIfOnlyReference(id,
         function()
         {
-            collection.remove( { _id: 1}, { w: 1 },
+            collection.remove({ _id: id }, { w: 1 },
                 function(error, removed)
                 {
                     callback();
@@ -120,8 +120,8 @@ function openCollections()
     collection = db.collection('Settings'); 
     artworkCache = db.collection('artworkCache');
 
-    collection.ensureIndex( { _id: 1 }, { unique: true } )
-    artworkCache.ensureIndex( { hash: 1 }, { unique: true } )
+    collection.ensureIndex({ _id: 1 }, { unique: true });
+    artworkCache.ensureIndex({ hash: 1 }, { unique: true });
 }
 
 function setupDatabase(callback)
@@ -342,6 +342,7 @@ function getCachedArtwork(hash, callback)
 setupDatabase(setupDatabaseDone);
 
 module.exports.getTags = getTags;
+module.exports.saveTag = saveTag;
 module.exports.saveTags = saveTags;
 module.exports.deleteTag = deleteTag;
 module.exports.updateTag = updateTag;

@@ -878,6 +878,12 @@ MusicPlayer.engine = (function()
 				var query = { call: 'deleteSong', id: id };
 				connect.sendQuery(query);
 			});
+
+		msgHandlers['deleteSongReply'] = function(data)
+		{
+			alert('Error: ' + data.error);
+			location.reload(true);
+		}
 	}
 
 	function updateFilePickerDlg(path)
@@ -925,7 +931,7 @@ MusicPlayer.engine = (function()
 		}
 	}
 
-	function addFile()
+	function addSong()
 	{
 		dialogs.filePicker(
 			function(selectedFile)
@@ -933,8 +939,20 @@ MusicPlayer.engine = (function()
 				if (!selectedFile)
 					return;
 
+				var selectedFiles = [];
+				selectedFiles.push(selectedFile);
+
+				var query = { call: 'addSong', fileList: selectedFiles };
+				connect.sendQuery(query);
+
 				console.log(selectedFile);
 			});
+
+		msgHandlers['addFilesReply'] = function(data)
+		{
+			alert('Added ' + data.savedCount + ' songs.');
+			location.reload(true);
+		}
 	}
 
 	return {
@@ -1058,9 +1076,9 @@ MusicPlayer.engine = (function()
 			return updateFilePickerDlg(path);
 		},
 
-		addFile: function()
+		addSong: function()
 		{
-			return addFile();
+			return addSong();
 		},
 	};
 }());

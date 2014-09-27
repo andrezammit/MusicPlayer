@@ -189,6 +189,29 @@ function onWSConnection(webSock)
 						sendData(reply);
 					});	
 			}
+			break;
+
+		case 'addFiles':
+			{
+				addFiles(query.fileList,
+					function()
+					{
+						var reply = { command: 'addFilesReply', savedFiles: query.fileList.length };
+						sendData(reply);
+					});
+			}
+			break;
+
+		case 'deleteSong':
+			{
+				database.deleteTag(query.id,
+					function()
+					{
+						var reply = { command: 'deleteSongReply', error: 0 };
+						sendData(reply);
+					});
+			}
+			break;
 		}
 	}
 
@@ -266,6 +289,27 @@ function getAlbumArtwork(tag, callback)
 function bufferToBinary(buffer)
 {
 	return buffer.toString('binary');
+}
+
+function addFiles(fileList, callback)
+{
+	var tagsSaved = 0;
+
+	for (var cnt = 0; cnt < fileList.length; cnt++)
+	{
+		new tagParser(false, true, true, true).getTag(fileList[cnt].fullPath,
+			function(error, tag)
+			{
+				database.saveTag(tag, 
+					function()
+					{
+						tagsSaved++;
+
+						if (tagsSaved == fileList.length)
+							callback();
+					});
+			});
+	}
 }
 
 wsServer.on('connection', onWSConnection);
