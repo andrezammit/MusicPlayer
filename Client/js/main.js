@@ -888,7 +888,7 @@ MusicPlayer.engine = (function()
 
 	function updateFilePickerDlg(path)
 	{
-		var query = { call: 'getFileListing', path: path };
+		var query = { call: 'getFileListing', showFiles: true, filter: ['.mp3'], path: path };
 		connect.sendQuery(query);  
 
 		msgHandlers['getFileListingReply'] = function(data)

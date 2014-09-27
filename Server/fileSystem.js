@@ -150,9 +150,9 @@ function getDriveLetters(callback)
     callback(fileEntries);
 }
 
-function getFolderContents(path, callback)
+function getFolderContents(folder, filter, showFiles, callback)
 {
-    if (path == '')
+    if (folder == '')
     {
         getDriveLetters(
             function(fileEntries)
@@ -163,7 +163,7 @@ function getFolderContents(path, callback)
         return;
     }
 
-    fs.readdir(path,
+    fs.readdir(folder,
         function(error, fileList)
         {
             if (error)
@@ -176,7 +176,7 @@ function getFolderContents(path, callback)
 
             for (var cnt = 0; cnt < fileList.length; cnt++)
             {
-                var fullPath = path;
+                var fullPath = folder;
 
                 if (fullPath.charAt(fullPath.length - 1) != '\\')
                     fullPath += '\\';
@@ -191,6 +191,17 @@ function getFolderContents(path, callback)
                 }
                 catch (ex)
                 {
+                    continue;
+                }
+
+                if (!stats.isDirectory() && !showFiles)
+                    continue;
+                
+                if (!stats.isDirectory() && filter)
+                {
+                    var fileExt = path.extname(fullPath);
+
+                    if (filter.indexOf(fileExt) == -1)
                     continue;
                 }
 

@@ -182,7 +182,7 @@ function onWSConnection(webSock)
 
 		case 'getFileListing':
 			{
-				fileSystem.getFolderContents(query.path, 
+				fileSystem.getFolderContents(query.path, query.filter, query.showFiles, 
 					function(error, fileList)
 					{
 						var reply = { command: 'getFileListingReply', fileList: fileList, error: error };
