@@ -202,6 +202,16 @@ function onWSConnection(webSock)
 			}
 			break;
 
+		case 'addFolders':
+			{
+				addFolder(query.folderList,
+					function()
+					{
+						var reply = { command: 'addFoldersReply', savedFiles: query.folderList.length };
+						sendData(reply);
+					})	
+			}
+
 		case 'deleteSong':
 			{
 				database.deleteTag(query.id,
@@ -293,7 +303,7 @@ function bufferToBinary(buffer)
 
 function addFiles(fileList, callback)
 {
-	var tagsSaved = 0;
+	var filesDone = 0;
 
 	for (var cnt = 0; cnt < fileList.length; cnt++)
 	{
@@ -303,11 +313,28 @@ function addFiles(fileList, callback)
 				database.saveTag(tag, 
 					function()
 					{
-						tagsSaved++;
+						filesDone++;
 
-						if (tagsSaved == fileList.length)
+						if (filesDone == fileList.length)
 							callback();
 					});
+			});
+	}
+}
+
+function addFolders(folderList, callback)
+{
+	var foldersDone = 0;
+
+	for (var cnt = 0; cnt < folderList.length; cnt++)
+	{
+		fileSystem.scan(folderList[cnt].fullPath,
+			function(error)
+			{
+				foldersDone++;
+
+				if (foldersDone == folderList.length)
+					callback();
 			});
 	}
 }

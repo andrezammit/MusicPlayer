@@ -194,7 +194,6 @@ function FileEntry(templateElement)
 						return;
 
 					musicPlayer.updateFilePickerDlg(_file.fullPath, _showFiles, _filter);
-
 				});
 		})();
 
