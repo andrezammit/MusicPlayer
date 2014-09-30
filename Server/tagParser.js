@@ -514,12 +514,33 @@ function TagParser(includeArtwork, artworkThumb, checkArtworkCache, normalizeArt
 
 			_tag.tagSize = _tagSize;
 			
-			new trackTime(_fd, _tag.path, _tagSize).getTrackTime(getTrackTimeDone);
+			skipID3v1IfThere(
+				function()
+				{
+					new trackTime(_fd, _tag.path, _tagSize).getTrackTime(getTrackTimeDone);
+				});
 
 			return;
 		}
 
         setTimeout(getTagFrame, 0, getTagFrameDone);
+	}
+
+	function skipID3v1IfThere(callback)
+	{
+		var v1Header = new Buffer(3);
+
+		fs.read(_fd, v1Header, 0, 3, _tagSize + 10, 
+			function(error, bytesRead)
+			{
+				var tagID = v1Header.toString('utf8', 0, 3);
+
+				if (tagID == 'TAG')
+					_tagSize += 128;
+
+				v1Header = null;
+				callback();
+			});
 	}
 
 	function getTrackTimeDone(error, time)
