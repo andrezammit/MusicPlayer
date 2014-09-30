@@ -86,14 +86,14 @@ MusicPlayer.menus = (function()
 				function()
 				{
 					hideMenu(addMenu);
-					musicPlayer.addSong();
+					musicPlayer.addSongs();
 				});
 
 			addFolderItem.click(
 				function()
 				{
 					hideMenu(addMenu);
-					musicPlayer.addFolder();
+					musicPlayer.addFolders();
 				});
 
 			addMenu.on('menuClosed',

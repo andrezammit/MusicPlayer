@@ -193,10 +193,10 @@ function onWSConnection(webSock)
 
 		case 'addFiles':
 			{
-				addFiles(query.fileList,
+				addFiles(query.itemList,
 					function()
 					{
-						var reply = { command: 'addFilesReply', savedFiles: query.fileList.length };
+						var reply = { command: 'addFilesReply', savedFiles: query.itemList.length };
 						sendData(reply);
 					});
 			}
@@ -204,10 +204,10 @@ function onWSConnection(webSock)
 
 		case 'addFolders':
 			{
-				addFolder(query.folderList,
+				addFolders(query.itemList,
 					function()
 					{
-						var reply = { command: 'addFoldersReply', savedFiles: query.folderList.length };
+						var reply = { command: 'addFoldersReply', savedFiles: query.itemList.length };
 						sendData(reply);
 					})	
 			}
@@ -324,18 +324,57 @@ function addFiles(fileList, callback)
 
 function addFolders(folderList, callback)
 {
+	var fileList = [];
 	var foldersDone = 0;
 
 	for (var cnt = 0; cnt < folderList.length; cnt++)
 	{
 		fileSystem.scan(folderList[cnt].fullPath,
-			function(error)
+			function(error, results)
 			{
+				debugger;
+
 				foldersDone++;
+				fileList = fileList.concat(results);
 
 				if (foldersDone == folderList.length)
-					callback();
+					scanDone(null, fileList);
 			});
+	}
+
+	function saveTagsDone(tagCount)
+	{
+	    console.log('Done saving ' + tagCount + ' ID3 tags to database.');
+	    callback();
+	}
+
+	function extractTagsDone(tagList)
+	{
+	    console.log("Done extracting ID3 tags.");
+	    console.log("Saving tags to database...");
+
+	    database.saveTags(tagList, saveTagsDone);
+	}
+
+	function scanDone(error, fileList)
+	{
+		if (error)
+		{
+	        console.log('Error: ' + error);
+	        return;
+	    }
+
+		if (!fileList)
+		{
+	        console.log('Error: No files found.');
+	        return;
+	    }
+	    
+	    console.log('Finished file listing.');
+	    console.log('Found ' + fileList.length + ' files.');
+
+	    console.log('Extracting ID3 tags...');
+	    fileSystem.extractTags(fileList, extractTagsDone)
 	}
 }
 

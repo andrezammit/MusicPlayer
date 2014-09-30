@@ -175,7 +175,14 @@ function FileEntry(templateElement)
 
 	function getElement()
 	{
+		var imgPath = 'images/file.png';
+
+		if (_file.folder)
+			imgPath = 'images/folder.png';
+
 		_clone.find(".fileName").html(_file.name);
+		_clone.find(".fileIconImg").attr('src', imgPath);
+
 		_clone.data("file", _file);
 
 		(function()
@@ -190,10 +197,7 @@ function FileEntry(templateElement)
 			_clone.dblclick(
 				function(event)
 				{
-					if (!_file.folder)
-						return;
-
-					musicPlayer.updateFilePickerDlg(_file.fullPath, _showFiles, _filter);
+					$("#filePicker").trigger("itemDblClick");
 				});
 		})();
 
@@ -206,11 +210,9 @@ function FileEntry(templateElement)
 			return getElement();
 		},
 
-		setInfo: function setInfo(file, showFiles, filter)
+		setInfo: function setInfo(file)
 		{
 			_file = file;
-			_showFiles = showFiles;
-			_filter = filter;
 		}
 	}; 
 }

@@ -151,7 +151,7 @@ MusicPlayer.dialogs = (function()
 			{
 				var selectedFile = filePickerDlg.find(".selected").data('file');
 				
-				if (selectedFile.folder)
+				if (showFiles && selectedFile.folder)
 				{
 					musicPlayer.updateFilePickerDlg(selectedFile.fullPath, showFiles, filter);
 					return;
@@ -159,6 +159,21 @@ MusicPlayer.dialogs = (function()
 
 				closeDialog(filePickerDlg);
 				callback(selectedFile);
+			});
+
+		filePickerDlg.off("itemDblClick");
+		filePickerDlg.on("itemDblClick", 
+			function()
+			{
+				var selectedFile = filePickerDlg.find(".selected").data('file');
+
+				if (selectedFile.folder)
+				{
+					musicPlayer.updateFilePickerDlg(selectedFile.fullPath, showFiles, filter);
+					return;
+				}
+
+				filePickerDlg.find(".okBtn").click();
 			});
 
 		getDialogContainer().fadeIn(400, 

@@ -924,14 +924,14 @@ MusicPlayer.engine = (function()
 				var file = data.fileList[cnt];
 
 				var fileEntry = new FileEntry(fileTemplate);
-				fileEntry.setInfo(file, showFiles, filter);
+				fileEntry.setInfo(file);
 
 				fileView.append(fileEntry.getElement());
 			}
 		}
 	}
 
-	function addSong()
+	function addSongs()
 	{
 		dialogs.filePicker(true, ['.mp3'],
 			function(selectedFile)
@@ -939,23 +939,23 @@ MusicPlayer.engine = (function()
 				if (!selectedFile)
 					return;
 
-				var selectedFiles = [];
-				selectedFiles.push(selectedFile);
+				var selectedItems = [];
+				selectedItems.push(selectedFile);
 
-				var query = { call: 'addSong', fileList: selectedFiles };
+				var query = { call: 'addFiles', itemList: selectedItems };
 				connect.sendQuery(query);
 
 				console.log(selectedFile);
 			});
 
-		msgHandlers['addSongReply'] = function(data)
+		msgHandlers['addFilesReply'] = function(data)
 		{
 			alert('Added ' + data.savedCount + ' songs.');
 			location.reload(true);
 		}
 	}
 
-	function addFolder()
+	function addFolders()
 	{
 		dialogs.filePicker(false, null,
 			function(selectedItem)
@@ -963,16 +963,16 @@ MusicPlayer.engine = (function()
 				if (!selectedItem)
 					return;
 
-				var selectedFiles = [];
+				var selectedItems = [];
 				selectedItems.push(selectedItem);
 
-				var query = { call: 'addFolder', fileList: selectedItems };
+				var query = { call: 'addFolders', itemList: selectedItems };
 				connect.sendQuery(query);
 
 				console.log(selectedItem);
 			});
 
-		msgHandlers['addFolderReply'] = function(data)
+		msgHandlers['addFoldersReply'] = function(data)
 		{
 			alert('Added ' + data.savedCount + ' songs.');
 			location.reload(true);
@@ -1100,14 +1100,14 @@ MusicPlayer.engine = (function()
 			return updateFilePickerDlg(path, showFiles, filter);
 		},
 
-		addSong: function()
+		addSongs: function()
 		{
-			return addSong();
+			return addSongs();
 		},
 
-		addFolder: function()
+		addFolders: function()
 		{
-			return addFolder();
+			return addFolders();
 		},
 	};
 }());
