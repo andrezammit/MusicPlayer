@@ -14,6 +14,15 @@ MusicPlayer.dialogs = (function()
 
 				closeDialog($(dlg));
 			});
+
+		var filePickerDlg = $(".dialogs").find("#filePicker");
+		closeDialogButtons = filePickerDlg.find(".closeDialog, .cancelBtn");
+
+		closeDialogButtons.click(
+			function()
+			{
+				$("body").css('overflow', 'auto');
+			});
 	}
 
 	function closeDialog(dlg)
@@ -124,6 +133,17 @@ MusicPlayer.dialogs = (function()
 
 		var filePickerDlg = $(".dialogs").find("#filePicker");
 
+		var dlgTitle = filePickerDlg.find("h3");
+
+		if (showFiles)
+		{
+			dlgTitle.html("Add File");
+		}
+		else
+		{
+			dlgTitle.html("Add Folder");
+		}
+
 		filePickerDlg.find("#goUp").off('click');
 		filePickerDlg.find("#goUp").click(
 			function()
@@ -159,6 +179,20 @@ MusicPlayer.dialogs = (function()
 
 				closeDialog(filePickerDlg);
 				callback(selectedFile);
+
+				$("body").css('overflow', 'auto');
+			});
+
+		filePickerDlg.off("itemClick");
+		filePickerDlg.on("itemClick", 
+			function()
+			{
+				var selectedFile = filePickerDlg.find(".selected").data('file');
+
+				if (!selectedFile)
+					return;
+
+				filePickerDlg.find("#selectedFile").val(selectedFile.name);
 			});
 
 		filePickerDlg.off("itemDblClick");

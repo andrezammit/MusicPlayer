@@ -928,6 +928,8 @@ MusicPlayer.engine = (function()
 
 				fileView.append(fileEntry.getElement());
 			}
+
+			$("#selectedFile").val('');
 		}
 	}
 

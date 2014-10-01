@@ -192,6 +192,8 @@ function FileEntry(templateElement)
 				{
 					$(".fileEntry.selected").toggleClass("selected");
 					_clone.toggleClass("selected");
+					
+					$("#filePicker").trigger("itemClick");
 				});
 
 			_clone.dblclick(
