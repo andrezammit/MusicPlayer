@@ -66,6 +66,46 @@ MusicPlayer.menus = (function()
 		showMenu(offsetElement, trackMenu);
 	}
 
+	function showAlbumMenu(offsetElement, arist, album)
+	{
+		var albumMenu = $(".menus").find("#albumMenu");
+		offsetMenu(offsetElement, albumMenu);
+
+		var editItem = albumMenu.find("#edit");
+		var deleteItem = albumMenu.find("#delete");
+
+		(function()
+		{
+			editItem.off('click');
+			deleteItem.off('click');
+
+			albumMenu.off('menuClosed');
+
+			editItem.click(
+				function()
+				{
+					hideMenu(albumMenu);
+					musicPlayer.editAlbum(artist, album);
+
+				});
+
+			deleteItem.click(
+				function()
+				{
+					hideMenu(albumMenu);
+					musicPlayer.deleteAlbum(artist, album);
+				});
+
+			albumMenu.on('menuClosed',
+				function()
+				{
+					offsetElement.trigger('menuClosed');
+				});
+		})();
+
+		showMenu(offsetElement, albumMenu);
+	}
+
 	function showAddMenu(offsetElement)
 	{
 		var addMenu = $(".menus").find("#addMenu");
@@ -110,6 +150,11 @@ MusicPlayer.menus = (function()
 		showTrackMenu: function(offsetElement, id)
 		{
 			showTrackMenu(offsetElement, id);
+		},
+
+		showAlbumMenu: function(offsetElement, aritst, album)
+		{
+			showAlbumMenu(offsetElement, artist, album);
 		},
 
 		showAddMenu: function(offsetElement)
