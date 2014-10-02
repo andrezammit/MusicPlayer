@@ -471,9 +471,14 @@ MusicPlayer.engine = (function()
 		
 		(function()
 		{
+			var menuOpen = false;
+
 			albumEntryHover.mouseout(
 				function(event)
 				{
+					if (menuOpen)
+						return;
+
 					onAlbumOut(event);
 				});
 
@@ -492,9 +497,22 @@ MusicPlayer.engine = (function()
 					var artist = albumEntry.data('artist');
 					var album = albumEntry.data('album');
 					
-					menus.showAlbumMenu(albumEntry, artist, album);
+					menus.showAlbumMenu(albumEntryHover, artist, album);
 
 					return false;
+				});
+
+			albumEntryHover.bind('menuOpened', 
+				function()
+				{
+					menuOpen = true;
+				});
+
+			albumEntryHover.bind('menuClosed', 
+				function()
+				{
+					menuOpen = false;
+					clearAnyExpandedAlbums();
 				});
 		})();
 
