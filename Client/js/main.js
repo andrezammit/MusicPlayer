@@ -64,6 +64,7 @@ MusicPlayer.engine = (function()
 			    	var parent = $(".menuOpen");
 			     	parent.trigger('menuClosed');
 
+			     	container.children().hide();
 			        container.hide();
 			    }
 			});
@@ -506,12 +507,15 @@ MusicPlayer.engine = (function()
 				function()
 				{
 					menuOpen = true;
+  					albumEntryHover.toggleClass('menuOpen');
 				});
 
 			albumEntryHover.bind('menuClosed', 
 				function()
 				{
 					menuOpen = false;
+  					albumEntryHover.toggleClass('menuOpen');
+
 					clearAnyExpandedAlbums();
 				});
 		})();
