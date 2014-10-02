@@ -485,6 +485,17 @@ MusicPlayer.engine = (function()
 					var albumEntry = _expandedAlbumEntries[index].data('albumEntry');
 					albumEntry.click();
 				});
+
+			albumEntryHover.bind('contextmenu', 
+				function(event)
+				{
+					var artist = albumEntry.data('artist');
+					var album = albumEntry.data('album');
+					
+					menus.showAlbumMenu(albumEntry, artist, album);
+
+					return false;
+				});
 		})();
 
 		_expandedAlbumEntries.push(albumEntryHover);
