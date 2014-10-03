@@ -1014,6 +1014,17 @@ MusicPlayer.engine = (function()
 		}
 	}
 
+	function editAlbum(artist, album)
+	{
+		var query = { call: 'getAlbumInfo', artist: artist, album: album };
+		connect.sendQuery(query);
+
+		msgHandlers['getAlbumInfoReply'] = function(data)
+		{
+			console.log(data.commonTag);
+		}
+	}
+
 	return {
 		connectWebSocket: function() 
 		{
@@ -1143,6 +1154,11 @@ MusicPlayer.engine = (function()
 		addFolders: function()
 		{
 			return addFolders();
+		},
+
+		editAlbum: function(artist, album)
+		{
+			return editAlbum(artist, album);
 		},
 	};
 }());

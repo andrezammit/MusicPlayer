@@ -222,8 +222,49 @@ function onWSConnection(webSock)
 					});
 			}
 			break;
+
+		case 'getAlbumInfo':
+			{
+				database.getAlbumTracks(query.artist, query.album, 
+					function(docs)
+					{
+						if (!docs)
+						{
+							var reply = { command: 'getTracksReply', error: getNoTagsResponse() };
+							sendData(reply);
+
+							return;
+						}
+
+						var tagList = [];
+						var artwork = null;
+
+						for (var cnt = 0; cnt < docs.length; cnt++)
+						{
+							var includeArtwork = cnt == 0;
+
+							new tagParser(includeArtwork, false).getTag(docs[cnt].path, 
+								function(error, tag)
+								{									
+									if (tag.artwork)
+										artwork = bufferToBinary(tag.artwork);
+
+									tagList.push(tag);
+
+									if (tagList.length == docs.length)
+									{
+										var commonTag = getCommonTag(tagList, artwork);
+										var reply = { command: 'getAlbumInfoReply', commonTag: commonTag };
+
+										sendData(reply);
+									}
+								});
+						}
+					});
+			}
+			break;
 		}
-	}
+	}	
 
 	function sendData(data)
 	{
@@ -376,6 +417,42 @@ function addFolders(folderList, callback)
 	    console.log('Extracting ID3 tags...');
 	    fileSystem.extractTags(fileList, extractTagsDone)
 	}
+}
+
+function getCommonTag(tagList, artwork)
+{
+	if (tagList.length == 0)
+		return null;
+
+	var baseTag = tagList[0];
+	baseTag.artwork = artwork;
+	
+	delete baseTag.song;
+	delete baseTag.track;
+	delete baseTag.path;
+	delete baseTag.time;
+
+	if (tagList.length < 2)
+		return baseTag;
+
+	for (var cnt = 0; cnt < tagList.length; cnt++)
+	{
+		var tag = tagList[cnt];
+
+		if (baseTag.artist != tag.artist)
+			delete baseTag.artist;
+
+		if (baseTag.album != tag.album)
+			delete baseTag.album;
+
+		if (baseTag.albumArtist != tag.albumArtist)
+			delete baseTag.albumArtist;
+
+		if (baseTag.year != tag.year)
+			delete baseTag.year;
+	}
+
+	return baseTag;
 }
 
 wsServer.on('connection', onWSConnection);

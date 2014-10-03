@@ -66,7 +66,7 @@ MusicPlayer.menus = (function()
 		showMenu(offsetElement, trackMenu);
 	}
 
-	function showAlbumMenu(offsetElement, arist, album)
+	function showAlbumMenu(offsetElement, artist, album)
 	{
 		var albumMenu = $(".menus").find("#albumMenu");
 		offsetMenu(offsetElement, albumMenu);
@@ -152,7 +152,7 @@ MusicPlayer.menus = (function()
 			showTrackMenu(offsetElement, id);
 		},
 
-		showAlbumMenu: function(offsetElement, aritst, album)
+		showAlbumMenu: function(offsetElement, artist, album)
 		{
 			showAlbumMenu(offsetElement, artist, album);
 		},
