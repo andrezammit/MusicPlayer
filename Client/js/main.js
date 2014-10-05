@@ -1022,6 +1022,20 @@ MusicPlayer.engine = (function()
 		msgHandlers['getAlbumInfoReply'] = function(data)
 		{
 			console.log(data.commonTag);
+
+			dialogs.editAlbum(data.commonTag, 
+				function(newTag)
+				{
+					console.log(newTag);
+
+					query = { call: 'updateAlbumInfo', artist: artist, album: album, tag: newTag };
+					connect.sendQuery(query);
+				});
+		}
+
+		msgHandlers['updateAlbumInfoReply'] = function(data)
+		{
+			
 		}
 	}
 

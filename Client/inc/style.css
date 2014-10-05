@@ -677,7 +677,7 @@ a:hover
 	overflow: auto;
 }
 
-#editSong
+#editSong, #editAlbum
 {
 	display: none;
 

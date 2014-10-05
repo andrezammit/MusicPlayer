@@ -103,6 +103,58 @@ MusicPlayer.dialogs = (function()
 			});
 	}
 
+	function editAlbum(commonTag, callback)
+	{
+		var editAlbumDlg = $(".dialogs").find("#editAlbum");
+
+		editAlbumDlg.find("#artist").val(commonTag.artist);
+		editAlbumDlg.find("#albumArtist").val(commonTag.albumArtist);
+		editAlbumDlg.find("#album").val(commonTag.album);
+		editAlbumDlg.find("#year").val(commonTag.year);
+		
+		var blobURL = musicPlayer.getBlobURLFromData(commonTag.artwork);
+		editAlbumDlg.find("#editArtwork").attr('src', blobURL);
+
+		editAlbumDlg.find(".okBtn").off('click');
+		editAlbumDlg.find(".okBtn").click(
+			function()
+			{
+				var newTag = {};
+
+				var artistField = editAlbumDlg.find("#artist");
+
+				if (songInfo.artist != artistField.val())
+					newTag.artist = artistField.val();
+
+				var albumArtistField = editAlbumDlg.find("#albumArtist");
+
+				if (songInfo.albumArtist != albumArtistField.val())
+					newTag.albumArtist = albumArtistField.val();
+
+				var albumField = editAlbumDlg.find("#album");
+
+				if (songInfo.album != albumField.val())
+					newTag.album = albumField.val();
+
+				var yearField = editAlbumDlg.find("#year");
+
+				if (songInfo.year != yearField.val())
+					newTag.year = yearField.val();
+
+				closeDialog(editAlbumDlg);
+				callback(newTag);
+			});
+
+		$("body").css('overflow', 'hidden');
+
+		getDialogContainer().fadeIn(400, 
+			function()
+			{
+				musicPlayer.resizeDialogs();
+				editAlbumDlg.fadeIn(400);
+			});
+	}
+
 	function confirmDelete(id, callback)
 	{
 		$("body").css('overflow', 'hidden');
@@ -227,6 +279,11 @@ MusicPlayer.dialogs = (function()
 		editSong: function(id, songInfo, callback)
 		{
 			editSong(id, songInfo, callback);
+		},
+
+		editAlbum: function(commonTag, callback)
+		{
+			editAlbum(commonTag, callback);
 		},
 
 		confirmDelete: function(id, callback)

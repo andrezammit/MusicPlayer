@@ -153,29 +153,11 @@ function onWSConnection(webSock)
 
 		case 'updateSongInfo':
 			{
-				database.getFileFromID(query.id,
-					function(filePath)
+				updateSongInfo(query.id, query.tag, 
+					function()
 					{
-						new tagWriter().saveTag(filePath, query.tag,
-							function(error)
-							{
-								 new tagParser(false, false, false, false).getTag(filePath, 
-								        function(error, tag)
-								        {
-								            if (error)
-								            {
-								                console.log(error);
-								                return;
-								            }
-
-								            database.updateTag(query.id, tag,
-								            	function(error)
-								            	{
-								            		var reply = { command: 'updateSongInfoReply', error: 0 };
-													sendData(reply);
-								            	});
-								        });
-							});
+						var reply = { command: 'updateSongInfoReply', error: 0 };
+						sendData(reply);
 					});
 			}
 			break;
@@ -256,6 +238,39 @@ function onWSConnection(webSock)
 										var commonTag = getCommonTag(tagList, artwork);
 										var reply = { command: 'getAlbumInfoReply', commonTag: commonTag };
 
+										sendData(reply);
+									}
+								});
+						}
+					});
+			}
+			break;
+
+		case 'updateAlbumInfo':
+			{
+				database.getAlbumTracks(query.artist, query.album, 
+					function(docs)
+					{
+						if (!docs)
+						{
+							var reply = { command: 'updateAlbumInfoReply', error: getNoTagsResponse() };
+							sendData(reply);
+
+							return;
+						}
+
+						var songsDone = 0;
+
+						for (var cnt = 0; cnt < docs.length; cnt++)
+						{
+							updateSongInfo(docs[cnt]._id, query.tag, 
+								function()
+								{
+									songsDone++;
+
+									if (songsDone == docs.length)
+									{
+										var reply = { command: 'getAlbumInfoReply' };
 										sendData(reply);
 									}
 								});
@@ -426,7 +441,7 @@ function getCommonTag(tagList, artwork)
 
 	var baseTag = tagList[0];
 	baseTag.artwork = artwork;
-	
+
 	delete baseTag.song;
 	delete baseTag.track;
 	delete baseTag.path;
@@ -453,6 +468,35 @@ function getCommonTag(tagList, artwork)
 	}
 
 	return baseTag;
+}
+
+function updateSongInfo(id, newTag, callback)
+{
+	database.getFileFromID(id,
+		function(filePath)
+		{
+			var tmpWriter = new tagWriter();
+
+			tmpWriter.saveTag(filePath, newTag,
+				function(error)
+				{
+					new tagParser(false, false, false, false).getTag(filePath, 
+						function(error, tag)
+						{
+						    if (error)
+						    {
+						        console.log(error);
+						        return;
+						    }
+
+						    database.updateTag(id, tag,
+						    	function(error)
+						    	{
+						    		callback();
+						    	});
+    					});
+				});
+		});
 }
 
 wsServer.on('connection', onWSConnection);
