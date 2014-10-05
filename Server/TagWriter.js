@@ -134,25 +134,25 @@ function TagWriter()
 
 	function copyMissingTagData()
 	{
-		if (!_newTag.album)
+		if (_newTag.album == null)
 			_newTag.album = _oldTag.album;
 
-		if (!_newTag.song)
+		if (_newTag.song == null)
 			_newTag.song = _oldTag.song;
 
-		if (!_newTag.albumArtist)
+		if (_newTag.albumArtist == null)
 			_newTag.albumArtist = _oldTag.albumArtist;
 
-		if (!_newTag.year)
+		if (_newTag.year == null)
 			_newTag.year = _oldTag.year;
 		
-		if (!_newTag.artist)
+		if (_newTag.artist == null)
 			_newTag.artist = _oldTag.artist;
 
-		if (!_newTag.track)
+		if (_newTag.track == null)
 			_newTag.track = _oldTag.track;
 
-		if (!_newTag.artwork)
+		if (_newTag.artwork == null)
 			_newTag.artwork = _oldTag.artwork;
 	}
 
@@ -203,6 +203,8 @@ function TagWriter()
 
 	this.saveTag = function(fullPath, newTag, callback)
 	{
+		debugger;
+
 		_fullPath = fullPath;
 		_callback = callback;
 
@@ -247,6 +249,7 @@ function TagWriter()
 			  	if (error) 
 			  		throw error;
 
+			  	console.log("tmpPath: " + tmpPath);
 			  	createTempFileDone(fd, tmpPath);
 			});
 	}
@@ -265,7 +268,7 @@ function TagWriter()
 					throw error;
 
 				writeTagDataDone(fd, tmpPath);
-			})
+			});
 	}
 
 	function writeTagDataDone(fd, tmpPath)
