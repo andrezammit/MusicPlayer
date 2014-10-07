@@ -270,7 +270,7 @@ function onWSConnection(webSock)
 
 									if (songsDone == docs.length)
 									{
-										var reply = { command: 'getAlbumInfoReply' };
+										var reply = { command: 'updateAlbumInfoReply' };
 										sendData(reply);
 									}
 								});
@@ -388,8 +388,6 @@ function addFolders(folderList, callback)
 		fileSystem.scan(folderList[cnt].fullPath,
 			function(error, results)
 			{
-				debugger;
-
 				foldersDone++;
 				fileList = fileList.concat(results);
 
@@ -470,8 +468,15 @@ function getCommonTag(tagList, artwork)
 	return baseTag;
 }
 
+function getObjectCopy(obj)
+{
+	return JSON.parse(JSON.stringify(obj));
+}
+
 function updateSongInfo(id, newTag, callback)
 {
+	var newTag = getObjectCopy(newTag);   
+
 	database.getFileFromID(id,
 		function(filePath)
 		{
@@ -480,7 +485,7 @@ function updateSongInfo(id, newTag, callback)
 			tmpWriter.saveTag(filePath, newTag,
 				function(error)
 				{
-					new tagParser(false, false, false, false).getTag(filePath, 
+					new tagParser(true, true, false, true).getTag(filePath, 
 						function(error, tag)
 						{
 						    if (error)

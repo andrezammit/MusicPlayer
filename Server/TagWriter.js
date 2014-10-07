@@ -154,6 +154,9 @@ function TagWriter()
 
 		if (_newTag.artwork == null)
 			_newTag.artwork = _oldTag.artwork;
+
+		_newTag.artworkHash = _oldTag.artworkHash;		
+		_newTag.path = _oldTag.path;
 	}
 
 	function prepareHeader()
@@ -203,8 +206,6 @@ function TagWriter()
 
 	this.saveTag = function(fullPath, newTag, callback)
 	{
-		debugger;
-
 		_fullPath = fullPath;
 		_callback = callback;
 
