@@ -211,6 +211,12 @@ MusicPlayer.engine = (function()
 
 		function getAlbums()
 		{
+			if (_albumCount == 0)
+			{
+				_callback();
+				return;
+			}
+
 			var albumsRemaning = _albumCount - _albumOffset;
 			var albumsToGet = Math.min(20, albumsRemaning);
 
@@ -411,6 +417,12 @@ MusicPlayer.engine = (function()
 	{
 		var albumTemplate = $(".templates").find('.albumEntry')[0];
 		var albumContainer = $('#albums');
+
+		if (albumList == null)
+		{
+			$("#loadingScreen").fadeOut();
+			return;
+		}
 
 		for (cnt = 0; cnt < albumList.length; cnt++)
 		{
@@ -1035,7 +1047,7 @@ MusicPlayer.engine = (function()
 
 		msgHandlers['updateAlbumInfoReply'] = function(data)
 		{
-			
+
 		}
 	}
 
