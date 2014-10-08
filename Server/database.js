@@ -53,13 +53,12 @@ function clearArtworkIfOnlyReference(id, callback)
             if (docs.length == 0)
                 return;
 
-            var artworkCount = collection.find({ artworkHash: docs[0] }).count(
+            var artworkCount = collection.find({ artworkHash: docs[0].artworkHash }).count(
                 function(error, count)
                 {
-                    if (artworkCount > 1)
-                        return;
+                    if (count <= 1)
+                        artworkCache.remove({ hash: docs[0].artworkHash });
 
-                    artworkCache.remove({ hash: docs[0] });
                     callback();
                 });
         });

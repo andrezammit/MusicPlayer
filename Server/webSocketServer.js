@@ -261,20 +261,22 @@ function onWSConnection(webSock)
 
 						var songsDone = 0;
 
-						for (var cnt = 0; cnt < docs.length; cnt++)
+						function updateSongInfoDone()
 						{
-							updateSongInfo(docs[cnt]._id, query.tag, 
-								function()
-								{
-									songsDone++;
+							songsDone++;
 
-									if (songsDone == docs.length)
-									{
-										var reply = { command: 'updateAlbumInfoReply' };
-										sendData(reply);
-									}
-								});
+							if (songsDone == docs.length)
+							{
+								var reply = { command: 'updateAlbumInfoReply' };
+								sendData(reply);
+							}
+							else
+							{
+								updateSongInfo(docs[songsDone]._id, query.tag, updateSongInfoDone);
+							}
 						}
+
+						updateSongInfo(docs[songsDone]._id, query.tag, updateSongInfoDone);
 					});
 			}
 			break;
