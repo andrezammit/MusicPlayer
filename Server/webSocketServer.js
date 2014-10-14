@@ -82,12 +82,11 @@ function onWSConnection(webSock)
 								{
 									if (artwork)
 									{
-										tag.artwork = artwork.data;
-										tag.artworkType = artwork.type;
-									}
+										tag.artwork = { buffer: artwork.data, mimeType: artwork.type };
 
-									if (tag.artwork)
-										tag.artwork = bufferToBinary(tag.artwork);
+										if (tag.artwork.buffer)
+											tag.artwork.buffer = bufferToBinary(tag.artwork.buffer);
+									}
 
 									albumsDone++;
 
@@ -122,7 +121,7 @@ function onWSConnection(webSock)
 							function(error, tag)
 							{
 								if (tag.artwork)
-									tag.artwork = bufferToBinary(tag.artwork);
+									tag.artwork.buffer = bufferToBinary(tag.artwork.buffer);
 
 								var replyData = { artist: query.albumArtist, album: query.album, trackList: docs, artwork: tag.artwork };
 
@@ -142,7 +141,7 @@ function onWSConnection(webSock)
 							function(error, tag)
 							{
 								if (tag.artwork)
-									tag.artwork = bufferToBinary(tag.artwork);
+									tag.artwork.buffer = bufferToBinary(tag.artwork.buffer);
 
 								var reply = { command: 'getSongInfoReply', songInfo: tag };
 								sendData(reply);
@@ -212,14 +211,14 @@ function onWSConnection(webSock)
 					{
 						if (!docs)
 						{
-							var reply = { command: 'getTracksReply', error: getNoTagsResponse() };
+							var reply = { command: 'getAlbumInfoReply', error: getNoTagsResponse() };
 							sendData(reply);
 
 							return;
 						}
 
 						var tagList = [];
-						var artwork = null;
+						var artwork = {};
 
 						for (var cnt = 0; cnt < docs.length; cnt++)
 						{
@@ -227,9 +226,9 @@ function onWSConnection(webSock)
 
 							new tagParser(includeArtwork, false).getTag(docs[cnt].path, 
 								function(error, tag)
-								{									
+								{					
 									if (tag.artwork)
-										artwork = bufferToBinary(tag.artwork);
+										artwork.buffer = bufferToBinary(tag.artwork.buffer);
 
 									tagList.push(tag);
 
@@ -475,9 +474,28 @@ function getObjectCopy(obj)
 	return JSON.parse(JSON.stringify(obj));
 }
 
+function getBufferFromDataURL(dataURL)
+{
+	var mimeStart = dataURL.indexOf(':') + 1;
+	var mimeEnd = dataURL.indexOf(';');
+
+	var mimeType = dataURL.substr(mimeStart, mimeEnd - mimeStart);
+	mimeType.trim();
+
+	var base64Tag = ';base64,';
+
+	var dataStart = dataURL.indexOf(base64Tag) + base64Tag.length;
+	var base64 = dataURL.substr(dataStart);
+
+	return { buffer: new Buffer(base64, 'base64'), mimeType: mimeType };
+}
+
 function updateSongInfo(id, newTag, callback)
 {
 	var newTag = getObjectCopy(newTag);   
+
+	if (newTag.artworkURL)
+		newTag.artwork = getBufferFromDataURL(newTag.artworkURL);
 
 	database.getFileFromID(id,
 		function(filePath)
@@ -504,6 +522,19 @@ function updateSongInfo(id, newTag, callback)
     					});
 				});
 		});
+}
+
+function getBufferFromObject(object)
+{
+	var keys = Object.keys(object);
+
+	var bufferSize = keys.length;
+	var buffer = new Buffer(bufferSize);
+
+	for (var cnt = 0; cnt < keys.length; cnt++)
+		buffer[cnt] = object[keys[cnt]];
+
+	return buffer;
 }
 
 wsServer.on('connection', onWSConnection);

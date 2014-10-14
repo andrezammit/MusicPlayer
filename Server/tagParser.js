@@ -421,10 +421,12 @@ function TagParser(includeArtwork, artworkThumb, checkArtworkCache, normalizeArt
 				tmpOffset += description.length + 1;
 				tmpDataSize -= description.length + 1;
 
-				_tag.artworkType = mimeType;
-
 				frameData = new Buffer(tmpDataSize);
-				 _dataBuffer.copy(frameData, 0, tmpOffset, tmpOffset + tmpDataSize);
+
+				var artworkBuffer = new Buffer(tmpDataSize);
+				 _dataBuffer.copy(artworkBuffer, 0, tmpOffset, tmpOffset + tmpDataSize);
+
+				frameData = { mimeType: mimeType, buffer: artworkBuffer };
 			}
 			else 
 			{
@@ -597,10 +599,9 @@ function TagParser(includeArtwork, artworkThumb, checkArtworkCache, normalizeArt
 		}
 
 		console.log('Resizing artwork for: ' + _tag.path);
-
 		arrImagesToResize.push(_tag.artworkHash);
 
-		var jpgBuffer = new images(_tag.artwork).encode('jpg');
+		var jpgBuffer = new images(_tag.artwork.buffer).encode('jpg');
 
 		var resizer = new lwip.load(jpgBuffer, jpgBuffer.length, 'jpgBuffer',
 			function(error, image)
@@ -612,11 +613,11 @@ function TagParser(includeArtwork, artworkThumb, checkArtworkCache, normalizeArt
 					{
 						if (artworkThumb == true)
 						{
-							_tag.artworkSmall = newBuffer;
+							_tag.artworkSmall = { mimeType: 'image/jpeg', buffer: newBuffer };
 						}
 						else
 						{
-							_tag.artwork = newBuffer;
+							_tag.artwork = { mimeType: 'image/jpeg', buffer: newBuffer };
 						}
 
 						image = null;

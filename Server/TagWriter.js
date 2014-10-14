@@ -46,8 +46,8 @@ function TagWriter()
 		if (tag.artwork)
 		{
 			tagSize += frameHeaderSize + 
-				7 +					// Artwork info.
-				tag.artwork.length;	// Artwork data.
+				7 +							// Artwork info.
+				tag.artwork.buffer.length;	// Artwork data.
 		}
 
 		return tagSize;
@@ -59,7 +59,7 @@ function TagWriter()
 		var bufferSize = tagSize;
 
 		if (tag.artwork)
-			bufferSize -= tag.artwork.length;
+			bufferSize -= tag.artwork.buffer.length;
 
 		return bufferSize;
 	}
@@ -91,9 +91,23 @@ function TagWriter()
 		_bufferOffset += data.length;
 	}
 
+	function getArtworkType(mimeType)
+	{
+		switch (mimeType)
+		{
+		case 'image/png':
+			return 'PNG';
+
+		default:
+		case 'image/jpeg':
+			return 'JFIF';
+		}
+	}
+
 	function writeArtworkFrame(frameID, data)
 	{
-		var frameSize = data.length + 7;
+		var mimeType = getArtworkType(data.mimeType);
+		var frameSize = data.buffer.length + 4 + mimeType.length;
 
 		_newTagBuffer.write(frameID, _bufferOffset);				// Frame ID.
 		_bufferOffset += 4;
@@ -103,8 +117,6 @@ function TagWriter()
 
 		_newTagBuffer.writeUInt16BE(0, _bufferOffset);				// Flags.
 		_bufferOffset += 2;
-
-		var mimeType = 'PNG';
 
 		_newTagBuffer.writeUInt8(0, _bufferOffset);					// Encoding byte.
 		_bufferOffset += 1;
@@ -126,10 +138,10 @@ function TagWriter()
 		_newTagBuffer.writeUInt8(0, _bufferOffset);					// Zero terminator.
 		_bufferOffset += 1;
 
-		_newTagBuffer = Buffer.concat([_newTagBuffer, data], _newTagBuffer.length + data.length);		// Data.
-		_bufferOffset += data.length;
+		_newTagBuffer = Buffer.concat([_newTagBuffer, data.buffer], _newTagBuffer.length + data.buffer.length);		// Data.
+		_bufferOffset += data.buffer.length;
 
-		console.log('Artwork length: ' + data.length);
+		console.log('Artwork length: ' + data.buffer.length);
 	}
 
 	function copyMissingTagData()

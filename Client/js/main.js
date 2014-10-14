@@ -373,7 +373,7 @@ MusicPlayer.engine = (function()
 
 		if (replyData.artwork)
 		{
-			var blobURL = getBlobURLFromData(replyData.artwork);
+			var blobURL = getBlobURLFromData(replyData.artwork.buffer);
 			albumImage.attr('src', blobURL);
 		}
 
@@ -431,8 +431,8 @@ MusicPlayer.engine = (function()
 				if (!album)
 					return;
 
-				if (album.artwork)
-					album.blobURL = getBlobURLFromData(album.artwork);
+				if (album.artwork && album.artwork.buffer)
+					album.blobURL = getBlobURLFromData(album.artwork.buffer);
 
 				var newAlbum = new AlbumEntry(albumTemplate);
 				newAlbum.setInfo(album.albumArtist, album.album, album.blobURL, album.year);
@@ -868,7 +868,7 @@ MusicPlayer.engine = (function()
 			return arrayBuffer;
 		}
 
-		var mimeStart = dataURL.indexOf(':')+1;
+		var mimeStart = dataURL.indexOf(':') + 1;
 		var mimeEnd = dataURL.indexOf(';');
 
 		var mimeType = dataURL.substr(mimeStart, mimeEnd - mimeStart);
@@ -876,6 +876,14 @@ MusicPlayer.engine = (function()
 
 		var dataStart = dataURL.indexOf(';') + 1;
 		var data = dataURL.substr(dataStart);
+
+		if (data.substr(0, 7) == 'base64,')
+		{
+			dataStart += 7;
+
+			var base64 = dataURL.substr(dataStart);
+			data = atob(base64);
+		}
 
 		return {
 			mimeType: mimeType,
@@ -886,6 +894,11 @@ MusicPlayer.engine = (function()
 	function getBlobURLFromData(data)
 	{
 		var dataURL = 'data:image/jpeg;' + data;
+		return getBlobURLFromDataURL(dataURL);
+	}
+
+	function getBlobURLFromDataURL(dataURL)
+	{
 		var artworkBuffer = getBufferFromDataURL(dataURL);
 
 		var arrayBuffer = artworkBuffer.buffer;
@@ -1160,6 +1173,11 @@ MusicPlayer.engine = (function()
 		getBlobURLFromData: function(data)
 		{
 			return getBlobURLFromData(data);
+		},
+
+		getBufferFromDataURL: function(dataURL)
+		{
+			return getBufferFromDataURL(dataURL);
 		},
 
 		resizeDialogs: function()

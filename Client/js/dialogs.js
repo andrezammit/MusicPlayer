@@ -50,8 +50,40 @@ MusicPlayer.dialogs = (function()
 		editSongDlg.find("#title").val(songInfo.song);
 		editSongDlg.find("#track").val(songInfo.track);
 		
-		var blobURL = musicPlayer.getBlobURLFromData(songInfo.artwork);
-		editSongDlg.find("#editArtwork").attr('src', blobURL);
+		var blobURL = musicPlayer.getBlobURLFromData(songInfo.artwork.buffer);
+
+		var editArtwork = editSongDlg.find("#editArtwork");
+		editArtwork.attr('src', blobURL);
+		
+		editSongDlg[0].onpaste =  
+			function(event)
+			{ 
+				var items = (event.clipboardData || event.originalEvent.clipboardData).items;
+
+				for (var cnt = 0; cnt < items.length; cnt++)
+				{
+					var item = items[cnt];
+
+					if (item.kind != 'file')
+						continue;
+
+					var blob = item.getAsFile();
+  					var reader = new FileReader();
+  					
+  					reader.onload = function(event)
+  					{
+  						var dataURL = event.target.result;
+
+  						if (!dataURL)
+  							return;
+
+						editArtwork.attr('src', dataURL);
+    				};
+
+  					reader.readAsDataURL(blob);
+  					break;
+				}
+			};
 
 		editSongDlg.find(".okBtn").off('click');
 		editSongDlg.find(".okBtn").click(
@@ -89,6 +121,12 @@ MusicPlayer.dialogs = (function()
 				if (songInfo.track != trackField.val())
 					newTag.track = trackField.val();
 
+				var artworkField = editSongDlg.find("#editArtwork");
+				var newArtwork = artworkField.attr('src');
+
+				if (blobURL != newArtwork)
+					newTag.artworkURL = newArtwork;
+
 				closeDialog(editSongDlg);
 				callback(newTag);
 			});
@@ -112,8 +150,40 @@ MusicPlayer.dialogs = (function()
 		editAlbumDlg.find("#album").val(commonTag.album);
 		editAlbumDlg.find("#year").val(commonTag.year);
 		
-		var blobURL = musicPlayer.getBlobURLFromData(commonTag.artwork);
-		editAlbumDlg.find("#editArtwork").attr('src', blobURL);
+		var blobURL = musicPlayer.getBlobURLFromData(commonTag.artwork.buffer);
+
+		var editArtwork = editAlbumDlg.find("#editArtwork");
+		editArtwork.attr('src', blobURL);
+
+		editAlbumDlg[0].onpaste =  
+			function(event)
+			{ 
+				var items = (event.clipboardData || event.originalEvent.clipboardData).items;
+
+				for (var cnt = 0; cnt < items.length; cnt++)
+				{
+					var item = items[cnt];
+
+					if (item.kind != 'file')
+						continue;
+
+					var blob = item.getAsFile();
+  					var reader = new FileReader();
+  					
+  					reader.onload = function(event)
+  					{
+  						var dataURL = event.target.result;
+
+  						if (!dataURL)
+  							return;
+
+						editArtwork.attr('src', dataURL);
+    				};
+
+  					reader.readAsDataURL(blob);
+  					break;
+				}
+			};
 
 		editAlbumDlg.find(".okBtn").off('click');
 		editAlbumDlg.find(".okBtn").click(
@@ -140,6 +210,12 @@ MusicPlayer.dialogs = (function()
 
 				if (songInfo.year != yearField.val())
 					newTag.year = yearField.val();
+
+				var artworkField = editAlbumDlg.find("#editArtwork");
+				var newArtwork = artworkField.attr('src');
+
+				if (blobURL != newArtwork)
+					newTag.artworkURL = newArtwork;
 
 				closeDialog(editAlbumDlg);
 				callback(newTag);

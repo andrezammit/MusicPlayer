@@ -12,15 +12,33 @@ function cacheArtwork(tag, callback)
         return;
     }
 
-    var doc = { hash: tag.artworkHash, artworkSmall: tag.artworkSmall };
+    var doc = { hash: tag.artworkHash, artworkSmall: tag.artworkSmall.buffer };
 
-    artworkCache.insert(doc, { w: 1 },
-        function(error, result)
+    artworkCache.find({ hash: tag.artworkHash }).count(
+        function(error, count)
         {
-            if (error)
-                console.log(error);
+            if (count > 0)
+            {
+                artworkCache.update({ hash: tag.artworkHash }, { $set: doc }, { w: 1 },
+                    function(error, result) 
+                    {
+                        if (error)
+                            console.log(error);
 
-            callback(tag);
+                        callback(tag);
+                    });
+            }
+            else
+            {
+                artworkCache.insert(doc, { w: 1 },
+                    function(error, result)
+                    {
+                        if (error)
+                            console.log(error);
+
+                        callback(tag);
+                    });
+            }
         });
 }
 
