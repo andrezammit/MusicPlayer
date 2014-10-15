@@ -356,6 +356,29 @@ function getCachedArtwork(hash, callback)
         });
 }
 
+function deleteAlbum(artist, album, callback)
+{
+    collection.find({ albumArtist: artist, album: album }, { artworkHash: 1 }).toArray(
+        function(error, docs)
+        {
+            if (!docs)
+            {
+                callback();
+                return;
+            }
+            
+            artworkCache.remove({ artworkHash: docs[0].artworkHash}, { w: 1 },
+                function(error, removed)
+                {
+                    collection.remove({ artist: artist, album: album }, { w: 1 },
+                        function(error, removed)
+                        {
+                            callback();
+                        });
+                })
+        });
+}
+
 setupDatabase(setupDatabaseDone);
 
 module.exports.getTags = getTags;
@@ -365,6 +388,7 @@ module.exports.deleteTag = deleteTag;
 module.exports.updateTag = updateTag;
 module.exports.getAlbums = getAlbums;
 module.exports.getAllTags = getAllTags;
+module.exports.deleteAlbum = deleteAlbum;
 module.exports.getTagCount = getTagCount;
 module.exports.getAlbumCount = getAlbumCount;
 module.exports.getFileFromID = getFileFromID;

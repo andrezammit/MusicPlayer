@@ -1060,7 +1060,18 @@ MusicPlayer.engine = (function()
 
 		msgHandlers['updateAlbumInfoReply'] = function(data)
 		{
+			location.reload(true);
+		}
+	}
 
+	function deleteAlbum(artist, album)
+	{
+		var query = { call: 'deleteAlbum', artist: artist, album: album };
+		connect.sendQuery(query);
+
+		msgHandlers['deleteAlbumReply'] = function(data)
+		{
+			location.reload(true);
 		}
 	}
 
@@ -1203,6 +1214,11 @@ MusicPlayer.engine = (function()
 		editAlbum: function(artist, album)
 		{
 			return editAlbum(artist, album);
+		},
+
+		deleteAlbum: function(artist, album)
+		{
+			return deleteAlbum(artist, album);
 		},
 	};
 }());

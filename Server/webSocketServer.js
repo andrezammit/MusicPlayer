@@ -279,6 +279,17 @@ function onWSConnection(webSock)
 					});
 			}
 			break;
+
+		case 'deleteAlbum':
+			{
+				database.deleteAlbum(query.artist, query.album,
+					function()
+					{
+						var reply = { command: 'deleteAlbumReply' };
+						sendData(reply);
+					});
+			}
+			break;
 		}
 	}	
 
