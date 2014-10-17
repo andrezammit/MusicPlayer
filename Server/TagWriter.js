@@ -45,8 +45,11 @@ function TagWriter()
 
 		if (tag.artwork)
 		{
+			var mimeType = getArtworkType(tag.artwork.mimeType);
+
 			tagSize += frameHeaderSize + 
-				7 +							// Artwork info.
+				4 +							// Artwork info.
+				mimeType.length +			// Mime type definition.
 				tag.artwork.buffer.length;	// Artwork data.
 		}
 
@@ -225,7 +228,7 @@ function TagWriter()
 
 		console.log('Saving ID3 tag to: ' + fullPath);
 
-		new tagParser(true, false, false, false).getTag(fullPath, 
+		new tagParser(true, false).getTag(fullPath, 
 			function(error, tag)
 			{
 				if (error)
