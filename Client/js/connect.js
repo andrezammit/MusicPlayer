@@ -75,7 +75,7 @@ MusicPlayer.connect = (function()
 
 	function sendQuery(query)
 	{
-		console.log('Sending query: ' +  query.call);
+		console.log('Sending query: ' +  query.command);
 		_webSock.send(JSON.stringify(query));
 	}
 
@@ -85,8 +85,10 @@ MusicPlayer.connect = (function()
 			createWebSocket(callback, onMessageCallback);
 		},
 
-		sendQuery: function(query)
+		sendQuery: function(command, queryData)
 		{
+			var query = { command: command, data: queryData };
+
 			if (!isSocketConnected())
 			{
 				if (isSocketClosed())

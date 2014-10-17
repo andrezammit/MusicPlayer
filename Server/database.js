@@ -255,6 +255,12 @@ function getAlbumCount(callback)
     collection.find({ }, { albumArtist: 1, album: 1 }).toArray(
         function(error, docs)
         {
+            if (!docs)
+            {
+                callback(albums.length);
+                return;
+            }
+            
             for (var cnt = 0; cnt < docs.length; cnt++)
             {
                 if (isAlbumInArray(albums, docs[cnt]) > -1)
@@ -264,23 +270,6 @@ function getAlbumCount(callback)
             }
 
             callback(albums.length);
-        });
-}
-
-function getAllAlbums(callback)
-{
-    var albums = [];
-
-    collection.find({ }, { albumArtist: 1, album: 1 }).toArray(
-        function(error, docs)
-        {
-            for (var cnt = 0; cnt < docs.length; cnt++)
-            {
-                if (isAlbumInArray(albums, docs[cnt]) > -1)
-                    continue;
-
-                albums.push(doc[cnt]);
-            }
         });
 }
 

@@ -4,298 +4,84 @@ var tagParser = require('./TagParser');
 var tagWriter = require('./tagWriter');
 var fileSystem = require('./fileSystem');
 
-var wsServer = new ws({ port: 3001 });
+var _wsServer = new ws({ port: 3001 });
+var _webSock = null;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// Websocket message handlers
 
 function onWSConnection(webSock)
 {
+	_webSock = webSock;
+
 	console.log('New web socket connection.');
+	_webSock.on('message', onWSMessage);
+}
 
-	webSock.on('message', processRequest);
+function onWSMessage(message)
+{
+	var query = JSON.parse(message);
+	console.log(query.command);
 
-	function processRequest(message)
+	var queryData = query.data;
+
+	switch (query.command)
 	{
-		var query = JSON.parse(message);
+	case 'getTags':
+		onGetTags(queryData);
+		break;
 
-		console.log(query.call);
+	case 'getTagCount':
+		onGetTagCount(queryData);
+		break;
 
-		switch (query.call)
-		{
-		case 'getTags':
-			{
-				database.getTags(query.offset, query.tagsToGet, 
-					function(docs)
-					{
-						if (docs && docs.length > 0)
-						{
-							var reply = { command: 'getTagsReply', error: getNoTagsResponse() };
-							sendData(reply);
+	case 'getAlbumCount':
+		onGetAlbumCount(queryData);
+		break;
 
-							return;
-						}
+	case 'getAlbums':
+		onGetAlbums(queryData);
+		break;
 
-						var reply = { command: 'getTagsReply', tagCount: docs.length, tagData: docs };
-						sendData(reply);
-					});
-			}
-			break;
+	case 'getTracks':
+		onGetTracks(queryData);
+		break;
 
-		case 'getTagCount':
-			{
-				database.getTagCount(
-					function(count)
-					{
-						var reply = { command: 'getTagCountReply', tagCount: count };
-						sendData(reply);
-					});
-			}
-			break;
+	case 'getSongInfo':
+		onGetSongInfo(queryData);
+		break;
 
-		case 'getAlbumCount':
-			{
-				database.getAlbumCount(
-					function(count)
-					{
-						var reply = { command: 'getAlbumCountReply', albumCount: count };
-						sendData(reply);
-					});
-			}
-			break;
+	case 'updateSongInfo':
+		onUpdateSongInfo(queryData);
+		break;
 
-		case 'getAlbums':
-			{
-				database.getAlbums(query.offset, query.albumsToGet, 
-					function(docs)
-					{
-						if (!docs)
-						{
-							var reply = { command: 'getAlbumsReply', error: getNoTagsResponse() };
-							sendData(reply);
+	case 'getFileListing':
+		onGetFileListing(queryData);
+		break;
 
-							return;
-						}
+	case 'addFiles':
+		onAddFiles(queryData);
+		break;
 
-						var albumsDone = 0;
-						for (var cnt = 0; cnt < docs.length; cnt++)
-						{
-							getCachedArtwork(docs[cnt], 
-								function(tag, artwork)
-								{
-									if (artwork)
-									{
-										tag.artwork = { buffer: artwork.data, mimeType: artwork.type };
+	case 'addFolders':
+		onAddFolders(queryData);
+		break;
 
-										if (tag.artwork.buffer)
-											tag.artwork.buffer = bufferToBinary(tag.artwork.buffer);
-									}
+	case 'deleteSong':
+		onDeleteSong(queryData);
+		break;
 
-									albumsDone++;
+	case 'getAlbumInfo':
+		onGetAlbumInfo(queryData);
+		break;
 
-									if (albumsDone == docs.length)
-										sendGetAlbumsReply();						
-								})
-						}
+	case 'updateAlbumInfo':
+		onUpdateAlbumInfo(queryData);
+		break;
 
-						function sendGetAlbumsReply()
-						{
-							var reply = { command: 'getAlbumsReply', albumCount: docs.length, albumData: docs };
-							sendData(reply);
-						}
-					});
-			}
-			break;
-
-		case 'getTracks':
-			{
-				database.getAlbumTracks(query.albumArtist, query.album, 
-					function(docs)
-					{
-						if (!docs)
-						{
-							var reply = { command: 'getTracksReply', error: getNoTagsResponse() };
-							sendData(reply);
-
-							return;
-						}
-
-						new tagParser(true, false).getTag(docs[0].path, 
-							function(error, tag)
-							{
-								if (tag.artwork)
-									tag.artwork.buffer = bufferToBinary(tag.artwork.buffer);
-
-								var replyData = { artist: query.albumArtist, album: query.album, trackList: docs, artwork: tag.artwork };
-
-								var reply = { command: 'getTracksReply', replyData: replyData };
-								sendData(reply);
-							});
-					});
-			}
-			break;
-
-		case 'getSongInfo':
-			{
-				database.getFileFromID(query.id, 
-					function(filePath)
-					{
-						new tagParser(true, false).getTag(filePath, 
-							function(error, tag)
-							{
-								if (tag.artwork)
-									tag.artwork.buffer = bufferToBinary(tag.artwork.buffer);
-
-								var reply = { command: 'getSongInfoReply', songInfo: tag };
-								sendData(reply);
-							});
-					});
-			}
-			break;
-
-		case 'updateSongInfo':
-			{
-				updateSongInfo(query.id, query.tag, 
-					function()
-					{
-						var reply = { command: 'updateSongInfoReply', error: 0 };
-						sendData(reply);
-					});
-			}
-			break;
-
-		case 'getFileListing':
-			{
-				fileSystem.getFolderContents(query.path, query.filter, query.showFiles, 
-					function(error, fileList)
-					{
-						var reply = { command: 'getFileListingReply', fileList: fileList, error: error };
-						sendData(reply);
-					});	
-			}
-			break;
-
-		case 'addFiles':
-			{
-				addFiles(query.itemList,
-					function()
-					{
-						var reply = { command: 'addFilesReply', savedFiles: query.itemList.length };
-						sendData(reply);
-					});
-			}
-			break;
-
-		case 'addFolders':
-			{
-				addFolders(query.itemList,
-					function()
-					{
-						var reply = { command: 'addFoldersReply', savedFiles: query.itemList.length };
-						sendData(reply);
-					})	
-			}
-
-		case 'deleteSong':
-			{
-				database.deleteTag(query.id,
-					function()
-					{
-						var reply = { command: 'deleteSongReply', error: 0 };
-						sendData(reply);
-					});
-			}
-			break;
-
-		case 'getAlbumInfo':
-			{
-				database.getAlbumTracks(query.artist, query.album, 
-					function(docs)
-					{
-						if (!docs)
-						{
-							var reply = { command: 'getAlbumInfoReply', error: getNoTagsResponse() };
-							sendData(reply);
-
-							return;
-						}
-
-						var tagList = [];
-						var artwork = {};
-
-						for (var cnt = 0; cnt < docs.length; cnt++)
-						{
-							var includeArtwork = cnt == 0;
-
-							new tagParser(includeArtwork, false).getTag(docs[cnt].path, 
-								function(error, tag)
-								{					
-									if (tag.artwork)
-										artwork.buffer = bufferToBinary(tag.artwork.buffer);
-
-									tagList.push(tag);
-
-									if (tagList.length == docs.length)
-									{
-										var commonTag = getCommonTag(tagList, artwork);
-										var reply = { command: 'getAlbumInfoReply', commonTag: commonTag };
-
-										sendData(reply);
-									}
-								});
-						}
-					});
-			}
-			break;
-
-		case 'updateAlbumInfo':
-			{
-				database.getAlbumTracks(query.artist, query.album, 
-					function(docs)
-					{
-						if (!docs)
-						{
-							var reply = { command: 'updateAlbumInfoReply', error: getNoTagsResponse() };
-							sendData(reply);
-
-							return;
-						}
-
-						var songsDone = 0;
-
-						function updateSongInfoDone()
-						{
-							songsDone++;
-
-							if (songsDone == docs.length)
-							{
-								var reply = { command: 'updateAlbumInfoReply' };
-								sendData(reply);
-							}
-							else
-							{
-								updateSongInfo(docs[songsDone]._id, query.tag, updateSongInfoDone);
-							}
-						}
-
-						updateSongInfo(docs[songsDone]._id, query.tag, updateSongInfoDone);
-					});
-			}
-			break;
-
-		case 'deleteAlbum':
-			{
-				database.deleteAlbum(query.artist, query.album,
-					function()
-					{
-						var reply = { command: 'deleteAlbumReply' };
-						sendData(reply);
-					});
-			}
-			break;
-		}
-	}	
-
-	function sendData(data)
-	{
-		webSock.send(JSON.stringify(data));
+	case 'deleteAlbum':
+		onDeleteAlbum(queryData);
+		break;
 	}
 }
 
@@ -303,6 +89,305 @@ function onWSClose(code, message)
 {
 	console.log('Connection closed. Message: ' + message + ' Code: ' + code);
 }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// Websocket Helpers
+
+function sendError(command, error)
+{
+	return sendReply(command, null, error);
+}
+
+function sendReply(command, data, error)
+{
+	var reply = { command: command, data: data, error: error };
+	_webSock.send(JSON.stringify(reply));
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// Client Message Handlers
+
+function onGetTags(queryData)
+{
+	database.getTags(queryData.offset, queryData.tagsToGet, 
+		function(docs)
+		{
+			if (!docs || docs.length == 0)
+			{
+				sendError('getTagsReply', 'No songs found.');
+				return;
+			}
+
+			var replyData = { tagCount: docs.length, tagData: docs };
+			sendReply('getTagsReply', replyData);
+		});
+}
+
+function onGetTagCount(queryData)
+{
+	database.getTagCount(
+		function(count)
+		{
+			var replyData = { tagCount: count };
+			sendReply('getTagCountReply', replyData);
+		});
+}
+
+function onGetAlbumCount(queryData)
+{
+	database.getAlbumCount(
+		function(count)
+		{
+			var replyData = { albumCount: count };
+			sendReply('getAlbumCountReply', replyData);
+		});
+}
+
+function onGetAlbums(queryData)
+{
+	database.getAlbums(queryData.offset, queryData.albumsToGet, 
+		function(docs)
+		{
+			if (!docs || docs.length == 0)
+			{
+				var replyData = { albumCount: 0 };
+				sendReply('getAlbumsReply', replyData);
+
+				return;
+			}
+
+			var albumsDone = 0;
+			for (var cnt = 0; cnt < docs.length; cnt++)
+			{
+				getCachedArtwork(docs[cnt], 
+					function(tag, artwork)
+					{
+						if (artwork)
+						{
+							tag.artwork = { buffer: artwork.data, mimeType: artwork.type };
+
+							if (tag.artwork.buffer)
+								tag.artwork.buffer = bufferToBinary(tag.artwork.buffer);
+						}
+
+						albumsDone++;
+
+						if (albumsDone == docs.length)
+							sendGetAlbumsReply();						
+					})
+			}
+
+			function sendGetAlbumsReply()
+			{
+				var replyData = { albumCount: docs.length, albumData: docs };
+				sendReply('getAlbumsReply', replyData);
+			}
+		});
+}
+
+function onGetTracks(queryData)
+{
+	database.getAlbumTracks(queryData.artist, queryData.album, 
+		function(docs)
+		{
+			if (!docs || docs.length == 0)
+			{
+				sendError('getTracksReply', 'No tracks found for album ' + queryData.artist + ' - ' + queryData.album + '.');
+				return;
+			}
+
+			new tagParser(true, false).getTag(docs[0].path, 
+				function(error, tag)
+				{
+					if (!tag)
+					{
+						sendError('getTracksReply', 'Failed to get track information for ' + queryData.artist + ' - ' + queryData.album + '.');
+						return;
+					}
+
+					if (tag.artwork)
+						tag.artwork.buffer = bufferToBinary(tag.artwork.buffer);
+
+					var replyData = { artist: queryData.albumArtist, album: queryData.album, trackList: docs, artwork: tag.artwork };
+					sendReply('getTracksReply', replyData);
+				});
+		});
+}
+
+function onGetSongInfo(queryData)
+{
+	database.getFileFromID(queryData.id, 
+		function(filePath)
+		{
+			if (!filePath)
+			{
+				sendError('getSongInfoReply', 'Failed to get song path from ID.');
+				return;
+			}
+
+			new tagParser(true, false).getTag(filePath, 
+				function(error, tag)
+				{
+					if (!tag)
+					{
+						sendError('getSongInfoReply', 'Failed to get track information for ID: ' + queryData.id + '.');
+						return;
+					}
+
+					if (tag.artwork)
+						tag.artwork.buffer = bufferToBinary(tag.artwork.buffer);
+
+					var replyData = { songInfo: tag };
+					sendReply('getSongInfoReply', replyData);
+				});
+		});
+}
+
+function onUpdateSongInfo(queryData)
+{
+	updateSongInfo(queryData.id, queryData.tag, 
+		function(error)
+		{
+			if (error)
+			{
+				sendError('updateSongInfoReply', 'Failed to update song ID: ' + queryData.id + '.');
+				return;
+			}
+
+			var replyData = { };
+			sendReply('updateSongInfoReply', replyData);
+		});
+}
+
+function onGetFileListing(queryData)
+{
+	fileSystem.getFolderContents(queryData.path, queryData.filter, queryData.showFiles, 
+		function(error, fileList)
+		{
+			if (error)
+			{
+				sendError('getFileListingReply', 'Failed to get file listing for ' + queryData.path);
+				return;
+			}
+
+			var replyData = { fileList: fileList };
+			sendReply('getFileListingReply', replyData);
+		});	
+}
+
+function onAddFiles(queryData)
+{
+	addFiles(queryData.itemList,
+		function()
+		{
+			var replyData = { savedFiles: queryData.itemList.length };
+			sendReply('addFilesReply', replyData);
+		});
+}
+
+function onAddFolders(queryData)
+{
+	addFolders(queryData.itemList,
+		function()
+		{
+			var replyData = { savedFolders: queryData.itemList.length };
+			sendReply('addFoldersReply', replyData);
+		});
+}
+
+function onDeleteSong(queryData)
+{
+	database.deleteTag(queryData.id,
+		function()
+		{
+			var replyData = { };
+			sendReply('deleteSongReply', replyData);
+		});
+}
+
+function onGetAlbumInfo(queryData)
+{
+	database.getAlbumTracks(queryData.artist, queryData.album, 
+		function(docs)
+		{
+			if (!docs || docs.length == 0)
+			{
+				sendError('getAlbumInfoReply', 'No tracks found for album ' + queryData.artist + ' - ' + queryData.album + '.');
+				return;
+			}
+
+			var tagList = [];
+			var artwork = {};
+
+			for (var cnt = 0; cnt < docs.length; cnt++)
+			{
+				var includeArtwork = cnt == 0;
+
+				new tagParser(includeArtwork, false).getTag(docs[cnt].path, 
+					function(error, tag)
+					{					
+						if (tag.artwork)
+							artwork.buffer = bufferToBinary(tag.artwork.buffer);
+
+						tagList.push(tag);
+
+						if (tagList.length == docs.length)
+						{
+							var commonTag = getCommonTag(tagList, artwork);
+
+							var replyData = { commonTag: commonTag };
+							sendReply('getAlbumInfoReply', replyData);
+						}
+					});
+			}
+		});
+}
+
+function onUpdateAlbumInfo(queryData)
+{
+	database.getAlbumTracks(queryData.artist, queryData.album, 
+		function(docs)
+		{
+			if (!docs || docs.length == 0)
+			{
+				sendError('updateAlbumInfoReply', 'No tracks found for album ' + queryData.artist + ' - ' + queryData.album + '.');
+				return;
+			}
+
+			var songsDone = 0;
+
+			function updateSongInfoDone()
+			{
+				songsDone++;
+
+				if (songsDone == docs.length)
+				{
+					var replyData = { };
+					sendReply('updateAlbumInfoReply', replyData);
+				}
+				else
+				{
+					updateSongInfo(docs[songsDone]._id, queryData.tag, updateSongInfoDone);
+				}
+			}
+
+			updateSongInfo(docs[songsDone]._id, queryData.tag, updateSongInfoDone);
+		});
+}
+
+function onDeleteAlbum(queryData)
+{
+	database.deleteAlbum(queryData.artist, queryData.album,
+		function()
+		{
+			var replyData = { };
+			sendReply('deleteAlbumReply', replyData);
+		});
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
 function getNoTagsResponse()
 {
@@ -548,5 +633,5 @@ function getBufferFromObject(object)
 	return buffer;
 }
 
-wsServer.on('connection', onWSConnection);
-wsServer.on('close', onWSClose);
+_wsServer.on('connection', onWSConnection);
+_wsServer.on('close', onWSClose);

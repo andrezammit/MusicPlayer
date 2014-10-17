@@ -38,8 +38,15 @@ MusicPlayer.engine = (function()
 
 	function onWebSockMessage(event)
 	{
-		var data = JSON.parse(event.data);
-		var callback = msgHandlers[data.command];
+		var reply = JSON.parse(event.data);
+
+		if (reply.error)
+		{
+			alert(reply.error);
+			return;
+		}
+
+		var callback = msgHandlers[reply.command];
 
 		if (!callback)
 		{
@@ -47,7 +54,8 @@ MusicPlayer.engine = (function()
 			return;
 		}
 
-		callback(data);
+		var replyData = reply.data;
+		callback(replyData);
 	}
 
 	function setupHandlers()
@@ -197,8 +205,8 @@ MusicPlayer.engine = (function()
 
 		function getAlbumCount()
 		{
-			var query = { call: 'getAlbumCount' };
-			connect.sendQuery(query);
+			var queryData = { };
+			connect.sendQuery('getAlbumCount', queryData);
 		}
 
 		msgHandlers['getAlbumCountReply'] = function(data)
@@ -220,8 +228,8 @@ MusicPlayer.engine = (function()
 			var albumsRemaning = _albumCount - _albumOffset;
 			var albumsToGet = Math.min(20, albumsRemaning);
 
-			var query = { call: 'getAlbums', offset: _albumOffset, albumsToGet: albumsToGet };
-			connect.sendQuery(query);
+			var queryData = { offset: _albumOffset, albumsToGet: albumsToGet };
+			connect.sendQuery('getAlbums', queryData);
 		}
 
 		msgHandlers['getAlbumsReply'] = function(data)
@@ -255,13 +263,13 @@ MusicPlayer.engine = (function()
 
 		function getTracks()
 		{
-			var query = { call: 'getTracks', albumArtist: artist, album: album };
-			connect.sendQuery(query);
+			var queryData = { artist: artist, album: album };
+			connect.sendQuery('getTracks', queryData);
 		}
 
 		msgHandlers['getTracksReply'] = function(data)
 		{
-			callback(event, data.replyData);
+			callback(event, data);
 		}
 	}
 
@@ -909,22 +917,22 @@ MusicPlayer.engine = (function()
 
 	function editSong(id)
 	{
-		var query = { call: 'getSongInfo', id: id };
-		connect.sendQuery(query);
+		var queryData = { id: id };
+		connect.sendQuery('getSongInfo', queryData);
 
 		msgHandlers['getSongInfoReply'] = function(data)
 		{
 			dialogs.editSong(data.songInfo,
 				function(newTag)
 				{
-					query = { call: 'updateSongInfo', id: id, tag: newTag };
-					connect.sendQuery(query);
+					queryData = { tag: newTag };
+					connect.sendQuery('updateSongInfo', queryData);
 				});
 		}
 
 		msgHandlers['updateSongInfoReply'] = function(data)
 		{
-			alert('updateSongInfoReply returned with error: ' + data.error);
+			location.reload(true);
 		}
 	}
 
@@ -933,30 +941,23 @@ MusicPlayer.engine = (function()
 		dialogs.confirmDelete(id,
 			function()
 			{
-				var query = { call: 'deleteSong', id: id };
-				connect.sendQuery(query);
+				var queryData = { id: id };
+				connect.sendQuery('deleteSong', queryData);
 			});
 
 		msgHandlers['deleteSongReply'] = function(data)
 		{
-			alert('Error: ' + data.error);
 			location.reload(true);
 		}
 	}
 
 	function updateFilePickerDlg(path, showFiles, filter)
 	{
-		var query = { call: 'getFileListing', showFiles: showFiles, filter: filter, path: path };
-		connect.sendQuery(query);  
+		var queryData = { showFiles: showFiles, filter: filter, path: path };
+		connect.sendQuery('getFileListing', queryData);  
 
 		msgHandlers['getFileListingReply'] = function(data)
 		{
-			if (data.error)
-			{
-				alert(data.error.code);
-				return;
-			}
-
 			if (path == '')
 			{
 				path = 'Computer';
@@ -1002,15 +1003,14 @@ MusicPlayer.engine = (function()
 				var selectedItems = [];
 				selectedItems.push(selectedFile);
 
-				var query = { call: 'addFiles', itemList: selectedItems };
-				connect.sendQuery(query);
+				var queryData = { itemList: selectedItems };
+				connect.sendQuery('addFiles', queryData);
 
 				console.log(selectedFile);
 			});
 
 		msgHandlers['addFilesReply'] = function(data)
 		{
-			alert('Added ' + data.savedCount + ' songs.');
 			location.reload(true);
 		}
 	}
@@ -1026,23 +1026,22 @@ MusicPlayer.engine = (function()
 				var selectedItems = [];
 				selectedItems.push(selectedItem);
 
-				var query = { call: 'addFolders', itemList: selectedItems };
-				connect.sendQuery(query);
+				var queryData = { itemList: selectedItems };
+				connect.sendQuery('addFolders', queryData);
 
 				console.log(selectedItem);
 			});
 
 		msgHandlers['addFoldersReply'] = function(data)
 		{
-			alert('Added ' + data.savedCount + ' songs.');
 			location.reload(true);
 		}
 	}
 
 	function editAlbum(artist, album)
 	{
-		var query = { call: 'getAlbumInfo', artist: artist, album: album };
-		connect.sendQuery(query);
+		var queryData = { artist: artist, album: album };
+		connect.sendQuery('getAlbumInfo', queryData);
 
 		msgHandlers['getAlbumInfoReply'] = function(data)
 		{
@@ -1053,8 +1052,8 @@ MusicPlayer.engine = (function()
 				{
 					console.log(newTag);
 
-					query = { call: 'updateAlbumInfo', artist: artist, album: album, tag: newTag };
-					connect.sendQuery(query);
+					queryData = { artist: artist, album: album, tag: newTag };
+					connect.sendQuery('updateAlbumInfo', queryData);
 				});
 		}
 
@@ -1066,8 +1065,8 @@ MusicPlayer.engine = (function()
 
 	function deleteAlbum(artist, album)
 	{
-		var query = { call: 'deleteAlbum', artist: artist, album: album };
-		connect.sendQuery(query);
+		var queryData = { artist: artist, album: album };
+		connect.sendQuery('deleteAlbum', queryData);
 
 		msgHandlers['deleteAlbumReply'] = function(data)
 		{
