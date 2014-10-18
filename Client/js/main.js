@@ -15,6 +15,7 @@ MusicPlayer.engine = (function()
 	var _currentAlbumTracks = [];
 	var _expandedAlbumEntries = [];
 
+	var _albumViewOpen = false;
 	var _currentVolume = 1;
 
 	(function()
@@ -300,9 +301,9 @@ MusicPlayer.engine = (function()
 		ratio = maxHeight / height; 				// get ratio for scaling image
 
 		artworkTag.css('height', maxHeight);   		// Set new height
-		artworkTag.css('width', width * ratio);    	// Scale width based on ratio
+		//artworkTag.css('width', width * ratio);    	// Scale width based on ratio
 
-		$("#tracks").css('height', maxHeight);
+		//$("#tracks").css('height', maxHeight);
 
 		if (callback)
 			callback();
@@ -327,7 +328,7 @@ MusicPlayer.engine = (function()
 	{
 		var header = $("#header");
 		var albumName = $("#albumName");
-		var albumViewContainer = $("#albumViewContainer");
+		var albumView = $("#albumView");
 
 		var width = parseInt(anchor.css('width')) - parseInt(header.css('padding-left'));
 
@@ -336,8 +337,8 @@ MusicPlayer.engine = (function()
 		
 		albumName.css('max-width', width - 100);
 
-		albumViewContainer.css('margin-left', anchor.css('margin-left'));
-		albumViewContainer.css('width', width);
+		albumView.css('margin-left', anchor.css('margin-left'));
+		albumView.css('width', width);
 
 		if (callback)
 			callback();
@@ -388,24 +389,43 @@ MusicPlayer.engine = (function()
 		albumImage.attr('alt', replyData.artist + ' - ' + replyData.album);
 
 		clearAnyExpandedAlbums();
-
 		onAlbumHover(event, false);
 
-		$.when($("#albumViewContainer").show(),
-			$("#albumView").slideToggle(500)).done(
+		var albumView = $("#albumView");
+		
+		_albumViewOpen = true;
+
+		albumView.css('top', '103px');
+		albumView.css('bottom', '80px');
+
+		var albums = $("#albums");
+		albums.css('webkitFilter', 'blur(20px)');
+
+		updateNowPlayingTrack();
+
+		$("body").css('overflow', 'hidden');
+
+		resizeArtwork($("#albumImageLarge"), 
 			function()
 			{
-				updateNowPlayingTrack();
-
-				$("#albums").css('webkitFilter', 'blur(20px)');
-				$("body").css('overflow', 'hidden');
-
-				resizeArtwork($("#albumImageLarge"), 
-					function()
-					{
-						$("#albumImageLarge").show();
-					});
+				$("#albumImageLarge").css('display', 'block');
 			});
+
+		// $.when($("#albumViewContainer").show(),
+		// 	$("#albumView").slideToggle(500)).done(
+		// 	function()
+		// 	{
+		// 		updateNowPlayingTrack();
+
+		// 		$("#albums").css('webkitFilter', 'blur(20px)');
+		// 		$("body").css('overflow', 'hidden');
+
+		// 		resizeArtwork($("#albumImageLarge"), 
+		// 			function()
+		// 			{
+		// 				$("#albumImageLarge").show();
+		// 			});
+		// 	});
 	}
 
 	function updateProgress(progress, tagCount)
@@ -548,7 +568,7 @@ MusicPlayer.engine = (function()
 		albumEntryHover.css('left', divPosition.left);
 		albumEntryHover.css('top', divPosition.top);
 
-		albumEntryHover.show();
+		albumEntryHover.show(0);
 
 		var right = divPosition.left + 200 + 5;
 		var bottom = divPosition.top + 200 + 5;
@@ -631,7 +651,7 @@ MusicPlayer.engine = (function()
 
 	function onAlbumHover(event, expandAlbum)
 	{
-		if ($("#albumViewContainer").is(":visible"))
+		if (_albumViewOpen == true)
 			return;
 
 		if (!event)
@@ -695,7 +715,7 @@ MusicPlayer.engine = (function()
 	{
 		// If an album is open we don't want to change the header.
 
-		if ($("#albumViewContainer").is(":visible"))
+		if (_albumViewOpen == true)
 			return;
 
 		if (event)
@@ -709,16 +729,16 @@ MusicPlayer.engine = (function()
 
 	function closeTracks()
 	{
-		$("#albumImageLarge").hide();
+		$("#albumImageLarge").css('display', 'none');
+
+		var albumView = $("#albumView");
+		albumView.css('top', 'calc(100% + 103px)');
+		albumView.css('bottom', 'calc(-100% + 80px)');
 
 		$("#albums").css('webkitFilter', 'blur(0px)');
 		$("body").css('overflow', 'auto');
 
-		$("#albumView").slideToggle(300, 
-			function()
-			{
-				$("#albumViewContainer").toggle();
-			});
+		_albumViewOpen = false;
 	}
 
 	function getTrackObject(trackID, callback)
