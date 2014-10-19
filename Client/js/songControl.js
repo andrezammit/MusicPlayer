@@ -74,6 +74,8 @@ MusicPlayer.songControl = (function()
 			progPercent = 0;
 
 		songProgress.css('width', progPercent + '%');
+
+		musicPlayer.updateControlBarBackBtn(audioElement.currentTime);
 	}
 
 	function onTrackEnded()

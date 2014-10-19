@@ -361,6 +361,8 @@ a:hover
    	
    	text-align: center;
    	vertical-align: middle;
+
+	transition: opacity 400ms linear;
 }
 
 .ctrlBtn:hover
@@ -372,6 +374,22 @@ a:hover
 .ctrlBtn:active
 {
 	border-top: 0px;
+}
+
+.ctrlBtn.disabled
+{
+	opacity: 0.3;
+}
+
+.ctrlBtn.disabled:hover
+{
+	cursor: default;
+	background: linear-gradient(to bottom, #000000, #232729);
+}
+
+.ctrlBtn.disabled:active
+{
+	border-top: 1px solid #5b6a73;
 }
 
 .ctrlBtn img

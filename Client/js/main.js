@@ -9,7 +9,7 @@ MusicPlayer.engine = (function()
 
 	var msgHandlers = {};
 
-	var _currentTrackID = null;
+	var _currentTrackID = -1;
 
 	var _albumTracks = [];
 	var _currentAlbumTracks = [];
@@ -57,6 +57,15 @@ MusicPlayer.engine = (function()
 
 		var replyData = reply.data;
 		callback(replyData);
+	}
+
+	function initialize()
+	{
+		startGettingAlbums();
+        setupHandlers();
+
+        songControl.setupAudioElement();
+		updateNowPlayingTrack();
 	}
 
 	function setupHandlers()
@@ -788,6 +797,51 @@ MusicPlayer.engine = (function()
 
 				$("#songInfo").html(songInfo);
 			});
+
+		if (getLastTrackID() == -1)
+		{
+			$("#bkButton").addClass("disabled");
+		}
+		else
+		{
+			$("#bkButton").removeClass("disabled");
+		}
+
+		if (_currentTrackID == -1)
+		{
+			$("#playButton").addClass("disabled");
+		}
+		else
+		{
+			$("#playButton").removeClass("disabled");
+		}
+
+		if (getNextTrackID() == -1)
+		{
+			$("#fwButton").addClass("disabled");
+		}
+		else
+		{
+			$("#fwButton").removeClass("disabled");
+		}
+	}
+
+	function updateControlBarBackBtn(seconds)
+	{
+		if (seconds > 5)
+		{
+			$("#bkButton").removeClass("disabled");
+			return;
+		}
+
+		if (getLastTrackID() == -1)
+		{
+			$("#bkButton").addClass("disabled");
+		}
+		else
+		{
+			$("#bkButton").removeClass("disabled");
+		}
 	}
 
 	function isTrackInCurrentAlbum(trackID)
@@ -1089,14 +1143,9 @@ MusicPlayer.engine = (function()
 			connect.createWebSocket(onWebSockOpen, onWebSockMessage);
 		},
 
-		setupHandlers: function()
+		initialize: function()
 		{
-			setupHandlers();
-		},
-
-		startGettingAlbums: function()
-		{
-			startGettingAlbums();
+			initialize();
 		},
 
 		onAlbumHover: function(event)
@@ -1122,11 +1171,6 @@ MusicPlayer.engine = (function()
 		updateNowPlayingTrack: function()
 		{
 			updateNowPlayingTrack();
-		},
-
-		setupAudioElement: function()
-		{
-    		songControl.setupAudioElement();
 		},
 
 		setCurrentTrackID: function(trackID)
@@ -1227,6 +1271,11 @@ MusicPlayer.engine = (function()
 		deleteAlbum: function(artist, album)
 		{
 			return deleteAlbum(artist, album);
+		},
+
+		updateControlBarBackBtn: function(seconds)
+		{
+			updateControlBarBackBtn(seconds);
 		},
 	};
 }());
