@@ -410,6 +410,7 @@ MusicPlayer.engine = (function()
 		updateNowPlayingTrack();
 
 		$("body").css('overflow', 'hidden');
+		$("#addMusic").css('opacity', '0');
 
 		resizeArtwork($("#albumImageLarge"));
 
@@ -728,6 +729,7 @@ MusicPlayer.engine = (function()
 		albumView.css('bottom', 'calc(-100% + 80px)');
 
 		$("body").css('overflow', 'auto');
+		$("#addMusic").css('opacity', '0.3');
 
 		_albumViewOpen = false;
 
