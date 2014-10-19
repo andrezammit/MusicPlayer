@@ -433,6 +433,9 @@ MusicPlayer.engine = (function()
 	{
 		$("#loadingScreen").show();
 
+		$("#appName").css('opacity', '1');
+		$("#loadingImage").css('opacity', '1');
+
 		getAllAlbums(displayAlbums, updateProgress);
 	}
 
