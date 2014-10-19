@@ -388,13 +388,12 @@ MusicPlayer.engine = (function()
 		}
 
 		var albumImage = $("#albumImageLarge");
+		var imageURL = 'images/defaultArtwork.png';
 
 		if (replyData.artwork)
-		{
-			var blobURL = getBlobURLFromData(replyData.artwork.buffer);
-			albumImage.attr('src', blobURL);
-		}
+			imageURL = getBlobURLFromData(replyData.artwork.buffer);
 
+		albumImage.attr('src', imageURL);
 		albumImage.attr('alt', replyData.artist + ' - ' + replyData.album);
 
 		clearAnyExpandedAlbums();

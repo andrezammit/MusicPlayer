@@ -142,7 +142,6 @@ function AlbumEntry(templateElement)
 			imageURL = _blobURL;
 
 		albumArtwork.attr('src', imageURL);
-		
 		albumArtwork.attr('alt', _albumArtist + ' - ' + _album);
 
 		_clone.data("artist", _albumArtist);
