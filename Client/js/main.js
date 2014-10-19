@@ -398,34 +398,19 @@ MusicPlayer.engine = (function()
 		albumView.css('top', '103px');
 		albumView.css('bottom', '80px');
 
-		var albums = $("#albums");
-		albums.css('webkitFilter', 'blur(20px)');
-
 		updateNowPlayingTrack();
 
 		$("body").css('overflow', 'hidden');
 
-		resizeArtwork($("#albumImageLarge"), 
+		resizeArtwork($("#albumImageLarge"));
+
+		setTimeout(
 			function()
 			{
-				$("#albumImageLarge").css('display', 'block');
-			});
-
-		// $.when($("#albumViewContainer").show(),
-		// 	$("#albumView").slideToggle(500)).done(
-		// 	function()
-		// 	{
-		// 		updateNowPlayingTrack();
-
-		// 		$("#albums").css('webkitFilter', 'blur(20px)');
-		// 		$("body").css('overflow', 'hidden');
-
-		// 		resizeArtwork($("#albumImageLarge"), 
-		// 			function()
-		// 			{
-		// 				$("#albumImageLarge").show();
-		// 			});
-		// 	});
+				var albums = $("#albums");
+				albums.css('webkitFilter', 'blur(20px)');
+			}
+			, 700);
 	}
 
 	function updateProgress(progress, tagCount)
@@ -729,16 +714,20 @@ MusicPlayer.engine = (function()
 
 	function closeTracks()
 	{
-		$("#albumImageLarge").css('display', 'none');
-
 		var albumView = $("#albumView");
 		albumView.css('top', 'calc(100% + 103px)');
 		albumView.css('bottom', 'calc(-100% + 80px)');
 
-		$("#albums").css('webkitFilter', 'blur(0px)');
 		$("body").css('overflow', 'auto');
 
 		_albumViewOpen = false;
+
+		setTimeout(
+			function()
+			{
+				$("#albums").css('webkitFilter', 'blur(0px)');
+			},
+			700);
 	}
 
 	function getTrackObject(trackID, callback)
