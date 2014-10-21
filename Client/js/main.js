@@ -61,6 +61,16 @@ MusicPlayer.engine = (function()
 
 	function initialize()
 	{
+		$("body").mCustomScrollbar(
+			{
+				theme: "minimal-dark",
+				setTop: 0,
+				advanced:
+				{
+					updateOnImageLoad: false,
+				}
+			});
+
 		startGettingAlbums();
         setupHandlers();
 
@@ -87,11 +97,6 @@ MusicPlayer.engine = (function()
 			    }
 			});
 	
-/*		window.onscroll = function(event) 
-		{
-			console.log(window.scrollY);
-    	};*/
-
 		$("#closeTracksLink").click(
 			function()
 			{
@@ -310,9 +315,6 @@ MusicPlayer.engine = (function()
 		ratio = maxHeight / height; 				// get ratio for scaling image
 
 		artworkTag.css('height', maxHeight);   		// Set new height
-		//artworkTag.css('width', width * ratio);    	// Scale width based on ratio
-
-		//$("#tracks").css('height', maxHeight);
 
 		if (callback)
 			callback();
@@ -408,7 +410,7 @@ MusicPlayer.engine = (function()
 
 		updateNowPlayingTrack();
 
-		$("body").css('overflow', 'hidden');
+		$("body").mCustomScrollbar('disable');
 		$("#addMusic").css('opacity', '0');
 
 		resizeArtwork($("#albumImageLarge"));
@@ -502,7 +504,7 @@ MusicPlayer.engine = (function()
 		albumEntryHover.attr('class', 'albumEntryHover');
 		albumEntryHover.data('albumEntry', albumEntry);
 
-		var divPosition = albumEntry.offset();
+		var divPosition = albumEntry.position();
 		albumEntryHover.offset(divPosition);
 
 		var albumImageSmall = albumEntryHover.find(".albumImageSmall");
@@ -558,7 +560,7 @@ MusicPlayer.engine = (function()
 		})();
 
 		_expandedAlbumEntries.push(albumEntryHover);
-		$("body").append(albumEntryHover);
+		$("#mCSB_1_container").append(albumEntryHover);
 
 		albumEntryHover.data('originalPos', divPosition);
 
@@ -730,7 +732,7 @@ MusicPlayer.engine = (function()
 		albumView.css('top', 'calc(100% + 103px)');
 		albumView.css('bottom', 'calc(-100% + 80px)');
 
-		$("body").css('overflow', 'auto');
+		$("body").mCustomScrollbar('update');
 		$("#addMusic").css('opacity', '0.3');
 
 		_albumViewOpen = false;
