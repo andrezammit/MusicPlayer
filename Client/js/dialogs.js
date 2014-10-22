@@ -21,7 +21,7 @@ MusicPlayer.dialogs = (function()
 		closeDialogButtons.click(
 			function()
 			{
-				$("body").css('overflow', 'auto');
+				$("body").mCustomScrollbar('update');
 			});
 	}
 
@@ -131,7 +131,7 @@ MusicPlayer.dialogs = (function()
 				callback(newTag);
 			});
 
-		$("body").css('overflow', 'hidden');
+		$("body").mCustomScrollbar('disable');
 
 		getDialogContainer().fadeIn(400, 
 			function()
@@ -221,7 +221,7 @@ MusicPlayer.dialogs = (function()
 				callback(newTag);
 			});
 
-		$("body").css('overflow', 'hidden');
+		$("body").mCustomScrollbar('disable');
 
 		getDialogContainer().fadeIn(400, 
 			function()
@@ -233,7 +233,7 @@ MusicPlayer.dialogs = (function()
 
 	function confirmDelete(id, callback)
 	{
-		$("body").css('overflow', 'hidden');
+		$("body").mCustomScrollbar('disable');
 
 		var confirmDeletegDlg = $(".dialogs").find("#confirmDelete");
 
@@ -257,7 +257,7 @@ MusicPlayer.dialogs = (function()
 	{
 		musicPlayer.updateFilePickerDlg('', showFiles, filter);
 
-		$("body").css('overflow', 'hidden');
+		$("body").mCustomScrollbar('disable');
 
 		var filePickerDlg = $(".dialogs").find("#filePicker");
 
@@ -308,7 +308,7 @@ MusicPlayer.dialogs = (function()
 				closeDialog(filePickerDlg);
 				callback(selectedFile);
 
-				$("body").css('overflow', 'auto');
+				$("body").mCustomScrollbar('update');
 			});
 
 		filePickerDlg.off("itemClick");
