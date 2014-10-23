@@ -189,11 +189,9 @@ a:hover
 #albumView
 {
     position: fixed;
-
-    top: calc(100% + 103px);
-	bottom: calc(-100% + 80px);
 	
 	width: 100%; 
+	height: calc(100% - 208px);
 
 	background: rgba(255, 255, 255, 0.7);
 	
