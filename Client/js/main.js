@@ -87,7 +87,7 @@ MusicPlayer.engine = (function()
 				setTop: 0,
 			});
 
-		$("#fileView").mCustomScrollbar(
+		$("#fileViewContainer").mCustomScrollbar(
 		{
 			theme: "minimal-dark",
 			setTop: 0,

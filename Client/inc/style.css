@@ -184,7 +184,7 @@ a:hover
 	margin: auto;
 
 	transition: all 0.5s ease-in-out 0.5s;
-;}
+}
 
 #albumView
 {
@@ -977,16 +977,22 @@ input:hover
 	width: 100%;
 }
 
-#fileView
+#fileViewContainer
 {
-	border: solid 1px #DCDCDC;
-
-	margin-bottom: 10px;
-	padding: 8px;
-	
 	height: 300px;
 
-	overflow: auto;
+	padding: 8px;
+	padding-right: 15px;
+
+	margin-bottom: 10px;
+
+	border: solid 1px #DCDCDC;
+}
+
+#fileView
+{
+	display: block;
+	overflow: visible;
 }
 
 .fileEntry
