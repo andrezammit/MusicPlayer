@@ -65,6 +65,7 @@ MusicPlayer.engine = (function()
 			{
 				theme: "minimal-dark",
 				setTop: 0,
+				snapAmount: 600,
 				advanced:
 				{
 					updateOnImageLoad: false,
