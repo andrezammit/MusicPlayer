@@ -105,9 +105,9 @@ function sendReply(command, data, error)
 	_webSock.send(JSON.stringify(reply));
 }
 
-function sendProgress(current, total)
+function sendProgress(current, total, action, status)
 {
-	var reply = { command: 'progress', data: { current: current, total: total } };
+	var reply = { command: 'progress', data: { current: current, total: total, action: action, status: status } };
 	_webSock.send(JSON.stringify(reply));
 }
 
@@ -365,10 +365,10 @@ function onUpdateAlbumInfo(queryData)
 
 			var songsDone = 0;
 
-			function updateSongInfoDone()
+			function updateSongInfoDone(fileDone)
 			{
 				songsDone++;
-				sendProgress(songsDone, docs.length)
+				sendProgress(songsDone, docs.length, 'Updating Album', fileDone)
 
 				if (songsDone == docs.length)
 				{
@@ -606,7 +606,7 @@ function updateSongInfo(id, newTag, callback)
 						    database.updateTag(id, tag,
 						    	function(error)
 						    	{
-						    		callback();
+						    		callback(filePath);
 						    	});
     					});
 				});

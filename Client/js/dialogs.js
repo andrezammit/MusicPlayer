@@ -353,10 +353,22 @@ MusicPlayer.dialogs = (function()
 		var dialogContainer = getDialogContainer();
 		var showProgressDlg = $(".dialogs").find("#showProgress");
 
+		if (data.action && data.action.length > 0)
+		{
+			var title = showProgressDlg.find("h3");
+			title.text(data.action);
+		}
+
 		var progress = (data.current / data.total) * 100;
 
 		var currentProgress = showProgressDlg.find("#progress");
 		currentProgress.css('width', progress + '%');
+
+		if (data.status && data.status.length > 0)
+		{
+			var status = showProgressDlg.find("#status");
+			status.text(data.status);
+		}
 
 		if (progress == 100)
 		{

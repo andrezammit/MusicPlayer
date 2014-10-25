@@ -544,12 +544,10 @@ MusicPlayer.engine = (function()
 		var albumEntry = $(event.currentTarget);
 		var albumEntryHover = albumEntry.clone();
 
-		var classes = 'albumEntryHover';
-
 		if ($("div").first().hasClass('busy'))
-			classes += ' busy';
+			albumEntryHover.addClass('busy');
 
-		albumEntryHover.attr('class', classes);
+		albumEntryHover.addClass('albumEntryHover');
 		albumEntryHover.data('albumEntry', albumEntry);
 
 		var divPosition = albumEntry.position();

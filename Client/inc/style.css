@@ -1111,3 +1111,12 @@ input:hover
 {
 	cursor: progress;
 }
+
+#status
+{
+	text-align: left;
+	text-overflow: ellipsis;
+	
+	white-space: nowrap;
+	overflow: hidden;
+}
