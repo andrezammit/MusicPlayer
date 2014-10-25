@@ -183,7 +183,7 @@ a:hover
 
 	margin: auto;
 
-	transition: all 0.5s ease-in-out 0.5s;
+	transition: all 400ms ease-in-out 400ms;
 }
 
 #albumView
@@ -200,7 +200,7 @@ a:hover
 	padding-left: 20px;
 	padding-top: 25px;
 	
-	transition: top 0.5s ease-in-out 0.5s;
+	transition: top 400ms ease-in-out 400ms;
 }
 
 #loadingScreen
@@ -249,7 +249,7 @@ a:hover
 	font-weight: 400;
 	font-size: 80px;
 
-	transition: opacity 0.5s ease-in-out 0.5s;
+	transition: opacity 400ms ease-in-out 400ms;
 }
 
 .helper 
@@ -261,32 +261,30 @@ a:hover
 
 #closeTracks
 {
-	top: 6px;
-	left: 13px;
+	top: 0px;
+	right: 15px;
 
-	float: left;
-	position: relative;
+	width: 23px;
+	height: 15px;
+
+	position: absolute;
+
+	border: 1px solid;
+	border-top: 0px;
+	border-color: lightgrey;
+
+	transition: background-color 200ms linear;
+}
+
+#closeTracks:hover
+{
+	background-color: rgba(128, 128, 128, 0.5);
 }
 
 #closeTracksImage
 {
-	height: 20px;
-	width: 20px;
-
-	border: 1px solid;
-	border-radius: 50%;
-	border-color: black;
-}
-
-#closeTracksImage:hover
-{
-	border: 1px solid;
-	border-radius: 50%;
-	border-color: black;
-
-	background-color: rgba(128, 128, 128, 0.5);
-
-	transition: background-color 200ms linear;
+	height: 100%;
+	width: 100%;
 }
 
 #artwork
@@ -305,21 +303,18 @@ a:hover
 {
 	float: left;
 
-	width: 43%;
-	height: 100%;
+	width: 50%;
 
-	margin-left: 20px;
-
-	padding-right: 20px;
+	transition: top 400ms ease-in-out 400ms;
 }
 
 #tracks
 {
 	display: block;
-
+	position: relative;
+	
 	padding-bottom: 20px;
-
-	width: 100%;
+	padding-right: 20px;
 
 	overflow: visible;
 }
@@ -512,8 +507,13 @@ a:hover
 
 	top: 1px;
 	left: 154px;
-
+	
+	width: calc(100% - 154px);
 	opacity: 0.6;
+
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
 }
 
 #totalProgress
@@ -589,6 +589,11 @@ a:hover
 	display: inline-block;
 
 	position: absolute;
+
+	overflow: hidden;
+	
+	white-space: nowrap;
+	text-overflow: ellipsis;
 }
 
 .track
@@ -605,6 +610,8 @@ a:hover
 .song
 {
 	left: 55px;
+	right: 65px;
+
 	text-align: left;
 }
 
@@ -799,6 +806,25 @@ a:hover
 	transform: translateX(-50%) translateY(-50%);
 }
 
+#showProgress
+{
+	display: none;
+
+	top: 50%;
+	left: 50%;
+	
+	position: absolute;
+	
+	width: 500px;
+	
+	z-index: 6;
+	
+	background-color: white;
+	box-shadow: 1px 1px 20px #000000;
+
+	transform: translateX(-50%) translateY(-50%);
+}
+
 .closeDialog
 {	
 	position: fixed;
@@ -851,7 +877,7 @@ input
 	margin-bottom: 7px;
 	border: solid 1px #DCDCDC;
 
-  	transition: box-shadow 0.4s, border 0.4s;
+  	transition: box-shadow 400ms, border 400ms;
 }
 
 #editArtwork:focus,
@@ -868,7 +894,7 @@ input:hover
 	width: 100%;
 	border: solid 1px #DCDCDC;
   	
-  	transition: box-shadow 0.4s, border 0.4s;
+  	transition: box-shadow 400ms, border 400ms;
 }
 
 .dialogBtn
@@ -968,7 +994,7 @@ input:hover
 
 	opacity: 0.3;
 
-	transition: 200ms opacity linear;
+	transition: 400ms opacity linear;
 }
 
 .menuBarImg
@@ -1057,4 +1083,26 @@ input:hover
 #mCSB_1_scrollbar_vertical
 {
 	bottom: 68px;
+}
+
+#fullProgress
+{
+	position: relative;
+	border: 1px solid;
+
+	padding: 3px;
+
+	height: 25px;
+
+	border-color: gray;
+}
+
+#progress
+{
+	position: relative;
+
+	height: 100%;
+
+	background: rgb(73, 110, 232);
+	transition: all 400ms ease-in-out 400ms;
 }

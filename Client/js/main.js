@@ -317,7 +317,7 @@ MusicPlayer.engine = (function()
 			return;
 
 		var parentTag = $(artworkTag).parent();
-		var imageSide = Math.min(parentTag.width() - 20, parentTag.height() - 16);
+		var imageSide = Math.min(parentTag.width() - 40, parentTag.height() - 16);
 
 		imageSide = Math.min(imageSide, 800);
 		imageSide = Math.max(imageSide, 200);
@@ -339,6 +339,16 @@ MusicPlayer.engine = (function()
 
 		artworkTag.css('height', maxHeight);   		// Set new height
 
+		var trackList = $("#tracks");
+
+		var trackListTop = 0;
+		var trackListHeight = trackList.height();
+
+		if (maxHeight > trackListHeight)
+			trackListTop = (maxHeight / 2) - (trackList.height() / 2);
+
+		$("#tracksContainer").css('top', trackListTop);
+
 		if (callback)
 			callback();
 	}
@@ -350,7 +360,7 @@ MusicPlayer.engine = (function()
 
 		var albumContainerParent = albumContainer.parent();		
 
-		var albumsToFit = Math.floor(albumContainerParent.width() / albumTemplate.width());
+		var albumsToFit = Math.floor((albumContainerParent.width() - 30) / albumTemplate.width());
 		var containerWidth = albumsToFit * albumTemplate.width();
 		
 		albumContainer.css('width', containerWidth);
@@ -449,8 +459,7 @@ MusicPlayer.engine = (function()
 
 	function updateProgress(progress, tagCount)
 	{
-		var html = progress + ' out of ' + tagCount + ' received.';
-		$("#progress").html(html); 
+		console.log(progress + ' out of ' + tagCount + ' received.');
 	}
 
 	function startGettingAlbums()
@@ -1164,6 +1173,12 @@ MusicPlayer.engine = (function()
 		{
 			location.reload(true);
 		}
+	}
+
+	msgHandlers['progress'] = function(data)
+	{
+		console.log('Progress: ' + data.current + '/' + data.total);
+		dialogs.showProgress(data);
 	}
 
 	return {

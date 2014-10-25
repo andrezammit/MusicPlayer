@@ -87,6 +87,7 @@ function onWSMessage(message)
 
 function onWSClose(code, message)
 {
+	_webSock = null;
 	console.log('Connection closed. Message: ' + message + ' Code: ' + code);
 }
 
@@ -101,6 +102,12 @@ function sendError(command, error)
 function sendReply(command, data, error)
 {
 	var reply = { command: command, data: data, error: error };
+	_webSock.send(JSON.stringify(reply));
+}
+
+function sendProgress(current, total)
+{
+	var reply = { command: 'progress', data: { current: current, total: total } };
 	_webSock.send(JSON.stringify(reply));
 }
 
@@ -210,7 +217,7 @@ function onGetTracks(queryData)
 					if (tag.artwork)
 						tag.artwork.buffer = bufferToBinary(tag.artwork.buffer);
 
-					var replyData = { artist: queryData.albumArtist, album: queryData.album, trackList: docs, artwork: tag.artwork };
+					var replyData = { artist: queryData.artist, album: queryData.album, trackList: docs, artwork: tag.artwork };
 					sendReply('getTracksReply', replyData);
 				});
 		});
@@ -333,6 +340,8 @@ function onGetAlbumInfo(queryData)
 
 						tagList.push(tag);
 
+						sendProgress(tagList.length, docs.length)
+
 						if (tagList.length == docs.length)
 						{
 							var commonTag = getCommonTag(tagList, artwork);
@@ -388,21 +397,6 @@ function onDeleteAlbum(queryData)
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-
-function getNoTagsResponse()
-{
-	return 'No mp3 files found.';
-}
-
-function getNoArtworkResponse()
-{
-	return 'No artwork for this album.';
-}
-
-function getNoMoreTracksReply()
-{
-	return 'No more tracks in this album.';
-}
 
 function getCachedArtwork(tag, callback)
 {

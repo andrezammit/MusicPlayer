@@ -346,6 +346,38 @@ MusicPlayer.dialogs = (function()
 			});
 	}
 
+	function showProgress(data)
+	{
+		$("body").mCustomScrollbar('disable');
+
+		var dialogContainer = getDialogContainer();
+		var showProgress = $(".dialogs").find("#showProgress");
+
+		var progress = (data.current / data.total) * 100;
+
+		var currentProgress = showProgress.find("#progress");
+		currentProgress.css('width', progress + '%');
+
+		if (progress == 100)
+		{
+			dialogContainer.fadeOut(0);
+			showProgress.fadeOut(0);
+
+			dialogContainer.css('cursor', 'default');
+
+			return;
+		}
+
+		dialogContainer.css('cursor', 'progress');
+
+		dialogContainer.fadeIn(0, 
+			function()
+			{
+				musicPlayer.resizeDialogs();
+				showProgress.fadeIn(400);
+			});
+	}
+
 	return {
 		initDialogs: function()
 		{
@@ -370,6 +402,11 @@ MusicPlayer.dialogs = (function()
 		filePicker: function(showFiles, filter, callback)
 		{
 			filePicker(showFiles, filter, callback);
+		},
+
+		showProgress: function(data)
+		{
+			showProgress(data);	
 		},
 	};
 })();
