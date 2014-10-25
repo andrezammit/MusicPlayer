@@ -16,6 +16,8 @@ MusicPlayer.engine = (function()
 	var _expandedAlbumEntries = [];
 
 	var _albumViewOpen = false;
+	var _gettingTracks = false;
+
 	var _currentVolume = 1;
 
 	(function()
@@ -289,6 +291,9 @@ MusicPlayer.engine = (function()
 
 	function getAlbumTracks(event, callback)
 	{
+		if (_gettingTracks)
+			return;
+
 		if (!event)
 			callback();
 
@@ -301,12 +306,18 @@ MusicPlayer.engine = (function()
 
 		function getTracks()
 		{
+			_gettingTracks = true;
+			$("div").toggleClass('busy');
+
 			var queryData = { artist: artist, album: album };
 			connect.sendQuery('getTracks', queryData);
 		}
 
 		msgHandlers['getTracksReply'] = function(data)
 		{
+			_gettingTracks = false;
+			$("div").toggleClass('busy');
+
 			callback(event, data);
 		}
 	}
@@ -533,7 +544,12 @@ MusicPlayer.engine = (function()
 		var albumEntry = $(event.currentTarget);
 		var albumEntryHover = albumEntry.clone();
 
-		albumEntryHover.attr('class', 'albumEntryHover');
+		var classes = 'albumEntryHover';
+
+		if ($("div").first().hasClass('busy'))
+			classes += ' busy';
+
+		albumEntryHover.attr('class', classes);
 		albumEntryHover.data('albumEntry', albumEntry);
 
 		var divPosition = albumEntry.position();
@@ -647,7 +663,7 @@ MusicPlayer.engine = (function()
 
 	function deflateAlbumEntry(albumEntryHover)
 	{		
-		if (albumEntryHover.attr('class') != "albumEntryHover")
+		if (!albumEntryHover.hasClass("albumEntryHover"))
 			return;
 
 		(function()
