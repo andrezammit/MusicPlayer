@@ -340,8 +340,6 @@ function onGetAlbumInfo(queryData)
 
 						tagList.push(tag);
 
-						sendProgress(tagList.length, docs.length)
-
 						if (tagList.length == docs.length)
 						{
 							var commonTag = getCommonTag(tagList, artwork);
@@ -370,6 +368,7 @@ function onUpdateAlbumInfo(queryData)
 			function updateSongInfoDone()
 			{
 				songsDone++;
+				sendProgress(songsDone, docs.length)
 
 				if (songsDone == docs.length)
 				{
