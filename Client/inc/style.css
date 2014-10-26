@@ -1104,7 +1104,7 @@ input:hover
 	height: 100%;
 
 	background: linear-gradient(to bottom, rgba(68,159,229,1) 0%,rgba(30,87,153,1) 100%);
-	transition: all 400ms ease-in-out 400ms;
+	/*transition: all 400ms ease-in-out 400ms;*/
 }
 
 .busy

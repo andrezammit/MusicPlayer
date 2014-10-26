@@ -6,64 +6,69 @@ var tagParser = require('./TagParser');
 
 var bunchOfTags = 300;
 
-function processFile(dir, fileList, fileIndex, results, callback)
-{
-    var fileEntry = fileList[fileIndex++];
-
-    if (!fileEntry)
-    {
-        callback(null, results);
-        return;
-    }
-
-    var fullPath = dir + '\\' + fileEntry;
-
-    fs.stat(fullPath,
-        function(error, stats)
-        {
-            if (!stats)
-                return;
-
-            if (stats.isDirectory())
-            {
-                scan(fullPath, 
-                    function(error, tmpResults)
-                    {
-                        results = results.concat(tmpResults);
-                        processFile(dir, fileList, fileIndex, results, callback);
-                    });
-            }
-            else
-            {
-                var fileExt = path.extname(fullPath);
-
-                if (fileExt === '.mp3')
-                    results.push(fullPath);
-                
-                processFile(dir, fileList, fileIndex, results, callback);
-            }
-        });
-}
-
 function scan(dir, callback)
 {
-    var results = [];
+    getFileList(dir, 
+        function(fullFileList)
+        {
+            callback(fullFileList)
+        });
+};
+
+function getFileList(dir, callback)
+{
+    var filesDone = 0;
+    var fullFileList = [];
+
+    function readyCheck(fileList)
+    {
+        filesDone++;
+        
+        if (filesDone == fileList.length)
+            callback(fullFileList);        
+    }
+
+    function addFile(fileList, index)
+    {
+        var fileName = fileList[index];
+        var fullPath = dir + '\\' + fileName;
+
+        fs.stat(fullPath,
+            function(error, stats)
+            {
+                if (!stats)
+                    return;
+
+                if (stats.isDirectory())
+                {
+                    getFileList(fullPath, 
+                        function(tmpResults)
+                        {
+                            fullFileList = fullFileList.concat(tmpResults);
+                            readyCheck(fileList);
+                        });
+                }
+                else
+                {
+                    var fileExt = path.extname(fullPath);
+
+                    if (fileExt === '.mp3')
+                        fullFileList.push(fullPath);
+
+                    readyCheck(fileList);
+                }
+            });
+    }
 
     fs.readdir(dir, 
         function(error, fileList)
         {
-            if (error)
-            {
-                callback(error)
-                return;
-            }
-
-            var fileIndex = 0;
-            processFile(dir, fileList, fileIndex, results, callback);
+            for (var cnt = 0; cnt < fileList.length; cnt++)
+                addFile(fileList, cnt);
         });
-};
+}
 
-function extractTags(fileList, callback) 
+function extractTags(fileList, progressCallback, callback) 
 {
     var filesDone = 0;
     var filesStarted = 0;
@@ -75,15 +80,18 @@ function extractTags(fileList, callback)
 
     function getTagDone(tag)
     {
-        tagList.push(tag);
+        filesDone++;
 
-        if (++filesDone == listSize)
+        tagList.push(tag);
+        progressCallback(filesDone, fileList.length, tag.path);
+
+        if (filesDone == listSize)
         {
             callback(tagList);
             return;
         }
 
-        setTimeout(getTag, 0, fileList[filesStarted++], getTagDone);
+        setTimeout(getTag, 100, fileList[filesStarted++], getTagDone);
     };
 
     function getSomeTags(startIndex)
@@ -94,7 +102,7 @@ function extractTags(fileList, callback)
         filesStarted = thisBunch;
 
         for (var cnt = startIndex; cnt < thisBunch; cnt++)
-            setTimeout(getTag, 0, fileList[cnt], getTagDone);
+            setTimeout(getTag, 100, fileList[cnt], getTagDone);
     }
 
     getSomeTags(0);
@@ -215,4 +223,5 @@ function getFolderContents(folder, filter, showFiles, callback)
 
 module.exports.scan = scan;
 module.exports.extractTags = extractTags;
+module.exports.getFileList = getFileList;
 module.exports.getFolderContents = getFolderContents;

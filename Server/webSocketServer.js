@@ -476,13 +476,13 @@ function addFolders(folderList, callback)
 	for (var cnt = 0; cnt < folderList.length; cnt++)
 	{
 		fileSystem.scan(folderList[cnt].fullPath,
-			function(error, results)
+			function(fullFileList)
 			{
 				foldersDone++;
-				fileList = fileList.concat(results);
+				fileList = fileList.concat(fullFileList);
 
 				if (foldersDone == folderList.length)
-					scanDone(null, fileList);
+					scanDone(fileList);
 			});
 	}
 
@@ -490,6 +490,11 @@ function addFolders(folderList, callback)
 	{
 	    console.log('Done saving ' + tagCount + ' ID3 tags to database.');
 	    callback();
+	}
+
+	function extractTagProgress(current, total, status)
+	{
+		sendProgress(current, total, 'Add Folder', status);
 	}
 
 	function extractTagsDone(tagList)
@@ -500,14 +505,8 @@ function addFolders(folderList, callback)
 	    database.saveTags(tagList, saveTagsDone);
 	}
 
-	function scanDone(error, fileList)
+	function scanDone(fileList)
 	{
-		if (error)
-		{
-	        console.log('Error: ' + error);
-	        return;
-	    }
-
 		if (!fileList)
 		{
 	        console.log('Error: No files found.');
@@ -518,7 +517,7 @@ function addFolders(folderList, callback)
 	    console.log('Found ' + fileList.length + ' files.');
 
 	    console.log('Extracting ID3 tags...');
-	    fileSystem.extractTags(fileList, extractTagsDone)
+	    fileSystem.extractTags(fileList, extractTagProgress, extractTagsDone)
 	}
 }
 
