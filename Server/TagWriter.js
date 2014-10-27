@@ -170,7 +170,6 @@ function TagWriter()
 		if (_newTag.artwork == null)
 			_newTag.artwork = _oldTag.artwork;
 
-		_newTag.artworkHash = _oldTag.artworkHash;		
 		_newTag.path = _oldTag.path;
 	}
 

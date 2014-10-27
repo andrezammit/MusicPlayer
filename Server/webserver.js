@@ -37,17 +37,50 @@ function processFileRequest(request, callback)
 
 	var fullPath = '../Client' + requestPath;
 
-	if (!fs.existsSync(fullPath))
+	fs.readFile(fullPath, 
+		function (error, data) 
+		{
+			if (error)
+			{
+				callback(getFileNotFoundResponse(requestPath), "text/html");
+				return;
+			}
+
+			callback(data, mimeType);
+		});
+}
+
+function processArtworkRequest(request, callback)
+{
+	var album = getDataFromURL(request.url);
+	var artworkFile = 'artwork\\' + album + '.jpg';
+
+	fs.readFile(artworkFile, 
+		function (error, data) 
+		{
+			if (error)
+			{
+				returnDefaultArtwork(callback);
+				return;
+			}
+
+			callback(data, 'image/jpeg');
+		});
+}
+
+function processOtherRequest(request, callback)
+{
+	var url_parts = url.parse(request.url, true);
+	var requestPath = url_parts.pathname;
+
+	switch(requestPath)
 	{
-		callback(getFileNotFoundResponse(requestPath), "text/html");
+	case '/getArtwork':
+		processArtworkRequest(request, callback);
 		return;
 	}
 
-	fs.readFile(fullPath, 
-		function (err, data) 
-		{
-			callback(data, mimeType);
-		});
+	callback('Invalid request.', 'text/html');
 }
 
 function getHTML(request, callback)
@@ -63,18 +96,13 @@ function getHTML(request, callback)
 
 	var extension = path.extname(requestPath);
 
-	if (!extension)
+	if (extension)
 	{
-		getRequestData(request, 
-			function(data)
-			{
-				processAJAXRequest(request, data, callback);
-			});
-
+		processFileRequest(request, callback);
 		return;
 	}
 
-	processFileRequest(request, callback);
+	processOtherRequest(request, callback);
 }
 
 function processRequest(request, response)
@@ -92,6 +120,33 @@ function processRequest(request, response)
     			response.write(data);  
     			response.end();		
     		});
+}
+
+function returnDefaultArtwork(callback)
+{
+	var artworkPath = '../Client/images/defaultArtwork.png';
+
+	fs.readFile(artworkPath, 
+		function (error, data) 
+		{
+			if (error)
+			{
+				callback(getFileNotFoundResponse(artworkPath), "text/html");
+				return;
+			}
+
+			callback(data, 'image/png');
+		});
+}
+
+function getDataFromURL(url)
+{
+	var pos = url.search('\\?');
+
+	if (pos == -1)
+		return null;
+
+	return url.substr(pos + 1)
 }
 
 http.createServer(processRequest).listen(3000, '0.0.0.0');

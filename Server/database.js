@@ -1,8 +1,8 @@
+var fs = require('fs');
 var dbEngine = require('tingodb')();
 
 var db;
 var collection;
-var artworkCache;
 
 function cacheArtwork(tag, callback)
 {
@@ -12,33 +12,15 @@ function cacheArtwork(tag, callback)
         return;
     }
 
-    var doc = { hash: tag.artworkHash, artworkSmall: tag.artworkSmall.buffer };
+    var artworkFile = tag.albumArtist + '_' + tag.album + '.jpg';
+    artworkFile = encodeURI(artworkFile);
 
-    artworkCache.find({ hash: tag.artworkHash }).count(
-        function(error, count)
+    var artworkPath = 'artwork\\' + artworkFile;
+    
+    fs.writeFile(artworkPath, tag.artworkSmall.buffer, { encoding: 'binary' },
+        function(error)
         {
-            if (count > 0)
-            {
-                artworkCache.update({ hash: tag.artworkHash }, { $set: doc }, { w: 1 },
-                    function(error, result) 
-                    {
-                        if (error)
-                            console.log(error);
-
-                        callback(tag);
-                    });
-            }
-            else
-            {
-                artworkCache.insert(doc, { w: 1 },
-                    function(error, result)
-                    {
-                        if (error)
-                            console.log(error);
-
-                        callback(tag);
-                    });
-            }
+            callback(tag);
         });
 }
 
@@ -46,9 +28,9 @@ function saveTag(tag, callback)
 {
     var tmpArtist = tag.albumArtist || tag.artist;
 
-    console.log('Saving: ' + tmpArtist + ' - ' + tag.song + ' - ' + tag.album + ' - ' + tag.track + ' - ' + tag.time + ' - ' + tag.year + ' - ' + tag.artworkHash);
+    console.log('Saving: ' + tmpArtist + ' - ' + tag.song + ' - ' + tag.album + ' - ' + tag.track + ' - ' + tag.time + ' - ' + tag.year);
 
-    var doc = { artist: tag.artist, albumArtist: tag.albumArtist, song: tag.song, album: tag.album, track: parseInt(tag.track), time: tag.time, year: parseInt(tag.year), path: tag.path, artworkHash: tag.artworkHash };
+    var doc = { artist: tag.artist, albumArtist: tag.albumArtist, song: tag.song, album: tag.album, track: parseInt(tag.track), time: tag.time, year: parseInt(tag.year), path: tag.path };
 
     collection.insert(doc, { w: 1 }, 
         function(error, result) 
@@ -62,7 +44,7 @@ function saveTag(tag, callback)
 
 function clearArtworkIfOnlyReference(id, callback)
 {
-    collection.find( { _id: id }, { artworkHash: 1 } ).toArray(
+    collection.find({ _id: id }, { albumArtist: 1, album: 1 }).toArray(
         function(error, docs)
         {
             if (!docs)
@@ -71,11 +53,16 @@ function clearArtworkIfOnlyReference(id, callback)
             if (docs.length == 0)
                 return;
 
-            var artworkCount = collection.find({ artworkHash: docs[0].artworkHash }).count(
+            var albumArtist = docs[0].albumArtist;
+            var album = docs[0].album;
+
+            var artworkPath = 'artwork\\' + albumArtist + '_' + album;
+
+            collection.find({ albumArtist: albumArtist, album: album }).count(
                 function(error, count)
                 {
                     if (count <= 1)
-                        artworkCache.remove({ hash: docs[0].artworkHash });
+                        fs.unlink(artworkPath);
 
                     callback();
                 });
@@ -92,9 +79,9 @@ function updateTag(id, tag, callback)
             cacheArtwork(tag, 
                 function(tag)
                 {
-                    console.log('Updating: ' + tmpArtist + ' - ' + tag.song + ' - ' + tag.album + ' - ' + tag.track + ' - ' + tag.time + ' - ' + tag.year + ' - ' + tag.artworkHash);
+                    console.log('Updating: ' + tmpArtist + ' - ' + tag.song + ' - ' + tag.album + ' - ' + tag.track + ' - ' + tag.time + ' - ' + tag.year);
 
-                    var doc = { artist: tag.artist, albumArtist: tag.albumArtist, song: tag.song, album: tag.album, track: parseInt(tag.track), time: tag.time, year: parseInt(tag.year), path: tag.path, artworkHash: tag.artworkHash };
+                    var doc = { artist: tag.artist, albumArtist: tag.albumArtist, song: tag.song, album: tag.album, track: parseInt(tag.track), time: tag.time, year: parseInt(tag.year), path: tag.path };
 
                     collection.update({ _id: parseInt(id) }, { $set: doc }, { w: 1 },
                         function(error, result) 
@@ -135,10 +122,8 @@ function clearDatabaseDone()
 function openCollections()
 {
     collection = db.collection('Settings'); 
-    artworkCache = db.collection('artworkCache');
 
     collection.ensureIndex({ _id: 1 }, { unique: true });
-    artworkCache.ensureIndex({ hash: 1 }, { unique: true });
 }
 
 function setupDatabase(callback)
@@ -277,7 +262,7 @@ function getAlbums(offset, albumsToGet, callback)
 {
     var albums = [];
 
-    collection.find({ }, { albumArtist: 1, album: 1, year: 1, artworkHash: 1 }).sort({ albumArtist: 1, year: 1, album: 1 }).toArray(
+    collection.find({ }, { albumArtist: 1, album: 1, year: 1 }).sort({ albumArtist: 1, year: 1, album: 1 }).toArray(
         function(error, docs)
         {
             if (!docs)
@@ -322,49 +307,18 @@ function getAlbumTracks(albumArtist, album, callback)
         });
 }
 
-function getCachedArtwork(hash, callback)
-{
-    if (!hash)
-    {
-        callback();
-        return;
-    }
-
-    artworkCache.find({ hash: hash }, { artworkSmall: 1 }).toArray(
-        function(error, docs)
-        {
-            var artwork = {};
-
-            if (docs)
-            {
-                artwork.data = Buffer(docs[0].artworkSmall).toString('binary');
-                artwork.type = 'image/jpeg';
-            }
-
-            callback(artwork);
-        });
-}
-
 function deleteAlbum(artist, album, callback)
 {
-    collection.find({ albumArtist: artist, album: album }, { artworkHash: 1 }).toArray(
-        function(error, docs)
+    collection.remove({ artist: artist, album: album }, { w: 1 },
+        function(error, removed)
         {
-            if (!docs)
-            {
-                callback();
-                return;
-            }
-            
-            artworkCache.remove({ artworkHash: docs[0].artworkHash}, { w: 1 },
-                function(error, removed)
-                {
-                    collection.remove({ artist: artist, album: album }, { w: 1 },
-                        function(error, removed)
-                        {
-                            callback();
-                        });
-                })
+            var artworkFile = artist + '_' + album + '.jpg';
+            artworkFile = encodeURI(artworkFile);
+
+            var artworkPath = 'artwork\\' + artworkFile;
+            fs.unlink(artworkPath);
+
+            callback();
         });
 }
 
@@ -382,4 +336,3 @@ module.exports.getTagCount = getTagCount;
 module.exports.getAlbumCount = getAlbumCount;
 module.exports.getFileFromID = getFileFromID;
 module.exports.getAlbumTracks = getAlbumTracks;
-module.exports.getCachedArtwork = getCachedArtwork;

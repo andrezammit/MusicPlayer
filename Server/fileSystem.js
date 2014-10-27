@@ -83,7 +83,9 @@ function extractTags(fileList, progressCallback, callback)
         filesDone++;
 
         tagList.push(tag);
-        progressCallback(filesDone, fileList.length, tag.path);
+
+        if (progressCallback)
+            progressCallback(filesDone, fileList.length, tag.path);
 
         if (filesDone == listSize)
         {

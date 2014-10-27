@@ -136,10 +136,8 @@ function AlbumEntry(templateElement)
 				});
 		})();
 
-		var imageURL = 'images/defaultArtwork.png';
-
-		if (_blobURL)
-			imageURL = _blobURL;
+		var encodedURL = encodeURI(_albumArtist + '_' + _album)
+		var imageURL = 'getArtwork?' + encodedURL;
 
 		albumArtwork.attr('src', imageURL);
 		albumArtwork.attr('alt', _albumArtist + ' - ' + _album);

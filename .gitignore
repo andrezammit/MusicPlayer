@@ -26,4 +26,4 @@ node_modules
 Settings
 *.db
 *.mp3
-Server/artworkCache
+Server/artwork

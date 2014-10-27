@@ -501,11 +501,8 @@ MusicPlayer.engine = (function()
 				if (!album)
 					return;
 
-				if (album.artwork && album.artwork.buffer)
-					album.blobURL = getBlobURLFromData(album.artwork.buffer);
-
 				var newAlbum = new AlbumEntry(albumTemplate);
-				newAlbum.setInfo(album.albumArtist, album.album, album.blobURL, album.year);
+				newAlbum.setInfo(album.albumArtist, album.album, album.year);
 
 				var newAlbumElement = newAlbum.getElement();
 				albumContainer.append(newAlbumElement);

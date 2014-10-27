@@ -558,18 +558,6 @@ function TagParser(includeArtwork, artworkThumb, checkArtworkCache, normalizeArt
 
 				_tag.time = time;
 
-				var stringToHash = _tag.albumArtist + _tag.album;
-
-				if (stringToHash.length > 0)
-				{
-					var md5sum = crypto.createHash('md5');
-
-			    	md5sum.update(stringToHash, 'ascii');
-			    	_tag.artworkHash = md5sum.digest('hex');
-			    	
-			    	md5sum = null;
-		    	}
-
 				if (_tag.artwork && _normalizeArtwork == true)
 				{
 					var width = 800;
@@ -591,15 +579,18 @@ function TagParser(includeArtwork, artworkThumb, checkArtworkCache, normalizeArt
 	}
 
 	function resizeArtworkWorker(width, callback)
-	{
-		if (_checkArtworkCache && arrImagesToResize.indexOf(_tag.artworkHash) > -1)
+	{		
+		var artworkFile = _tag.albumArtist + '_' + _tag.album;
+        artworkFile = encodeURI(artworkFile);
+
+		if (_checkArtworkCache && arrImagesToResize.indexOf(artworkFile) > -1)
 		{
 			callback();
 			return;
 		}
 
 		console.log('Resizing artwork for: ' + _tag.path);
-		arrImagesToResize.push(_tag.artworkHash);
+		arrImagesToResize.push(artworkFile);
 
 		var jpgBuffer = new images(_tag.artwork.buffer).encode('jpg');
 

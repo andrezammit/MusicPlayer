@@ -165,26 +165,7 @@ function onGetAlbums(queryData)
 				return;
 			}
 
-			var albumsDone = 0;
-			for (var cnt = 0; cnt < docs.length; cnt++)
-			{
-				getCachedArtwork(docs[cnt], 
-					function(tag, artwork)
-					{
-						if (artwork)
-						{
-							tag.artwork = { buffer: artwork.data, mimeType: artwork.type };
-
-							if (tag.artwork.buffer)
-								tag.artwork.buffer = bufferToBinary(tag.artwork.buffer);
-						}
-
-						albumsDone++;
-
-						if (albumsDone == docs.length)
-							sendGetAlbumsReply();						
-					})
-			}
+			sendGetAlbumsReply();		
 
 			function sendGetAlbumsReply()
 			{
@@ -285,7 +266,7 @@ function onGetFileListing(queryData)
 }
 
 function onAddFiles(queryData)
-{
+{	
 	addFiles(queryData.itemList,
 		function()
 		{
@@ -396,15 +377,6 @@ function onDeleteAlbum(queryData)
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-
-function getCachedArtwork(tag, callback)
-{
-	database.getCachedArtwork(tag.artworkHash, 
-		function(artwork)
-		{
-			callback(tag, artwork);
-		});
-}
 
 function getAlbumArtwork(tag, callback)
 {
