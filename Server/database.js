@@ -12,10 +12,12 @@ function cacheArtwork(tag, callback)
         return;
     }
 
-    var artworkFile = tag.albumArtist + '_' + tag.album + '.jpg';
+    var artworkFile = tag.albumArtist + '_' + tag.album;
+
+    artworkFile = artworkFile.replace(/[^\w\s]/gi, '');
     artworkFile = encodeURI(artworkFile);
 
-    var artworkPath = 'artwork\\' + artworkFile;
+    var artworkPath = 'artwork\\' + artworkFile + '.jpg';
     
     fs.writeFile(artworkPath, tag.artworkSmall.buffer, { encoding: 'binary' },
         function(error)
@@ -312,10 +314,12 @@ function deleteAlbum(artist, album, callback)
     collection.remove({ artist: artist, album: album }, { w: 1 },
         function(error, removed)
         {
-            var artworkFile = artist + '_' + album + '.jpg';
+            var artworkFile = artist + '_' + album;
+
+            artworkFile = artworkFile.replace(/[^\w\s]/gi, '');
             artworkFile = encodeURI(artworkFile);
 
-            var artworkPath = 'artwork\\' + artworkFile;
+            var artworkPath = 'artwork\\' + artworkFile + '.jpg';
             fs.unlink(artworkPath);
 
             callback();

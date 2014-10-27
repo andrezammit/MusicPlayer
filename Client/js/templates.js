@@ -106,7 +106,6 @@ function AlbumEntry(templateElement)
 {
 	var _year;
 	var _album;
-	var _blobURL;
 	var _albumArtist;
 
 	var _clone = $(templateElement).clone();
@@ -136,7 +135,11 @@ function AlbumEntry(templateElement)
 				});
 		})();
 
-		var encodedURL = encodeURI(_albumArtist + '_' + _album)
+		var encodedURL = _albumArtist + '_' + _album;
+
+		encodedURL = encodedURL.replace(/[^\w\s]/gi, '');
+		encodedURL = encodeURI(encodedURL);
+		
 		var imageURL = 'getArtwork?' + encodedURL;
 
 		albumArtwork.attr('src', imageURL);
@@ -155,11 +158,10 @@ function AlbumEntry(templateElement)
 			return getElement();
 		},
 
-		setInfo: function(albumArtist, album, blobURL, year)
+		setInfo: function(albumArtist, album, year)
 		{
 			_year = year;
 			_album = album;
-			_blobURL = blobURL;
 			_albumArtist = albumArtist;
 		},
 	};
