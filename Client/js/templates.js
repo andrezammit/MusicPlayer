@@ -133,6 +133,35 @@ function AlbumEntry(templateElement)
 				{
 					musicPlayer.onAlbumHover(event);
 				});
+
+			_clone.bind('contextmenu', 
+				function(event)
+				{
+					var artist = _clone.data('artist');
+					var album = _clone.data('album');
+					
+					menus.showAlbumMenu(albumArtwork, artist, album);
+
+					return false;
+				});
+
+			albumArtwork.mouseout(
+				function(event)
+				{
+					musicPlayer.onAlbumOut(event);
+				});
+
+			albumArtwork.bind('menuOpened', 
+				function()
+				{
+  					albumArtwork.toggleClass('menuOpen');
+				});
+
+			albumArtwork.bind('menuClosed', 
+				function()
+				{
+  					albumArtwork.toggleClass('menuOpen');
+				});
 		})();
 
 		var encodedURL = _albumArtist + '_' + _album;

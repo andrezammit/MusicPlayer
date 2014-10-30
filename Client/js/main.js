@@ -13,7 +13,6 @@ MusicPlayer.engine = (function()
 
 	var _albumTracks = [];
 	var _currentAlbumTracks = [];
-	var _expandedAlbumEntries = [];
 
 	var _albumViewOpen = false;
 	var _gettingTracks = false;
@@ -29,8 +28,6 @@ MusicPlayer.engine = (function()
 				resizeAlbumContainer();
 				resizeTextToFit($("#albumName"));
 				resizeArtwork($("#albumImageLarge"));
-
-				clearAnyExpandedAlbums();
 	   		});
 	})();
 
@@ -307,6 +304,7 @@ MusicPlayer.engine = (function()
 		function getTracks()
 		{
 			_gettingTracks = true;
+
 			$("div").toggleClass('busy');
 
 			var queryData = { artist: artist, album: album };
@@ -442,8 +440,7 @@ MusicPlayer.engine = (function()
 		albumImage.attr('src', imageURL);
 		albumImage.attr('alt', replyData.artist + ' - ' + replyData.album);
 
-		clearAnyExpandedAlbums();
-		onAlbumHover(event, false);
+		onAlbumHover(event);
 
 		var albumView = $("#albumView");
 		
@@ -533,177 +530,11 @@ MusicPlayer.engine = (function()
 			});
 	}
 
-	function expandAlbumEntry(event)
-	{
-		if (!event)
-			return;
-
-		var albumEntry = $(event.currentTarget);
-		var albumEntryHover = albumEntry.clone();
-
-		if ($("div").first().hasClass('busy'))
-			albumEntryHover.addClass('busy');
-
-		albumEntryHover.addClass('albumEntryHover');
-		albumEntryHover.data('albumEntry', albumEntry);
-
-		var divPosition = albumEntry.position();
-		albumEntryHover.offset(divPosition);
-
-		var albumImageSmall = albumEntryHover.find(".albumImageSmall");
-		
-		(function()
-		{
-			var menuOpen = false;
-
-			albumEntryHover.mouseout(
-				function(event)
-				{
-					if (menuOpen)
-						return;
-
-					onAlbumOut(event);
-				});
-
-			albumEntryHover.click(
-				function(event)
-				{
-					var index = _expandedAlbumEntries.indexOf(albumEntryHover);
-					
-					var albumEntry = _expandedAlbumEntries[index].data('albumEntry');
-					albumEntry.click();
-				});
-
-			albumEntryHover.bind('contextmenu', 
-				function(event)
-				{
-					var artist = albumEntry.data('artist');
-					var album = albumEntry.data('album');
-					
-					menus.showAlbumMenu(albumEntryHover, artist, album);
-
-					return false;
-				});
-
-			albumEntryHover.bind('menuOpened', 
-				function()
-				{
-					menuOpen = true;
-  					albumEntryHover.toggleClass('menuOpen');
-				});
-
-			albumEntryHover.bind('menuClosed', 
-				function()
-				{
-					menuOpen = false;
-  					albumEntryHover.toggleClass('menuOpen');
-
-					clearAnyExpandedAlbums();
-				});
-		})();
-
-		_expandedAlbumEntries.push(albumEntryHover);
-		$("#mCSB_1_container").append(albumEntryHover);
-
-		albumEntryHover.data('originalPos', divPosition);
-
-		albumEntryHover.css('left', divPosition.left);
-		albumEntryHover.css('top', divPosition.top);
-
-		albumEntryHover.show(0);
-
-		var right = divPosition.left + 200 + 5;
-		var bottom = divPosition.top + 200 + 5;
-
-		albumEntryHover.css('box-shadow', '0px 0px 20px #000');
-
-		albumEntryHover.css('left', divPosition.left - 5);
-		albumEntryHover.css('top', divPosition.top - 5);
-
-		albumEntryHover.css('width', 210);
-		albumEntryHover.css('height', 210);
-	}
-
-	function clearAnyExpandedAlbums()
-	{
-		for (var cnt = 0; cnt < _expandedAlbumEntries.length; cnt++)
-		{
-			var albumEntryHover = _expandedAlbumEntries[cnt];
-			deflateAlbumEntry(albumEntryHover);
-		}
-	}
-
-	function removeAlbumEntryHover(albumEntryHover)
-	{
-		function findAlbumEntryHover(albumEntryHover)
-		{
-			for (var cnt = 0; cnt < _expandedAlbumEntries.length; cnt++)
-			{
-				if (_expandedAlbumEntries[cnt] == albumEntryHover)
-					return cnt;
-			}
-
-			return -1;
-		}
-
-		var index = findAlbumEntryHover(albumEntryHover);
-
-		if (index == -1)
-			return;
-
-		_expandedAlbumEntries.splice(index, 1);
-
-		albumEntryHover.remove();
-	}
-
-	function deflateAlbumEntry(albumEntryHover)
-	{		
-		if (!albumEntryHover.hasClass("albumEntryHover"))
-			return;
-
-		(function()
-		{
-			albumEntryHover.one('transitionend', 
-				function()
-				{
-					removeAlbumEntryHover(albumEntryHover);
-				});
-		})();
-
-		// Check if the element got a chance to expand more than the original size.
-		// If the element is still 200x200, it won't have any transition to carry out
-		// and the transitionend event will never fire.
-
-		if (albumEntryHover.width() == 200)
-		{
-			removeAlbumEntryHover(albumEntryHover);
-			return;
-		}
-
-		var originalPos = albumEntryHover.data('originalPos');
-
-		albumEntryHover.css('left', originalPos.left);
-		albumEntryHover.css('top', originalPos.top);
-
-		albumEntryHover.css('width', 200);
-		albumEntryHover.css('height', 200);
-
-		albumEntryHover.css('box-shadow', '0px 0px 0px #000');
-	}
-
-	function onAlbumHover(event, expandAlbum)
+	function onAlbumHover(event)
 	{
 		if (_albumViewOpen == true)
 			return;
 
-		if (!event)
-			expandAlbum = false;
-
-		clearAnyExpandedAlbums();
-
-		if (expandAlbum === true)
-			expandAlbumEntry(event);
-	
 		updateHeaderInfo(event);
 	}
 
@@ -760,13 +591,10 @@ MusicPlayer.engine = (function()
 		if (_albumViewOpen == true)
 			return;
 
-		if (event)
-		{
-			var fromElement = $(event.currentTarget);
-			deflateAlbumEntry(fromElement);
-		}
+		if ($(event.toElement).hasClass("albumImageSmall"))
+			return;
 
-		onAlbumHover(null, false);
+		onAlbumHover(null);
 	}
 
 	function closeTracks()
@@ -1205,7 +1033,7 @@ MusicPlayer.engine = (function()
 
 		onAlbumHover: function(event)
 		{
-			onAlbumHover(event, true);
+			onAlbumHover(event);
 		},
 
 		onAlbumOut: function(event)
