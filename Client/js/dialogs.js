@@ -269,14 +269,17 @@ MusicPlayer.dialogs = (function()
 		var filePickerDlg = $(".dialogs").find("#filePicker");
 
 		var dlgTitle = filePickerDlg.find("h3");
+		var label = filePickerDlg.find(".label");
 
 		if (showFiles)
 		{
 			dlgTitle.html("Add File");
+			label.html("File:")
 		}
 		else
 		{
 			dlgTitle.html("Add Folder");
+			label.html("Folder:")
 		}
 
 		filePickerDlg.find("#goUp").off('click');
