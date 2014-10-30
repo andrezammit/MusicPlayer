@@ -157,7 +157,7 @@ a:hover
 .albumImageSmall:hover,
 .albumImageSmall.menuopen
 { 
-	z-index: 2;
+	z-index: 3;
 
 	width: 210px;
 	height: 210px;
