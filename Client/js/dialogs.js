@@ -315,6 +315,18 @@ MusicPlayer.dialogs = (function()
 					return;
 				}
 
+				if (!showFiles && !selectedFile)
+				{
+					selectedFile = 
+					{ 
+						folder: true,
+						fullPath: $("#currentDir").val(),
+					}
+
+					if (selectedFile.fullPath == '\\')
+						return;
+				}
+
 				closeDialog(filePickerDlg);
 				callback(selectedFile);
 			});
