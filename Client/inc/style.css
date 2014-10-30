@@ -128,7 +128,7 @@ a:hover
 	text-align: left;
 
 	-webkit-transform: translate3d(0, 0, 0);
-	transition: 400ms -webkit-filter linear;
+	transition: 200ms -webkit-filter linear;
 }
 
 .dummyAlbum
@@ -365,6 +365,8 @@ a:hover
 	transition: opacity 400ms linear;
 
 	opacity: 0.8;
+
+	-webkit-user-select: none;
 }
 
 #controlBar:hover
@@ -480,6 +482,8 @@ a:hover
 
    	font-family: 'digital-7', sans-serif;
 	font-weight: 400;
+
+	cursor: default;
 }
 
 #currentTime
@@ -1039,6 +1043,8 @@ input:hover
 
 	padding-left: 20px;
 	padding-bottom: 2px;
+
+	-webkit-user-select: none;
 }
 
 .fileEntry.selected
