@@ -6,6 +6,7 @@ MusicPlayer.engine = (function()
 	var songControl = MusicPlayer.songControl;
 	var dialogs = MusicPlayer.dialogs;
 	var menus = MusicPlayer.menus;
+	var cookie = MusicPlayer.cookieHelpers;
 
 	var msgHandlers = {};
 
@@ -893,11 +894,16 @@ MusicPlayer.engine = (function()
 
 	function updateFilePickerDlg(path, showFiles, filter)
 	{
+		if (path == '')
+			path = cookie.getCookie('lastPath');
+
 		var queryData = { showFiles: showFiles, filter: filter, path: path };
 		connect.sendQuery('getFileListing', queryData);  
 
 		msgHandlers['getFileListingReply'] = function(data)
 		{
+			path = data.path;
+
 			if (path == '')
 			{
 				path = 'Computer';
@@ -940,6 +946,9 @@ MusicPlayer.engine = (function()
 				if (!selectedFile)
 					return;
 
+				var currentDir = $("#currentDir");
+				cookie.setCookie('lastPath', currentDir.val(), 100);
+
 				var selectedItems = [];
 				selectedItems.push(selectedFile);
 
@@ -963,6 +972,9 @@ MusicPlayer.engine = (function()
 				if (!selectedItem)
 					return;
 
+				var currentDir = $("#currentDir");
+				cookie.setCookie('lastPath', currentDir.val(), 100);
+				
 				var selectedItems = [];
 				selectedItems.push(selectedItem);
 
