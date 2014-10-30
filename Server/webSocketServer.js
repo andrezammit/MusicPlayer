@@ -252,7 +252,7 @@ function onUpdateSongInfo(queryData)
 function onGetFileListing(queryData)
 {
 	fileSystem.getFolderContents(queryData.path, queryData.filter, queryData.showFiles, 
-		function(error, fileList)
+		function(error, path, fileList)
 		{
 			if (error)
 			{
@@ -260,7 +260,7 @@ function onGetFileListing(queryData)
 				return;
 			}
 
-			var replyData = { fileList: fileList };
+			var replyData = { path: path, fileList: fileList };
 			sendReply('getFileListingReply', replyData);
 		});	
 }
