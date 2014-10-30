@@ -1122,8 +1122,7 @@ input:hover
 
 	height: 100%;
 
-	background: linear-gradient(to bottom, rgba(68,159,229,1) 0%,rgba(30,87,153,1) 100%);
-	/*transition: all 400ms ease-in-out 400ms;*/
+	background: linear-gradient(to bottom, rgba(68,159,229,1) 0%, rgba(30,87,153,1) 100%);
 }
 
 .busy
@@ -1138,4 +1137,20 @@ input:hover
 
 	white-space: nowrap;
 	overflow: hidden;
+}
+
+.currentAlbum
+{
+	z-index: 2;
+}
+
+.glow
+{
+	-webkit-animation: glow 2s infinite;
+}
+
+@-webkit-keyframes glow {
+  0%   { box-shadow: 0px 0px 10px white; }
+  50%   { box-shadow: 0px 0px 25px white; }
+  100% { box-shadow: 0px 0px 10px white; }
 }

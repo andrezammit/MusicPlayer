@@ -23,6 +23,8 @@ MusicPlayer.songControl = (function()
 	function onPlay()
 	{
 		updateControlButtons();
+
+		musicPlayer.setPlayingAlbum();
 		musicPlayer.updateNowPlayingTrack();
 
 		var trackTime = musicPlayer.getTrackSeconds();
