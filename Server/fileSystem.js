@@ -167,7 +167,7 @@ function getFolderContents(folder, filter, showFiles, callback)
         getDriveLetters(
             function(fileEntries)
             {
-                callback(null, fileEntries);
+                callback(null, folder, fileEntries);
             });
 
         return;
@@ -178,7 +178,15 @@ function getFolderContents(folder, filter, showFiles, callback)
         {
             if (error)
             {
-                callback(error, null);
+                if (path != '')
+                {
+                    getFolderContents('', filter, showFiles, callback);
+                }
+                else
+                {
+                    callback(error);
+                }
+
                 return;
             }
 
@@ -219,7 +227,7 @@ function getFolderContents(folder, filter, showFiles, callback)
                 fileEntries.push(fileEntry);
             }
 
-            callback(null, fileEntries);
+            callback(null, folder, fileEntries);
         });
 }
 
