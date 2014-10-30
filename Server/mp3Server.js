@@ -40,7 +40,6 @@ function processRequest(request, response)
 		header['Content-Type'] = 'audio/mpeg'; 
 		header['Content-Range'] = 'bytes ' + start + '-' + end + '/' + fileSize;
 		header['Accept-Ranges'] = 'bytes';
-		header['Content-Length'] = chunkSize;
 		header['Transfer-Encoding'] = 'chunked';
 		header['Content-Transfer-Encoding'] = 'binary';
 		header['Connection'] = 'close';
