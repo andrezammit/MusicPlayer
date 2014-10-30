@@ -988,11 +988,6 @@ input:hover
 	height: 35px;
 }
 
-.menuBarBtn:hover, .menuBarBtn.menuOpen
-{
-	opacity: 1;
-}
-
 .menuBarBtn
 {
 	height: 30px;
@@ -1001,6 +996,17 @@ input:hover
 	opacity: 0.3;
 
 	transition: 400ms opacity linear;
+}
+
+.menuBarBtn:hover, 
+.menuBarBtn.menuOpen
+{
+	opacity: 1;
+}
+
+.menuBarBtn.hidden
+{
+	opacity: 0;
 }
 
 .menuBarImg

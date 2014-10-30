@@ -452,8 +452,8 @@ MusicPlayer.engine = (function()
 		updateNowPlayingTrack();
 
 		$("body").mCustomScrollbar('disable');
-		$("#addMusic").css('opacity', '0');
-
+		$("#addMusic").toggleClass('hidden');
+		
 		resizeArtwork($("#albumImageLarge"));
 
 		setTimeout(
@@ -604,7 +604,7 @@ MusicPlayer.engine = (function()
 		albumView.css('bottom', 'calc(-100% + 80px)');
 
 		$("body").mCustomScrollbar('update');
-		$("#addMusic").css('opacity', '0.3');
+		$("#addMusic").toggleClass('hidden');
 
 		_albumViewOpen = false;
 
