@@ -453,14 +453,14 @@ MusicPlayer.engine = (function()
 
 		$("body").mCustomScrollbar('disable');
 		$("#addMusic").toggleClass('hidden');
-		
+
 		resizeArtwork($("#albumImageLarge"));
 
 		setTimeout(
 			function()
 			{
 				var albums = $("#albums");
-				albums.css('webkitFilter', 'blur(20px)');
+				albums.css('webkitFilter', 'blur(10px)');
 			}, 
 			700);
 	}
