@@ -332,6 +332,8 @@ a:hover
 	left: 5px;
 
 	position: absolute;
+
+	-webkit-user-select: none;
 }
 
 .playButtonSmallImg
