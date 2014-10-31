@@ -2,32 +2,36 @@ var MusicPlayer = window.MusicPlayer || {};
 
 MusicPlayer.cookieHelpers = (function()
 {
-	function setCookie(name, value, duration) 
+	function setCookie(name, value) 
 	{
-	    var date = new Date();
-	    date.setTime(date.getTime() + (duration * 24 * 60 * 60 * 1000));
+		localStorage.setItem(name, value);
 
-	    var expires = 'expires=' + date.toUTCString();
-	    document.cookie = name + '=' + value + '; ' + expires;
+	    // var date = new Date();
+	    // date.setTime(date.getTime() + (duration * 24 * 60 * 60 * 1000));
+
+	    // var expires = 'expires=' + date.toUTCString();
+	    // document.cookie = name + '=' + value + '; ' + expires;
 	}
 
 	function getCookie(name) 
 	{
-	    var tmpName = name + '=';
-	    var data = document.cookie.split(';');
+		return localStorage.getItem(name);
+
+	    // var tmpName = name + '=';
+	    // var data = document.cookie.split(';');
 	    
-	    for (var cnt = 0; cnt < data.length; cnt++) 
-	    {
-	        var entry = data[cnt];
+	    // for (var cnt = 0; cnt < data.length; cnt++) 
+	    // {
+	    //     var entry = data[cnt];
 
-	        while (entry.charAt(0) == ' ') 
-	        	entry = entry.substring(1);
+	    //     while (entry.charAt(0) == ' ') 
+	    //     	entry = entry.substring(1);
 	        
-	        if (entry.indexOf(tmpName) != -1) 
-	        	return entry.substring(tmpName.length, entry.length);
-	    }
+	    //     if (entry.indexOf(tmpName) != -1) 
+	    //     	return entry.substring(tmpName.length, entry.length);
+	    // }
 
-	    return '';
+	    // return null;
 	}
 
 	return {
