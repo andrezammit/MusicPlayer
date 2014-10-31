@@ -294,10 +294,8 @@ MusicPlayer.engine = (function()
 						if (_resumeData.songID == null)
 							return;
 
-						playSong(_resumeData.songID);
-
-						if (_resumeData.wasPlaying == 'false')
-							songControl.togglePlay();
+						var paused = _resumeData.wasPlaying == "false";
+						playSong(_resumeData.songID, paused);
 
 						var audioElement = getAudioElement();
 						audioElement.currentTime = _resumeData.trackTime;
@@ -605,6 +603,9 @@ MusicPlayer.engine = (function()
 				if (!album)
 					return;
 
+				if (album.albumArtist == null || album.album == null)
+					return;
+
 				var newAlbum = new AlbumEntry(albumTemplate);
 				newAlbum.setInfo(album.albumArtist, album.album, album.year);
 
@@ -613,6 +614,9 @@ MusicPlayer.engine = (function()
 
 				if (_resumeData.artist == album.albumArtist && _resumeData.album == album.album)
 				{
+					if (_albumViewOpen)
+						_showingAlbumEntry = newAlbumElement;
+
 					_currentAlbumEntry = newAlbumElement;
 					setPlayingAlbum();
 				}
@@ -892,7 +896,7 @@ MusicPlayer.engine = (function()
 		return -1;
 	}
 
-	function playSong(trackID)
+	function playSong(trackID, paused)
 	{
 		if (trackID == _currentTrackID)
 		{
@@ -903,7 +907,7 @@ MusicPlayer.engine = (function()
 		if (!isTrackInCurrentAlbum(trackID))
 			_currentAlbumTracks = _albumTracks;
 		
-		songControl.fadeOutSong(trackID);
+		songControl.fadeOutSong(trackID, paused);
 
 		if (_currentTrackID != _resumeData.songID)
 			clearResumeData();
@@ -1030,7 +1034,12 @@ MusicPlayer.engine = (function()
 	function updateFilePickerDlg(path, showFiles, filter)
 	{
 		if (path == '')
-			path = cookieHelpers.getCookie('lastPath');
+		{
+			var lastPath = cookieHelpers.getCookie('lastPath');
+
+			if (lastPath != null)
+				path = lastPath;
+		}
 
 		var queryData = { showFiles: showFiles, filter: filter, path: path };
 		connect.sendQuery('getFileListing', queryData);  
@@ -1215,9 +1224,9 @@ MusicPlayer.engine = (function()
 			return _currentTrackID;
 		},
 
-		playSong: function(trackID)
+		playSong: function(trackID, paused)
 		{
-			playSong(trackID);
+			playSong(trackID, paused);
 		},
 
 		getAudioElement: function()

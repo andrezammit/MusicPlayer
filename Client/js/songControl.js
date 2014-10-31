@@ -22,7 +22,7 @@ MusicPlayer.songControl = (function()
 		}
 	};
 
-	function onPlay()
+	function onCanPlay()
 	{
 		updateControlButtons();
 
@@ -33,6 +33,14 @@ MusicPlayer.songControl = (function()
 
 		$("#currentPlaying").attr('totalTime', trackTime);
 		$("#seekBar").attr('max', trackTime);
+	}
+
+	function onPlay()
+	{
+		updateControlButtons();
+
+		musicPlayer.setPlayingAlbum();
+		musicPlayer.updateNowPlayingTrack();
 
 		cookieHelpers.setCookie('wasPlaying', true);
 	}
@@ -142,10 +150,11 @@ MusicPlayer.songControl = (function()
 		audioElement.bind('ended', onTrackEnded);
 
 		audioElement.bind('pause', onPause);
+		audioElement.bind('canplay', onCanPlay);
 		audioElement.bind('play', onPlay);
 	}
 
-	function fadeOutSong(trackID)
+	function fadeOutSong(trackID, paused)
 	{
 		var audioElement = musicPlayer.getAudioElement();
 		
@@ -154,11 +163,11 @@ MusicPlayer.songControl = (function()
 		$(audioElement).animate({ volume: 0 }, 500, 'swing',
 			function()
 			{
-				playSong(trackID);
+				playSong(trackID, paused);
 			});
 	}
 
-	function playSong(trackID)
+	function playSong(trackID, paused)
 	{
 		_nextTrackElement = null;
 
@@ -179,7 +188,8 @@ MusicPlayer.songControl = (function()
 
 		musicPlayer.setCurrentTrackID(trackID);
 
-		audioElement.play();
+		if (!paused)
+			audioElement.play();
 	}
 
 	function playNextSong()
@@ -232,14 +242,14 @@ MusicPlayer.songControl = (function()
 			}
 		},
 
-		fadeOutSong: function(trackID)
+		fadeOutSong: function(trackID, paused)
 		{
-			fadeOutSong(trackID);
+			fadeOutSong(trackID, paused);
 		},
 
-		playSong: function(trackID)
+		playSong: function(trackID, paused)
 		{
-			playSong(trackID);
+			playSong(trackID, paused);
 		},
 
 		playNextSong: function()
