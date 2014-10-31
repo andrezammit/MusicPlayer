@@ -1,5 +1,7 @@
 var MusicPlayer = window.MusicPlayer || {};
 
+var cookieHelpers = MusicPlayer.cookieHelpers;
+
 MusicPlayer.songControl = (function()
 {
 	var _nextTrackElement = null;
@@ -31,12 +33,16 @@ MusicPlayer.songControl = (function()
 
 		$("#currentPlaying").attr('totalTime', trackTime);
 		$("#seekBar").attr('max', trackTime);
+
+		cookieHelpers.setCookie('wasPlaying', true);
 	}
 
 	function onPause()
 	{
 		updateControlButtons();
 		musicPlayer.updateNowPlayingTrack();
+
+		cookieHelpers.setCookie('wasPlaying', false);
 	}
 
 	function getFormattedTime(totalSeconds)
@@ -77,6 +83,7 @@ MusicPlayer.songControl = (function()
 
 		songProgress.css('width', progPercent + '%');
 
+		cookieHelpers.setCookie('lastTime', audioElement.currentTime);
 		musicPlayer.updateControlBarBackBtn(audioElement.currentTime);
 	}
 
