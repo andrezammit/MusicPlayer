@@ -242,6 +242,7 @@ MusicPlayer.engine = (function()
 	{
 		var lastAlbum = cookieHelpers.getCookie('lastAlbum');
 		var lastArtist = cookieHelpers.getCookie('lastArtist');
+		var lastYear = cookieHelpers.getCookie('lastYear');
 		var lastSongID = cookieHelpers.getCookie('lastSongID');
 		var wasPlaying = cookieHelpers.getCookie('wasPlaying');
 		var lastTime = cookieHelpers.getCookie('lastTime');
@@ -251,6 +252,7 @@ MusicPlayer.engine = (function()
 		{ 
 			album: lastAlbum, 
 			artist: lastArtist, 
+			year: lastYear, 
 			songID: lastSongID, 
 			wasPlaying: wasPlaying, 
 			trackTime: lastTime,
@@ -258,20 +260,38 @@ MusicPlayer.engine = (function()
 		};
 	}
 
+	function clearResumeData()
+	{
+		_resumeData.album = null;
+		_resumeData.artist = null;
+		_resumeData.year = null;
+		_resumeData.songID = null;
+		_resumeData.wasPlaying = null;
+		_resumeData.trackTime = null;
+		_resumeData.volume = null;
+	}
+
 	function resumePlayback()
 	{
-		$(".knob").val(_resumeData.volume).trigger('change');
+		if (_resumeData.volume != null)
+			$(".knob").val(_resumeData.volume).trigger('change');
 
-		if (_resumeData.artist == '' || _resumeData.album == '')
+		if (_resumeData.artist == null || _resumeData.album == null)
 			return;
 
 		getAlbumTracks(_resumeData.artist, _resumeData.album,
 			function(data)
 			{
+				var albumTemplate = $(".templates").find('.albumEntry')[0];
+				var lastAlbumEntry = new AlbumEntry(albumTemplate);
+
+				lastAlbumEntry.setInfo(_resumeData.artist, _resumeData.album, _resumeData.year);
+				_showingAlbumEntry = lastAlbumEntry.getElement();
+
 				showAlbumTracks(data,
 					function()
 					{
-						if (_resumeData.songID == '')
+						if (_resumeData.songID == null)
 							return;
 
 						playSong(_resumeData.songID);
@@ -591,8 +611,7 @@ MusicPlayer.engine = (function()
 				var newAlbumElement = newAlbum.getElement();
 				albumContainer.append(newAlbumElement);
 
-				if (_currentAlbumEntry == null &&
-					_resumeData.artist == album.albumArtist && _resumeData.album == album.album)
+				if (_resumeData.artist == album.albumArtist && _resumeData.album == album.album)
 				{
 					_currentAlbumEntry = newAlbumElement;
 					setPlayingAlbum();
@@ -629,29 +648,34 @@ MusicPlayer.engine = (function()
 		if (_albumViewOpen == true)
 			return;
 
-		updateHeaderInfo(event);
-	}
+		var year = null;
+		var album = null;
+		var artist = null;
 
-	function updateHeaderInfo(event)
-	{
-		var headerTag = $("#albumName, #albumYear");
+		var albumEntry = null;
 
-		var album;
-		var artist;
-		var year;
+		if (event != null)
+			albumEntry = $(event.currentTarget);	
 
-		if (event)
+		if (albumEntry == null && _showingAlbumEntry != null)
+			albumEntry = _showingAlbumEntry;
+
+		if (albumEntry)
 		{
-			var albumEntry = $(event.currentTarget);
-
 			album = albumEntry.data('album');
 			artist = albumEntry.data('artist');
 			year = albumEntry.data('year');
 		}
-		else
-		{
+
+		updateHeaderInfo(artist, album, year);
+	}
+
+	function updateHeaderInfo(artist, album, year)
+	{
+		var headerTag = $("#albumName, #albumYear");
+
+		if (artist == null)
 			artist = "MusicPlayer";
-		}
 
 		headerTag.fadeOut(100,
 			function()
@@ -878,8 +902,11 @@ MusicPlayer.engine = (function()
 
 		if (!isTrackInCurrentAlbum(trackID))
 			_currentAlbumTracks = _albumTracks;
-
+		
 		songControl.fadeOutSong(trackID);
+
+		if (_currentTrackID != _resumeData.songID)
+			clearResumeData();
 	}
 
 	function getTrackSeconds()
@@ -1055,7 +1082,7 @@ MusicPlayer.engine = (function()
 					return;
 
 				var currentDir = $("#currentDir");
-				cookieHelpers.setCookie('lastPath', currentDir.val(), 100);
+				cookieHelpers.setCookie('lastPath', currentDir.val());
 
 				var selectedItems = [];
 				selectedItems.push(selectedFile);
@@ -1081,7 +1108,7 @@ MusicPlayer.engine = (function()
 					return;
 
 				var currentDir = $("#currentDir");
-				cookieHelpers.setCookie('lastPath', currentDir.val(), 100);
+				cookieHelpers.setCookie('lastPath', currentDir.val());
 
 				var selectedItems = [];
 				selectedItems.push(selectedItem);
@@ -1292,9 +1319,11 @@ MusicPlayer.engine = (function()
 
 			var artist = _showingAlbumEntry.data('artist');
 			var album = _showingAlbumEntry.data('album');
+			var year = _showingAlbumEntry.data('year');
 
 			cookieHelpers.setCookie('lastArtist', artist);
 			cookieHelpers.setCookie('lastAlbum', album);
+			cookieHelpers.setCookie('lastYear', year);
 		},
 	};
 }());

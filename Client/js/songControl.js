@@ -149,6 +149,8 @@ MusicPlayer.songControl = (function()
 	{
 		var audioElement = musicPlayer.getAudioElement();
 		
+		musicPlayer.setCurrentTrackID(trackID);
+		
 		$(audioElement).animate({ volume: 0 }, 500, 'swing',
 			function()
 			{
