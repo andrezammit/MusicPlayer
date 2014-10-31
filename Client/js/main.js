@@ -591,10 +591,10 @@ MusicPlayer.engine = (function()
 				var newAlbumElement = newAlbum.getElement();
 				albumContainer.append(newAlbumElement);
 
-				if (_showingAlbumEntry == null &&
-				 _resumeData.artist == artist && _resumeData.album == album)
+				if (_currentAlbumEntry == null &&
+					_resumeData.artist == album.albumArtist && _resumeData.album == album.album)
 				{
-					_showingAlbumEntry = newAlbumElement;
+					_currentAlbumEntry = newAlbumElement;
 					setPlayingAlbum();
 				}
 
