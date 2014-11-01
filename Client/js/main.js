@@ -182,6 +182,16 @@ MusicPlayer.engine = (function()
 				$(this).toggleClass('menuOpen');
 			});
 
+		$("#songInfo").click(
+			function()
+			{
+				getAlbumTracks(_resumeData.artist, _resumeData.album,
+					function(data)
+					{
+						showAlbumTracks(data);
+					});
+			});
+
 		function onVolumeChange(value)
 		{
 	    	console.log('Volume: ' + value);
@@ -431,7 +441,8 @@ MusicPlayer.engine = (function()
 			_gettingTracks = false;
 			$("div").toggleClass('busy');
 
-			callback(data);
+			if (callback)
+				callback(data);
 		}
 	}
 
