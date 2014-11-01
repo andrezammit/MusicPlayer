@@ -5,12 +5,6 @@ MusicPlayer.cookieHelpers = (function()
 	function setCookie(name, value) 
 	{
 		localStorage.setItem(name, value);
-
-	    // var date = new Date();
-	    // date.setTime(date.getTime() + (duration * 24 * 60 * 60 * 1000));
-
-	    // var expires = 'expires=' + date.toUTCString();
-	    // document.cookie = name + '=' + value + '; ' + expires;
 	}
 
 	function getCookie(name) 
@@ -20,27 +14,13 @@ MusicPlayer.cookieHelpers = (function()
 		if (value == 'null')
 			return null;
 
-	    // var tmpName = name + '=';
-	    // var data = document.cookie.split(';');
-	    
-	    // for (var cnt = 0; cnt < data.length; cnt++) 
-	    // {
-	    //     var entry = data[cnt];
-
-	    //     while (entry.charAt(0) == ' ') 
-	    //     	entry = entry.substring(1);
-	        
-	    //     if (entry.indexOf(tmpName) != -1) 
-	    //     	return entry.substring(tmpName.length, entry.length);
-	    // }
-
-	    // return null;
+		return value;
 	}
 
 	return {
-		setCookie: function(name, value, duration)
+		setCookie: function(name, value)
 		{
-			return setCookie(name, value, duration);
+			return setCookie(name, value);
 		},
 
 		getCookie: function(name)
