@@ -1155,3 +1155,8 @@ input:hover
   50%   { box-shadow: 0px 0px 25px white; }
   100% { box-shadow: 0px 0px 10px white; }
 }
+
+#editArtwork:hover
+{
+	cursor: hand;
+}

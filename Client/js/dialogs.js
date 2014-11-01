@@ -80,6 +80,38 @@ MusicPlayer.dialogs = (function()
 
 		var editArtwork = editSongDlg.find("#editArtwork");
 		editArtwork.attr('src', blobURL);
+
+		editArtwork.click(
+			function(event)
+			{
+				var fileDlg = $("<input type='file'>");
+				fileDlg.trigger('click');
+
+				fileDlg.bind('change', 
+					function()
+					{
+						var items = fileDlg[0].files;
+                  		
+                  		for (var cnt = 0; cnt < items.length; cnt++)
+						{
+							var item = items[cnt];
+		  					var reader = new FileReader();
+		  					
+		  					reader.onload = function(event)
+		  					{
+		  						var dataURL = event.target.result;
+
+		  						if (!dataURL)
+		  							return;
+
+								editArtwork.attr('src', dataURL);
+		    				};
+
+		  					reader.readAsDataURL(item);
+		  					break;
+						}
+					});
+			});
 		
 		editSongDlg[0].onpaste =  
 			function(event)
@@ -174,6 +206,38 @@ MusicPlayer.dialogs = (function()
 		var editArtwork = editAlbumDlg.find("#editArtwork");
 		editArtwork.attr('src', blobURL);
 
+		editArtwork.click(
+			function(event)
+			{
+				var fileDlg = $("<input type='file'>");
+				fileDlg.trigger('click');
+
+				fileDlg.bind('change', 
+					function()
+					{
+						var items = fileDlg[0].files;
+                  		
+                  		for (var cnt = 0; cnt < items.length; cnt++)
+						{
+							var item = items[cnt];
+		  					var reader = new FileReader();
+		  					
+		  					reader.onload = function(event)
+		  					{
+		  						var dataURL = event.target.result;
+
+		  						if (!dataURL)
+		  							return;
+
+								editArtwork.attr('src', dataURL);
+		    				};
+
+		  					reader.readAsDataURL(item);
+		  					break;
+						}
+					});
+			});
+		
 		editAlbumDlg[0].onpaste =  
 			function(event)
 			{ 
