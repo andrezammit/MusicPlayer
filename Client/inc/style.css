@@ -178,7 +178,7 @@ a:hover
 
 	background: white;
 
-	transition: margin-left 300ms linear, margin-top 300ms linear, left 300ms linear, top 300ms linear, height 300ms, width 300ms linear, box-shadow 300ms linear;
+	transition: margin-left 300ms, margin-top 300ms, left 300ms, top 300ms, height 300ms, width 300ms, box-shadow 300ms;
 }
 
 #albumImageLarge
@@ -361,7 +361,7 @@ a:hover
 	background-image: url('/images/ampBackground.png');
 	background-size: cover;
 
-	transition: opacity 400ms linear;
+	transition: opacity 400ms;
 
 	opacity: 0.8;
 
@@ -588,7 +588,7 @@ a:hover
 	height: 35px;
 	width: 100%;
 
-	transition: opacity 400ms linear;
+	transition: opacity 400ms;
 
 	background: linear-gradient(to right, rgba(0,0,0,0) 0%, rgba(255, 255, 255, 0.65) 23%, rgba(255, 255, 255, 0.65) 81%, rgba(0,0,0,0) 100%);
 }
