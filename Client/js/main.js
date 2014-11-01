@@ -104,14 +104,15 @@ MusicPlayer.engine = (function()
 		resizeAlbumContainer()
 		closeTracks();
 
-		startGettingAlbums();
-        setupHandlers();
-
         songControl.setupAudioElement();
-		updateNowPlayingTrack();
 
 		loadResumeData();
 		resumePlayback();
+
+        setupHandlers();
+
+		startGettingAlbums();
+		updateNowPlayingTrack();
 	}
 
 	function setupHandlers()
@@ -194,6 +195,7 @@ MusicPlayer.engine = (function()
 				getAlbumTracks(_resumeData.artist, _resumeData.album,
 					function(data)
 					{
+						_showingAlbumEntry = _currentAlbumEntry;
 						showAlbumTracks(data);
 					});
 			});
@@ -311,11 +313,7 @@ MusicPlayer.engine = (function()
 		getAlbumTracks(_resumeData.artist, _resumeData.album,
 			function(data)
 			{
-				var albumTemplate = $(".templates").find('.albumEntry')[0];
-				var lastAlbumEntry = new AlbumEntry(albumTemplate);
-
-				lastAlbumEntry.setInfo(_resumeData.artist, _resumeData.album, _resumeData.year);
-				_showingAlbumEntry = lastAlbumEntry.getElement();
+				_showingAlbumEntry = getAlbumEntry(_resumeData.artist, _resumeData.album, _resumeData.year)
 
 				showAlbumTracks(data,
 					function()
@@ -330,6 +328,25 @@ MusicPlayer.engine = (function()
 						audioElement.currentTime = _resumeData.trackTime;
 					});
 			});
+	}
+
+	function getAlbumEntry(artist, album, year)
+	{
+		var albums = $(".albumEntry");
+
+		for (var cnt = 0; cnt < albums.length; cnt++)
+		{
+			var tmpEntry = albums.eq(cnt);
+
+			if (tmpEntry.data('album') == album && tmpEntry.data('artist') == artist)
+				return tmpEntry;
+		}
+
+		var albumTemplate = $(".templates").find('.albumEntry')[0];
+		var tmpEntry = new AlbumEntry(albumTemplate);
+
+		tmpEntry.setInfo(artist, album, year);
+		return tmpEntry.getElement();
 	}
 
 	function getAllAlbums(callback, progressCallback)
