@@ -127,8 +127,8 @@ a:hover
 {
 	text-align: left;
 
-	-webkit-transform: translate3d(0, 0, 0);
 	transition: 1000ms -webkit-filter linear;
+	-webkit-transform: translateZ(0);
 }
 
 .dummyAlbum
@@ -203,6 +203,7 @@ a:hover
 	padding-top: 25px;
 	
 	transition: top 1000ms ease-in-out 700ms;
+	-webkit-transform-style: preserve-3d;
 }
 
 #loadingScreen
@@ -1065,10 +1066,15 @@ input:hover
 	padding-left: 5px;
 
 	overflow: hidden;
+
+	text-overflow: ellipsis;
+	overflow-wrap: normal;
+	white-space: nowrap;
 }
 
 #goUp
 {
+	cursor: hand;
 	display: inline-block;
 }
 
@@ -1159,4 +1165,52 @@ input:hover
 #editArtwork:hover
 {
 	cursor: hand;
+}
+
+#addMusicContainer
+{
+	display: none;
+
+	position: fixed;
+
+	top: 130px;
+	left: 0px;
+	right: 0px;
+	bottom: 80px;
+}
+
+#addMusicBtn
+{
+	position: absolute;
+	
+	left: 50%;
+	top: 30%;
+
+	border: 1px solid;
+	border-color: gray;
+	border-radius: 5px;
+	
+	padding-bottom: 5px;
+	padding-right: 18px;
+
+	font-family: 'Raleway', sans-serif;
+	font-size: 60px;
+
+	vertical-align: bottom;
+
+	cursor: hand;
+
+	transition: background-color 200ms linear;
+	transform: translateX(-50%) translateY(-50%);
+}
+
+#addMusicBtn:hover
+{
+	background-color: lightgray;
+}
+
+
+#addMusicImg
+{
+	vertical-align: middle;
 }
