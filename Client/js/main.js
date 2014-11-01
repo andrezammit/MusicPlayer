@@ -196,8 +196,17 @@ MusicPlayer.engine = (function()
 					function(data)
 					{
 						_showingAlbumEntry = _currentAlbumEntry;
-						showAlbumTracks(data);
+						showAlbumTracks();
 					});
+			});
+
+		$(document).keyup(
+			function(event)
+			{
+				if (event.which == 27)
+				{
+					closeTracks();
+				}
 			});
 
 		function onVolumeChange(value)
@@ -315,7 +324,7 @@ MusicPlayer.engine = (function()
 			{
 				_showingAlbumEntry = getAlbumEntry(_resumeData.artist, _resumeData.album, _resumeData.year)
 
-				showAlbumTracks(data,
+				processAlbumTracks(data, false,
 					function()
 					{
 						if (_resumeData.songID == null)
@@ -465,7 +474,7 @@ MusicPlayer.engine = (function()
 			$("div").toggleClass('busy');
 
 			if (callback)
-				callback(data);
+				callback(data, true);
 		}
 	}
 
@@ -546,9 +555,9 @@ MusicPlayer.engine = (function()
 			callback();
 	}
 
-	function showAlbumTracks(replyData, callback)
+	function processAlbumTracks(data, showAlbum, callback)
 	{
-		if (!replyData)
+		if (!data)
 			return;
 
 		var trackTemplate = $(".templates").find('.trackEntry')[0];
@@ -557,7 +566,7 @@ MusicPlayer.engine = (function()
 			return;
 
 		var trackContainer = $('#tracks');
-		var trackList = replyData.trackList;
+		var trackList = data.trackList;
 
 		_albumTracks = [];
 		trackContainer.empty();
@@ -570,7 +579,7 @@ MusicPlayer.engine = (function()
 					return;
 
 				var newTrack = new TrackEntry(trackTemplate);
-				newTrack.setInfo(track, replyData.artist, replyData.album);
+				newTrack.setInfo(track, data.artist, data.album);
 			
 				var newTrackElement = newTrack.getElement();
 
@@ -583,14 +592,23 @@ MusicPlayer.engine = (function()
 		var albumImage = $("#albumImageLarge");
 		var imageURL = 'images/defaultArtwork.png';
 
-		if (replyData.artwork)
-			imageURL = getBlobURLFromData(replyData.artwork.buffer);
+		if (data.artwork)
+			imageURL = getBlobURLFromData(data.artwork.buffer);
 
 		albumImage.attr('src', imageURL);
-		albumImage.attr('alt', replyData.artist + ' - ' + replyData.album);
+		albumImage.attr('alt', data.artist + ' - ' + data.album);
 
 		onAlbumHover(null);
 
+		if (showAlbum)
+			showAlbumTracks();
+
+		if (callback)
+			callback();
+	}
+
+	function showAlbumTracks()
+	{
 		var albumView = $("#albumView");
 		
 		_albumViewOpen = true;
@@ -612,9 +630,6 @@ MusicPlayer.engine = (function()
 				albums.css('webkitFilter', 'blur(10px)');
 			}, 
 			2000);
-
-		if (callback)
-			callback();
 	}
 
 	function updateProgress(progress, tagCount)
@@ -1246,7 +1261,7 @@ MusicPlayer.engine = (function()
 
 		chooseAlbum: function(event)
 		{
-			chooseAlbum(event, showAlbumTracks);
+			chooseAlbum(event, processAlbumTracks);
 		},
 
 		closeTracks: function()
