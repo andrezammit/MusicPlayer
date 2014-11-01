@@ -128,7 +128,7 @@ a:hover
 	text-align: left;
 
 	-webkit-transform: translate3d(0, 0, 0);
-	transition: 200ms -webkit-filter linear;
+	transition: 1000ms -webkit-filter linear;
 }
 
 .dummyAlbum
@@ -202,7 +202,7 @@ a:hover
 	padding-left: 20px;
 	padding-top: 25px;
 	
-	transition: top 400ms ease-in-out 400ms;
+	transition: top 1000ms ease-in-out 700ms;
 }
 
 #loadingScreen

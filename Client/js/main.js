@@ -103,7 +103,7 @@ MusicPlayer.engine = (function()
 
 		resizeAlbumContainer()
 		closeTracks();
-		
+
 		startGettingAlbums();
         setupHandlers();
 
@@ -577,7 +577,7 @@ MusicPlayer.engine = (function()
 				var albums = $("#albums");
 				albums.css('webkitFilter', 'blur(10px)');
 			}, 
-			700);
+			2000);
 
 		if (callback)
 			callback();
