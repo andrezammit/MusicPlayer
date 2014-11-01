@@ -322,7 +322,7 @@ MusicPlayer.engine = (function()
 		getAlbumTracks(_resumeData.artist, _resumeData.album,
 			function(data)
 			{
-				_showingAlbumEntry = getAlbumEntry(_resumeData.artist, _resumeData.album, _resumeData.year)
+				_currentAlbumEntry = getAlbumEntry(_resumeData.artist, _resumeData.album, _resumeData.year)
 
 				processAlbumTracks(data, false,
 					function()
@@ -674,7 +674,8 @@ MusicPlayer.engine = (function()
 				var newAlbumElement = newAlbum.getElement();
 				albumContainer.append(newAlbumElement);
 
-				if (_resumeData.artist == album.albumArtist && _resumeData.album == album.album)
+				if (!getAudioElement().paused &&
+					_resumeData.artist == album.albumArtist && _resumeData.album == album.album)
 				{
 					if (_albumViewOpen)
 						_showingAlbumEntry = newAlbumElement;
