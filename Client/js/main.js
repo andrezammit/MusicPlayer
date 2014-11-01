@@ -49,6 +49,8 @@ MusicPlayer.engine = (function()
 		if (reply.error)
 		{
 			alert(reply.error);
+			clearResumeData();
+
 			return;
 		}
 
@@ -99,6 +101,9 @@ MusicPlayer.engine = (function()
 			setTop: 0,
 		});
 
+		resizeAlbumContainer()
+		closeTracks();
+		
 		startGettingAlbums();
         setupHandlers();
 
@@ -269,6 +274,14 @@ MusicPlayer.engine = (function()
 		_resumeData.wasPlaying = null;
 		_resumeData.trackTime = null;
 		_resumeData.volume = null;
+
+		cookieHelpers.setCookie('lastAlbum', null);
+		cookieHelpers.setCookie('lastArtist', null);
+		cookieHelpers.setCookie('lastYear', null);
+	 	cookieHelpers.setCookie('lastSongID', null);
+		cookieHelpers.setCookie('wasPlaying', null);
+		cookieHelpers.setCookie('lastTime', null);
+		cookieHelpers.setCookie('lastVolume', null);
 	}
 
 	function resumePlayback()
@@ -726,7 +739,7 @@ MusicPlayer.engine = (function()
 		albumView.css('bottom', 'calc(-100% + 80px)');
 
 		$("body").mCustomScrollbar('update');
-		$("#addMusic").toggleClass('hidden');
+		$("#addMusic").removeClass('hidden');
 
 		_albumViewOpen = false;
 		_showingAlbumEntry = null;

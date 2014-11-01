@@ -15,7 +15,10 @@ MusicPlayer.cookieHelpers = (function()
 
 	function getCookie(name) 
 	{
-		return localStorage.getItem(name);
+		var value = localStorage.getItem(name);
+
+		if (value == 'null')
+			return null;
 
 	    // var tmpName = name + '=';
 	    // var data = document.cookie.split(';');
