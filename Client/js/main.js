@@ -170,6 +170,12 @@ MusicPlayer.engine = (function()
 				menus.showAddMenu($(this));
 			});
 
+		$("#power").click(
+			function()
+			{
+				close();
+			});
+
 		$(".menuBarBtn").bind('menuOpened', 
 			function()
 			{
