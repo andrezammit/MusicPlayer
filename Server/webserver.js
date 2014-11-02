@@ -4,6 +4,12 @@ var http = require('http');
 var path = require('path');
 var qs = require('querystring');
 
+var connect = require('connect');
+var compression = require('compression');
+
+var app = connect();
+app.use(compression());
+
 extensions = 
 {
     ".html" : "text/html",
@@ -105,18 +111,18 @@ function getHTML(request, callback)
 	processOtherRequest(request, callback);
 }
 
-function processRequest(request, response)
-{
+app.use(
+	function(request, response)
+	{
     	console.log(request.url);
 
     	getHTML(request,
     		function (data, mimeType)
     		{
-    			response.writeHead(200, {'Content-Type' : mimeType, 'Content-Length' : data.length });
     			response.write(data);  
     			response.end();		
     		});
-}
+	});
 
 function returnDefaultArtwork(callback)
 {
@@ -145,4 +151,4 @@ function getDataFromURL(url)
 	return url.substr(pos + 1)
 }
 
-http.createServer(processRequest).listen(3000, '0.0.0.0');
+http.createServer(app).listen(3000, '0.0.0.0');
