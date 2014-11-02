@@ -5,20 +5,22 @@ var tagWriter = require('./tagWriter');
 var fileSystem = require('./fileSystem');
 
 var _wsServer = new ws({ port: 3001 });
-var _webSock = null;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Websocket message handlers
 
 function onWSConnection(webSock)
 {
-	_webSock = webSock;
-
 	console.log('New web socket connection.');
-	_webSock.on('message', onWSMessage);
+	
+	webSock.on('message', 
+		function(message)
+		{
+			onWSMessage(webSock, message);
+		});
 }
 
-function onWSMessage(message)
+function onWSMessage(socket, message)
 {
 	var query = JSON.parse(message);
 	console.log(query.command);
@@ -28,87 +30,86 @@ function onWSMessage(message)
 	switch (query.command)
 	{
 	case 'getTags':
-		onGetTags(queryData);
+		onGetTags(socket, queryData);
 		break;
 
 	case 'getTagCount':
-		onGetTagCount(queryData);
+		onGetTagCount(socket, queryData);
 		break;
 
 	case 'getAlbumCount':
-		onGetAlbumCount(queryData);
+		onGetAlbumCount(socket, queryData);
 		break;
 
 	case 'getAlbums':
-		onGetAlbums(queryData);
+		onGetAlbums(socket, queryData);
 		break;
 
 	case 'getTracks':
-		onGetTracks(queryData);
+		onGetTracks(socket, queryData);
 		break;
 
 	case 'getSongInfo':
-		onGetSongInfo(queryData);
+		onGetSongInfo(socket, queryData);
 		break;
 
 	case 'updateSongInfo':
-		onUpdateSongInfo(queryData);
+		onUpdateSongInfo(socket, queryData);
 		break;
 
 	case 'getFileListing':
-		onGetFileListing(queryData);
+		onGetFileListing(socket, queryData);
 		break;
 
 	case 'addFiles':
-		onAddFiles(queryData);
+		onAddFiles(socket, queryData);
 		break;
 
 	case 'addFolders':
-		onAddFolders(queryData);
+		onAddFolders(socket, queryData);
 		break;
 
 	case 'deleteSong':
-		onDeleteSong(queryData);
+		onDeleteSong(socket, queryData);
 		break;
 
 	case 'getAlbumInfo':
-		onGetAlbumInfo(queryData);
+		onGetAlbumInfo(socket, queryData);
 		break;
 
 	case 'updateAlbumInfo':
-		onUpdateAlbumInfo(queryData);
+		onUpdateAlbumInfo(socket, queryData);
 		break;
 
 	case 'deleteAlbum':
-		onDeleteAlbum(queryData);
+		onDeleteAlbum(socket, queryData);
 		break;
 	}
 }
 
 function onWSClose(code, message)
 {
-	_webSock = null;
 	console.log('Connection closed. Message: ' + message + ' Code: ' + code);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Websocket Helpers
 
-function sendError(command, error)
+function sendError(socket, command, error)
 {
-	return sendReply(command, null, error);
+	return sendReply(socket, command, null, error);
 }
 
-function sendReply(command, data, error)
+function sendReply(socket, command, data, error)
 {
 	var reply = { command: command, data: data, error: error };
-	_webSock.send(JSON.stringify(reply));
+	socket.send(JSON.stringify(reply));
 }
 
-function sendProgress(current, total, action, status)
+function sendProgress(socket, current, total, action, status)
 {
 	var reply = { command: 'progress', data: { current: current, total: total, action: action, status: status } };
-	_webSock.send(JSON.stringify(reply));
+	socket.send(JSON.stringify(reply));
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -116,43 +117,43 @@ function sendProgress(current, total, action, status)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Client Message Handlers
 
-function onGetTags(queryData)
+function onGetTags(socket, queryData)
 {
 	database.getTags(queryData.offset, queryData.tagsToGet, 
 		function(docs)
 		{
 			if (!docs || docs.length == 0)
 			{
-				sendError('getTagsReply', 'No songs found.');
+				sendError(socket, 'getTagsReply', 'No songs found.');
 				return;
 			}
 
 			var replyData = { tagCount: docs.length, tagData: docs };
-			sendReply('getTagsReply', replyData);
+			sendReply(socket, 'getTagsReply', replyData);
 		});
 }
 
-function onGetTagCount(queryData)
+function onGetTagCount(socket, queryData)
 {
 	database.getTagCount(
 		function(count)
 		{
 			var replyData = { tagCount: count };
-			sendReply('getTagCountReply', replyData);
+			sendReply(socket, 'getTagCountReply', replyData);
 		});
 }
 
-function onGetAlbumCount(queryData)
+function onGetAlbumCount(socket, queryData)
 {
 	database.getAlbumCount(
 		function(count)
 		{
 			var replyData = { albumCount: count };
-			sendReply('getAlbumCountReply', replyData);
+			sendReply(socket, 'getAlbumCountReply', replyData);
 		});
 }
 
-function onGetAlbums(queryData)
+function onGetAlbums(socket, queryData)
 {
 	database.getAlbums(queryData.offset, queryData.albumsToGet, 
 		function(docs)
@@ -160,7 +161,7 @@ function onGetAlbums(queryData)
 			if (!docs || docs.length == 0)
 			{
 				var replyData = { albumCount: 0 };
-				sendReply('getAlbumsReply', replyData);
+				sendReply(socket, 'getAlbumsReply', replyData);
 
 				return;
 			}
@@ -170,19 +171,19 @@ function onGetAlbums(queryData)
 			function sendGetAlbumsReply()
 			{
 				var replyData = { albumCount: docs.length, albumData: docs };
-				sendReply('getAlbumsReply', replyData);
+				sendReply(socket, 'getAlbumsReply', replyData);
 			}
 		});
 }
 
-function onGetTracks(queryData)
+function onGetTracks(socket, queryData)
 {
 	database.getAlbumTracks(queryData.artist, queryData.album, 
 		function(docs)
 		{
 			if (!docs || docs.length == 0)
 			{
-				sendError('getTracksReply', 'No tracks found for album ' + queryData.artist + ' - ' + queryData.album + '.');
+				sendError(socket, 'getTracksReply', 'No tracks found for album ' + queryData.artist + ' - ' + queryData.album + '.');
 				return;
 			}
 
@@ -191,7 +192,7 @@ function onGetTracks(queryData)
 				{
 					if (!tag)
 					{
-						sendError('getTracksReply', 'Failed to get track information for ' + queryData.artist + ' - ' + queryData.album + '.');
+						sendError(socket, 'getTracksReply', 'Failed to get track information for ' + queryData.artist + ' - ' + queryData.album + '.');
 						return;
 					}
 
@@ -199,19 +200,19 @@ function onGetTracks(queryData)
 						tag.artwork.buffer = bufferToBinary(tag.artwork.buffer);
 
 					var replyData = { artist: queryData.artist, album: queryData.album, trackList: docs, artwork: tag.artwork };
-					sendReply('getTracksReply', replyData);
+					sendReply(socket, 'getTracksReply', replyData);
 				});
 		});
 }
 
-function onGetSongInfo(queryData)
+function onGetSongInfo(socket, queryData)
 {
 	database.getFileFromID(queryData.id, 
 		function(filePath)
 		{
 			if (!filePath)
 			{
-				sendError('getSongInfoReply', 'Failed to get song path from ID.');
+				sendError(socket, 'getSongInfoReply', 'Failed to get song path from ID.');
 				return;
 			}
 
@@ -220,7 +221,7 @@ function onGetSongInfo(queryData)
 				{
 					if (!tag)
 					{
-						sendError('getSongInfoReply', 'Failed to get track information for ID: ' + queryData.id + '.');
+						sendError(socket, 'getSongInfoReply', 'Failed to get track information for ID: ' + queryData.id + '.');
 						return;
 					}
 
@@ -228,81 +229,81 @@ function onGetSongInfo(queryData)
 						tag.artwork.buffer = bufferToBinary(tag.artwork.buffer);
 
 					var replyData = { songInfo: tag };
-					sendReply('getSongInfoReply', replyData);
+					sendReply(socket, 'getSongInfoReply', replyData);
 				});
 		});
 }
 
-function onUpdateSongInfo(queryData)
+function onUpdateSongInfo(socket, queryData)
 {
 	updateSongInfo(queryData.id, queryData.tag, 
 		function(error)
 		{
 			if (error)
 			{
-				sendError('updateSongInfoReply', 'Failed to update song ID: ' + queryData.id + '.');
+				sendError(socket, 'updateSongInfoReply', 'Failed to update song ID: ' + queryData.id + '.');
 				return;
 			}
 
 			var replyData = { };
-			sendReply('updateSongInfoReply', replyData);
+			sendReply(socket, 'updateSongInfoReply', replyData);
 		});
 }
 
-function onGetFileListing(queryData)
+function onGetFileListing(socket, queryData)
 {
 	fileSystem.getFolderContents(queryData.path, queryData.filter, queryData.showFiles, 
 		function(error, path, fileList)
 		{
 			if (error)
 			{
-				sendError('getFileListingReply', 'Failed to get file listing for ' + queryData.path);
+				sendError(socket, 'getFileListingReply', 'Failed to get file listing for ' + queryData.path);
 				return;
 			}
 
 			var replyData = { path: path, fileList: fileList };
-			sendReply('getFileListingReply', replyData);
+			sendReply(socket, 'getFileListingReply', replyData);
 		});	
 }
 
-function onAddFiles(queryData)
+function onAddFiles(socket, queryData)
 {	
 	addFiles(queryData.itemList,
 		function()
 		{
 			var replyData = { savedFiles: queryData.itemList.length };
-			sendReply('addFilesReply', replyData);
+			sendReply(socket, 'addFilesReply', replyData);
 		});
 }
 
-function onAddFolders(queryData)
+function onAddFolders(socket, queryData)
 {
 	addFolders(queryData.itemList,
 		function()
 		{
 			var replyData = { savedFolders: queryData.itemList.length };
-			sendReply('addFoldersReply', replyData);
+			sendReply(socket, 'addFoldersReply', replyData);
 		});
 }
 
-function onDeleteSong(queryData)
+function onDeleteSong(socket, queryData)
 {
 	database.deleteTag(queryData.id,
 		function()
 		{
 			var replyData = { };
-			sendReply('deleteSongReply', replyData);
+			sendReply(socket, 'deleteSongReply', replyData);
 		});
 }
 
-function onGetAlbumInfo(queryData)
+function onGetAlbumInfo(socket, queryData)
 {
 	database.getAlbumTracks(queryData.artist, queryData.album, 
 		function(docs)
 		{
 			if (!docs || docs.length == 0)
 			{
-				sendError('getAlbumInfoReply', 'No tracks found for album ' + queryData.artist + ' - ' + queryData.album + '.');
+				sendError(socket, 'getAlbumInfoReply', 'No tracks found for album ' + queryData.artist + ' - ' + queryData.album + '.');
 				return;
 			}
 
@@ -326,21 +327,21 @@ function onGetAlbumInfo(queryData)
 							var commonTag = getCommonTag(tagList, artwork);
 
 							var replyData = { commonTag: commonTag };
-							sendReply('getAlbumInfoReply', replyData);
+							sendReply(socket, 'getAlbumInfoReply', replyData);
 						}
 					});
 			}
 		});
 }
 
-function onUpdateAlbumInfo(queryData)
+function onUpdateAlbumInfo(socket, queryData)
 {
 	database.getAlbumTracks(queryData.artist, queryData.album, 
 		function(docs)
 		{
 			if (!docs || docs.length == 0)
 			{
-				sendError('updateAlbumInfoReply', 'No tracks found for album ' + queryData.artist + ' - ' + queryData.album + '.');
+				sendError(socket, 'updateAlbumInfoReply', 'No tracks found for album ' + queryData.artist + ' - ' + queryData.album + '.');
 				return;
 			}
 
@@ -349,12 +350,12 @@ function onUpdateAlbumInfo(queryData)
 			function updateSongInfoDone(fileDone)
 			{
 				songsDone++;
-				sendProgress(songsDone, docs.length, 'Updating Album', fileDone)
+				sendProgress(socket, songsDone, docs.length, 'Updating Album', fileDone)
 
 				if (songsDone == docs.length)
 				{
 					var replyData = { };
-					sendReply('updateAlbumInfoReply', replyData);
+					sendReply(socket, 'updateAlbumInfoReply', replyData);
 				}
 				else
 				{
@@ -366,13 +367,13 @@ function onUpdateAlbumInfo(queryData)
 		});
 }
 
-function onDeleteAlbum(queryData)
+function onDeleteAlbum(socket, queryData)
 {
 	database.deleteAlbum(queryData.artist, queryData.album,
 		function()
 		{
 			var replyData = { };
-			sendReply('deleteAlbumReply', replyData);
+			sendReply(socket, 'deleteAlbumReply', replyData);
 		});
 }
 
