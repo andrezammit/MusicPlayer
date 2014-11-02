@@ -49,6 +49,7 @@
 			knob.on('mousewheel DOMMouseScroll', 
 				function(event)
 				{
+					event.stopPropagation();
 					turnKnob(lastDeg + (event.deltaY * 10));
 				});
 
