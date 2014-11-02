@@ -103,13 +103,29 @@ function sendError(socket, command, error)
 function sendReply(socket, command, data, error)
 {
 	var reply = { command: command, data: data, error: error };
-	socket.send(JSON.stringify(reply));
+
+	try
+	{
+		socket.send(JSON.stringify(reply));
+	}
+	catch (ex)
+	{
+		console.log(ex);
+	}
 }
 
 function sendProgress(socket, current, total, action, status)
 {
 	var reply = { command: 'progress', data: { current: current, total: total, action: action, status: status } };
-	socket.send(JSON.stringify(reply));
+	
+	try
+	{
+		socket.send(JSON.stringify(reply));
+	}
+	catch (ex)
+	{
+		console.log(ex);
+	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
