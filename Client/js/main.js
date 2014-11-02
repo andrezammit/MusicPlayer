@@ -226,42 +226,57 @@ MusicPlayer.engine = (function()
 			setCookie('lastVolume', value);
 		}
 
- 		$(".knob").knob(
- 		{
- 			release: onVolumeChange,
-            change: onVolumeChange,
+		$("#volumeContainer").knobKnob(
+		{
+		    snap : 10,
+		    value: 360 * getCookie('lastVolume'),
+		    turn : function(ratio)
+		    {
+		    	console.log('Volume: ' + ratio);
+
+		    	var audioElement = getAudioElement();
+		    	audioElement.volume = ratio;
+
+				setCookie('lastVolume', ratio);
+		    }
+		});
+
+ 		// $(".knob").knob(
+ 		// {
+ 		// 	release: onVolumeChange,
+   //          change: onVolumeChange,
           
-            draw: function () 
-            {
-				var img = $("#volumeKnobImg")[0];
+   //          draw: function () 
+   //          {
+			// 	var img = $("#volumeKnobImg")[0];
 
-				this.g.save();
+			// 	this.g.save();
 
-				this.g.translate(this.w / 2, this.h / 2);
+			// 	this.g.translate(this.w / 2, this.h / 2);
 		
-				this.g.rotate(-125 * Math.PI / 180);
-				this.g.rotate(this.cv * Math.PI / 72);
+			// 	this.g.rotate(-125 * Math.PI / 180);
+			// 	this.g.rotate(this.cv * Math.PI / 72);
 
-				this.g.drawImage(img, -img.width / 2, -img.height / 2);
+			// 	this.g.drawImage(img, -img.width / 2, -img.height / 2);
 
-				this.g.restore();
+			// 	this.g.restore();
 
-                this.cursorExt = 0.3;
+   //              this.cursorExt = 0.3;
 
-                var a = this.arc(this.cv)  // Arc
-                    , pa                   // Previous arc
-                    , r = 1;
+   //              var a = this.arc(this.cv)  // Arc
+   //                  , pa                   // Previous arc
+   //                  , r = 1;
 
-                this.g.lineWidth = this.lineWidth;
+   //              this.g.lineWidth = this.lineWidth;
 
-                this.g.beginPath();
-                this.g.strokeStyle = r ? this.o.fgColor : this.fgColor ;
-                this.g.arc(this.xy, this.xy, this.radius - this.lineWidth + 1 + this.lineWidth * 2 / 3, a.s, a.e, a.d);
-                this.g.stroke();
+   //              this.g.beginPath();
+   //              this.g.strokeStyle = r ? this.o.fgColor : this.fgColor ;
+   //              this.g.arc(this.xy, this.xy, this.radius - this.lineWidth + 1 + this.lineWidth * 2 / 3, a.s, a.e, a.d);
+   //              this.g.stroke();
 
-                return false;
-            }
-        });
+   //              return false;
+   //          }
+   //      });
 	}
 
 	function resizeDialogs()

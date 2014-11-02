@@ -680,7 +680,10 @@ a:hover
 	position: absolute;
 
 	right: 1%;
-	width: 80px; 
+	
+	height: 70px; 
+	width: 70px; 
+	
 	margin-top: 8px;
 }
 
@@ -1208,7 +1211,6 @@ input:hover
 {
 	background-color: lightgray;
 }
-
 
 #addMusicImg
 {
