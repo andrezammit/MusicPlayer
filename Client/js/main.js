@@ -199,11 +199,14 @@ MusicPlayer.engine = (function()
 		$("#songInfo").click(
 			function()
 			{
-				getAlbumTracks(_resumeData.lastArtist, _resumeData.lastAlbum,
+				var artist = _currentAlbumEntry.data('artist');
+				var album = _currentAlbumEntry.data('album');
+
+				getAlbumTracks(artist, album,
 					function(data)
 					{
 						_showingAlbumEntry = _currentAlbumEntry;
-						showAlbumTracks();
+						processAlbumTracks(data, true);
 					});
 			});
 
@@ -358,7 +361,7 @@ MusicPlayer.engine = (function()
 			}
 
 			var albumsRemaning = _albumCount - _albumOffset;
-			var albumsToGet = Math.min(20, albumsRemaning);
+			var albumsToGet = Math.min(200, albumsRemaning);
 
 			var queryData = { offset: _albumOffset, albumsToGet: albumsToGet };
 			connect.sendQuery('getAlbums', queryData);
