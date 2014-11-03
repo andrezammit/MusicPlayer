@@ -37,10 +37,10 @@ function getFileList(dir, callback)
             function(error, stats)
             {
                 if (!stats || error)
-		{
-		    console.log('Failed to get file info for: ' + fullPath);
-                    return;
-		}
+        		{
+        		    console.log('Failed to get file info for: ' + fullPath);
+                            return;
+        		}
 
                 if (stats.isDirectory())
                 {
@@ -66,11 +66,11 @@ function getFileList(dir, callback)
     fs.readdir(dir, 
         function(error, fileList)
         {
-	    if (fileList.length == 0)
-	    {
-		callback(fullFileList);
-	  	return;
-	    }
+    	    if (fileList.length == 0)
+    	    {
+        		callback(fullFileList);
+        	  	return;
+    	    }
 
             for (var cnt = 0; cnt < fileList.length; cnt++)
                 addFile(fileList, cnt);
