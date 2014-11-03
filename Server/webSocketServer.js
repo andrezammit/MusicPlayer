@@ -294,7 +294,7 @@ function onAddFiles(socket, queryData)
 
 function onAddFolders(socket, queryData)
 {
-	addFolders(queryData.itemList,
+	addFolders(socket, queryData.itemList,
 		function()
 		{
 			var replyData = { savedFolders: queryData.itemList.length };
@@ -457,7 +457,7 @@ function addFiles(fileList, callback)
 	}
 }
 
-function addFolders(folderList, callback)
+function addFolders(socket, folderList, callback)
 {
 	var fileList = [];
 	var foldersDone = 0;
@@ -483,7 +483,7 @@ function addFolders(folderList, callback)
 
 	function extractTagProgress(current, total, status)
 	{
-		sendProgress(current, total, 'Add Folder', status);
+		sendProgress(socket, current, total, 'Add Folder', status);
 	}
 
 	function extractTagsDone(tagList)

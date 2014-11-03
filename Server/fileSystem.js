@@ -25,7 +25,7 @@ function getFileList(dir, callback)
         filesDone++;
         
         if (filesDone == fileList.length)
-            callback(fullFileList);        
+	   callback(fullFileList);        
     }
 
     function addFile(fileList, index)
@@ -36,8 +36,11 @@ function getFileList(dir, callback)
         fs.stat(fullPath,
             function(error, stats)
             {
-                if (!stats)
+                if (!stats || error)
+		{
+		    console.log('Failed to get file info for: ' + fullPath);
                     return;
+		}
 
                 if (stats.isDirectory())
                 {
@@ -63,6 +66,12 @@ function getFileList(dir, callback)
     fs.readdir(dir, 
         function(error, fileList)
         {
+	    if (fileList.length == 0)
+	    {
+		callback(fullFileList);
+	  	return;
+	    }
+
             for (var cnt = 0; cnt < fileList.length; cnt++)
                 addFile(fileList, cnt);
         });
@@ -82,10 +91,13 @@ function extractTags(fileList, progressCallback, callback)
     {
         filesDone++;
 
-        tagList.push(tag);
+	if (tag != null)
+	{
+		tagList.push(tag);
 
-        if (progressCallback)
-            progressCallback(filesDone, fileList.length, tag.path);
+	        if (progressCallback)
+        	    progressCallback(filesDone, fileList.length, tag.path);
+	}
 
         if (filesDone == listSize)
         {
@@ -121,10 +133,7 @@ function getTag(fullPath, callback)
         function(error, tag)
         {
             if (error)
-            {
-                console.log(error);
-                return;
-            }
+                console.log('Error: ' + fullPath + ' - ' + error.msg);
 
             callback(tag);
         });
