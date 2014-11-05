@@ -1,6 +1,8 @@
 var fs = require('fs');
 var dbEngine = require('tingodb')();
 
+var fileSystem = require('./fileSystem');
+
 var db;
 var collection;
 
@@ -17,7 +19,7 @@ function cacheArtwork(tag, callback)
     artworkFile = artworkFile.replace(/[^\w\s]/gi, '');
     artworkFile = encodeURI(artworkFile);
 
-    var artworkPath = 'artwork\\' + artworkFile + '.jpg';
+    var artworkPath = fileSystem.getArtworkFolder() + artworkFile + '.jpg';
     
     fs.writeFile(artworkPath, tag.artworkSmall.buffer, { encoding: 'binary' },
         function(error)
@@ -58,7 +60,7 @@ function clearArtworkIfOnlyReference(id, callback)
             var albumArtist = docs[0].albumArtist;
             var album = docs[0].album;
 
-            var artworkPath = 'artwork\\' + albumArtist + '_' + album;
+            var artworkPath = fileSystem.getArtworkFolder() + albumArtist + '_' + album;
 
             collection.find({ albumArtist: albumArtist, album: album }).count(
                 function(error, count)
@@ -130,13 +132,13 @@ function openCollections()
 
 function setupDatabase(callback)
 {
-    db = new dbEngine.Db('', {});
+    db = new dbEngine.Db(fileSystem.getDatabaseFolder(), {});
     openCollections();
 
     db.close(
         function()
         {
-            db = new dbEngine.Db('', {});
+            db = new dbEngine.Db(fileSystem.getDatabaseFolder(), {});
             openCollections();
 
             if (callback)
@@ -319,7 +321,7 @@ function deleteAlbum(artist, album, callback)
             artworkFile = artworkFile.replace(/[^\w\s]/gi, '');
             artworkFile = encodeURI(artworkFile);
 
-            var artworkPath = 'artwork\\' + artworkFile + '.jpg';
+            var artworkPath = fileSystem.getArtworkFolder() + artworkFile + '.jpg';
             fs.unlink(artworkPath);
 
             callback();

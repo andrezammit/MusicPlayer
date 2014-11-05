@@ -39,7 +39,7 @@ function getFileList(dir, callback)
                 if (!stats || error)
         		{
         		    console.log('Failed to get file info for: ' + fullPath);
-                            return;
+                    return;
         		}
 
                 if (stats.isDirectory())
@@ -240,7 +240,31 @@ function getFolderContents(folder, filter, showFiles, callback)
         });
 }
 
+function getArtworkFolder()
+{
+    var userDir = "";
+
+    if (process.argv.length > 2)
+        userDir = process.argv[2] + '\\';
+
+    var artworkDir = userDir + 'artwork\\';
+    return artworkDir;
+}
+
+function getDatabaseFolder()
+{
+     var userDir = "";
+
+    if (process.argv.length > 2)
+        userDir = process.argv[2] + '\\';
+
+    var databaseDir = userDir + 'database\\';
+    return databaseDir;
+}
+
 module.exports.scan = scan;
 module.exports.extractTags = extractTags;
 module.exports.getFileList = getFileList;
+module.exports.getArtworkFolder = getArtworkFolder;
 module.exports.getFolderContents = getFolderContents;
+module.exports.getDatabaseFolder = getDatabaseFolder;

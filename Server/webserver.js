@@ -3,9 +3,10 @@ var url = require('url');
 var http = require('http');
 var path = require('path');
 var qs = require('querystring');
-
 var connect = require('connect');
 var compression = require('compression');
+
+var fileSystem = require('./fileSystem');
 
 var app = connect();
 app.use(compression());
@@ -41,7 +42,7 @@ function processFileRequest(request, callback)
 		return;
 	}
 
-	var fullPath = '../Client' + requestPath;
+	var fullPath = 'Client' + requestPath;
 
 	fs.readFile(fullPath, 
 		function (error, data) 
@@ -59,7 +60,7 @@ function processFileRequest(request, callback)
 function processArtworkRequest(request, callback)
 {
 	var album = getDataFromURL(request.url);
-	var artworkFile = 'artwork\\' + album + '.jpg';
+	var artworkFile = fileSystem.getArtworkFolder() + album + '.jpg';
 
 	fs.readFile(artworkFile, 
 		function (error, data) 
@@ -126,7 +127,7 @@ app.use(
 
 function returnDefaultArtwork(callback)
 {
-	var artworkPath = '../Client/images/defaultArtwork.png';
+	var artworkPath = 'Client/images/defaultArtwork.png';
 
 	fs.readFile(artworkPath, 
 		function (error, data) 
