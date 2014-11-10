@@ -29,11 +29,9 @@ function createDir(path)
     var artworkDir = fileSystem.getArtworkFolder();
     var databaseDir = fileSystem.getDatabaseFolder();
 
-    console.log('Artwork:' + artworkDir);
-    console.log('Database' + databaseDir);
+    console.log('Artwork: ' + artworkDir);
+    console.log('Database: ' + databaseDir);
 
     createDir(artworkDir);
     createDir(databaseDir);
-
-    open('http://localhost:3000/');
 })();
