@@ -180,7 +180,7 @@ MusicPlayer.engine = (function()
 
 		$("#power").click(
 			function()
-			{
+			{				
 				close();
 			});
 

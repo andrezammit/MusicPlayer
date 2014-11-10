@@ -57,8 +57,6 @@
 			
 				e.preventDefault();
 			
-				knobTop.addClass('noTransition');
-
 				var offset = knob.offset();
 				var center = {
 					y : offset.top + knob.height()/2,
@@ -126,8 +124,6 @@
 					
 					// Marking the starting degree as invalid
 					startDeg = -1;
-
-					knobTop.removeClass('noTransition');
 				});
 			
 			});

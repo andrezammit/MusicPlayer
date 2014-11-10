@@ -19,13 +19,6 @@
 	background-size: 60px 60px;
 	z-index:10;
 	cursor: hand;
-
-	transition: transform 200ms;
-}
-
-.knob .top.noTransition
-{
-	transition: transform 0ms;
 }
 
 .knob .base{
