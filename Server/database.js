@@ -28,21 +28,48 @@ function cacheArtwork(tag, callback)
         });
 }
 
+function isTagAlreadyThere(tag, callback)
+{
+    collection.find({ path: tag.path }, {}).toArray(
+        function(error, docs)
+        {
+            if (!docs)
+            {
+                callback(false);
+                return;
+            }
+
+            callback(docs.length != 0);
+        });
+}
+
 function saveTag(tag, callback)
 {
-    var tmpArtist = tag.albumArtist || tag.artist;
-
-    console.log('Saving: ' + tmpArtist + ' - ' + tag.song + ' - ' + tag.album + ' - ' + tag.track + ' - ' + tag.time + ' - ' + tag.year);
-
-    var doc = { artist: tag.artist, albumArtist: tag.albumArtist, song: tag.song, album: tag.album, track: parseInt(tag.track), time: tag.time, year: parseInt(tag.year), path: tag.path };
-
-    collection.insert(doc, { w: 1 }, 
-        function(error, result) 
+    isTagAlreadyThere(tag,
+        function(alreadyThere)
         {
-            if (error)
-                console.log(error);
+            if (alreadyThere)
+            {
+                console.log(tag.path + ' was already saved.');
 
-            callback();
+                callback();
+                return;
+            }
+
+            var tmpArtist = tag.albumArtist || tag.artist;
+
+            console.log('Saving: ' + tmpArtist + ' - ' + tag.song + ' - ' + tag.album + ' - ' + tag.track + ' - ' + tag.time + ' - ' + tag.year);
+
+            var doc = { artist: tag.artist, albumArtist: tag.albumArtist, song: tag.song, album: tag.album, track: parseInt(tag.track), time: tag.time, year: parseInt(tag.year), path: tag.path };
+
+            collection.insert(doc, { w: 1 }, 
+                function(error, result) 
+                {
+                    if (error)
+                        console.log(error);
+
+                    callback();
+                });
         });
 }
 
