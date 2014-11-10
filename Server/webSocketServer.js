@@ -438,6 +438,8 @@ function bufferToBinary(buffer)
 
 function addFiles(fileList, callback)
 {
+	tagParser.clearImagesArray();
+	
 	var filesDone = 0;
 
 	for (var cnt = 0; cnt < fileList.length; cnt++)
@@ -459,6 +461,8 @@ function addFiles(fileList, callback)
 
 function addFolders(socket, folderList, callback)
 {
+	tagParser.clearImagesArray();
+
 	var fileList = [];
 	var foldersDone = 0;
 

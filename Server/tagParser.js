@@ -583,14 +583,14 @@ function TagParser(includeArtwork, artworkThumb, checkArtworkCache, normalizeArt
 		var artworkFile = _tag.albumArtist + '_' + _tag.album;
         artworkFile = encodeURI(artworkFile);
 
-		if (_checkArtworkCache && arrImagesToResize.indexOf(artworkFile) > -1)
+		if (_checkArtworkCache && _arrImagesToResize.indexOf(artworkFile) > -1)
 		{
 			callback();
 			return;
 		}
 
 		console.log('Resizing artwork for: ' + _tag.path);
-		arrImagesToResize.push(artworkFile);
+		_arrImagesToResize.push(artworkFile);
 
 		var jpgBuffer = new images(_tag.artwork.buffer).encode('jpg');
 
@@ -633,11 +633,16 @@ function TagParser(includeArtwork, artworkThumb, checkArtworkCache, normalizeArt
 	}
 }
 
-var arrImagesToResize = [];
+var _arrImagesToResize = [];
+
+function clearImagesArray()
+{
+	_arrImagesToResize.length = 0;
+}
 
 function dumpImagesArray()
 {
-	arrImagesToResize.forEach(
+	_arrImagesToResize.forEach(
 		function(item)
 		{
 			console.log(item);
@@ -646,3 +651,4 @@ function dumpImagesArray()
 
 module.exports = TagParser;
 module.exports.dumpImagesArray = dumpImagesArray;
+module.exports.clearImagesArray = clearImagesArray;
