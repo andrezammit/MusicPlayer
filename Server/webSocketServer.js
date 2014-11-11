@@ -253,7 +253,7 @@ function onGetSongInfo(socket, queryData)
 function onUpdateSongInfo(socket, queryData)
 {
 	updateSongInfo(queryData.id, queryData.tag, 
-		function(error)
+		function(filePath, error)
 		{
 			if (error)
 			{
@@ -363,7 +363,7 @@ function onUpdateAlbumInfo(socket, queryData)
 
 			var songsDone = 0;
 
-			function updateSongInfoDone(fileDone)
+			function updateSongInfoDone(fileDone, error)
 			{
 				songsDone++;
 				sendProgress(socket, songsDone, docs.length, 'Updating Album', fileDone)
@@ -439,7 +439,7 @@ function bufferToBinary(buffer)
 function addFiles(fileList, callback)
 {
 	tagParser.clearImagesArray();
-	
+
 	var filesDone = 0;
 
 	for (var cnt = 0; cnt < fileList.length; cnt++)
