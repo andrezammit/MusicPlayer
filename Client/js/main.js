@@ -102,6 +102,8 @@ MusicPlayer.engine = (function()
 			setTop: 0,
 		});
 
+		$("input").attr('maxlength', 255);
+
 		resizeAlbumContainer()
 		closeTracks();
 
@@ -1037,7 +1039,7 @@ MusicPlayer.engine = (function()
 			dialogs.editSong(data.songInfo,
 				function(newTag)
 				{
-					queryData = { tag: newTag };
+					queryData = { id: id, tag: newTag };
 					connect.sendQuery('updateSongInfo', queryData);
 				});
 		}
