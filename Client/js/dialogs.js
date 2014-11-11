@@ -185,9 +185,29 @@ MusicPlayer.dialogs = (function()
 				if (blobURL != newArtwork)
 					newTag.artworkURL = newArtwork;
 
+				if (!validate(newTag))
+					return;
+
 				closeDialog(editSongDlg);
 				callback(newTag);
 			});
+
+		function validate(newTag)
+		{
+			if (newTag.artist != null && newTag.artist.length == 0)
+			{
+				alert("Please enter the artist name.");
+				return false;
+			}
+
+			if (newTag.song != null && newTag.song.length == 0)
+			{
+				alert("Please enter the song name.");
+				return false;
+			}
+
+			return true;
+		}
 
 		showDialog(editSongDlg);
 	}
@@ -300,9 +320,23 @@ MusicPlayer.dialogs = (function()
 				if (blobURL != newArtwork)
 					newTag.artworkURL = newArtwork;
 
+				if (!validate(newTag))
+					return;
+				
 				closeDialog(editAlbumDlg);
 				callback(newTag);
 			});
+
+		function validate(newTag)
+		{
+			if (newTag.artist != null && newTag.artist.length == 0)
+			{
+				alert("Please enter the artist name.");
+				return false;
+			}
+
+			return true;
+		}
 
 		showDialog(editAlbumDlg);
 	}
