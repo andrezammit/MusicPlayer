@@ -14,7 +14,6 @@ function TagWriter()
 	var _oldTagSize;
 
 	var _fullPath;
-
 	var _callback;
 
 	var _newTagBuffer;
@@ -31,17 +30,99 @@ function TagWriter()
 		return false;
 	}
 
+	function getUnicodeStringCount(tag)
+	{
+		var unicodeStrings = 0;
+
+		if (isUnicodeString(tag.artist))
+			unicodeStrings++;
+
+		if (isUnicodeString(tag.album))
+			unicodeStrings++;
+
+		if (isUnicodeString(tag.song))
+			unicodeStrings++;
+
+		if (isUnicodeString(tag.albumArtist))
+			unicodeStrings++;
+
+		if (isUnicodeString(tag.track))
+			unicodeStrings++;
+
+		if (isUnicodeString(tag.year))
+			unicodeStrings++;
+
+		return unicodeStrings;
+	}
+
+	function getUnicodeCharCount(tag)
+	{
+		var unicodeChars = 0;
+
+		if (isUnicodeString(tag.artist))
+			unicodeChars += tag.artist.length;
+
+		if (isUnicodeString(tag.album))
+			unicodeChars += tag.album.length;
+
+		if (isUnicodeString(tag.song))
+			unicodeChars += tag.song.length;
+
+		if (isUnicodeString(tag.albumArtist))
+			unicodeChars += tag.albumArtist.length;
+
+		if (isUnicodeString(tag.track))
+			unicodeChars += tag.track.length;
+
+		if (isUnicodeString(tag.year))
+			unicodeChars += tag.year.length;
+
+		return unicodeChars;
+	}
+
+	function isUnicodeString(string)
+	{
+		if (Buffer.byteLength(string) != string.length)
+			return true;
+
+		return false;
+	}
+
 	function getTagSize(tag)
 	{
-		var tagSize = tag.artist.length + 1 + 
-			tag.album.length + 1 +
-			tag.song.length + 1 + 
-			tag.albumArtist.length + 1 + 
-			tag.track.length + 1 + 
-			tag.year.length + 1 +
-			frameHeaderSize * 5 + 	// Frame headers. 
-			tagHeaderSize +			// Tag header.
-			10;						// Padding.
+		var strings = 6;
+		var tagSize = 0;
+		
+		tagSize += tag.artist.length;
+		tagSize += tag.album.length;
+		tagSize += tag.song.length;
+		tagSize += tag.albumArtist.length;
+		tagSize += tag.track.length;
+		tagSize += tag.year.length;
+
+		// Add encoding bytes.
+		tagSize += 1 * strings;
+
+		// Add frame headers size.
+		tagSize += frameHeaderSize * strings;
+
+		// Add tag header.
+		tagSize += tagHeaderSize;
+
+		// Add space for any Unicode strings.
+		var unicodeStrings = getUnicodeStringCount(tag);
+
+		if (unicodeStrings > 0)
+		{
+			var unicodeChars = getUnicodeCharCount(tag);
+			tagSize += unicodeChars;
+
+			// Add BOM for Unicode strings.
+			tagSize += 2 * unicodeStrings;
+		}
+
+		// Add padding.
+		tagSize += 10;
 
 		if (tag.artwork)
 		{
@@ -61,37 +142,68 @@ function TagWriter()
 		var tagSize = getTagSize(tag);
 		var bufferSize = tagSize;
 
+		bufferSize -= 10;								// Remove padding space.
+
 		if (tag.artwork)
-			bufferSize -= tag.artwork.buffer.length;
+			bufferSize -= tag.artwork.buffer.length;	// Remove artwork space.
 
 		return bufferSize;
 	}
 
 	function writeFrame(buffer, frameID, data)
 	{
-		var frameSize = data.length;
 		var encodedFrame = isEncodedFrame(frameID);
+		var unicodeString = encodedFrame && isUnicodeString(data);
+
+		var frameSize = data.length;
+		var dataSize = frameSize;
+
+		if (unicodeString)
+		{
+			// Add space for 2 bytes per character.
+			frameSize += data.length;
+			dataSize = frameSize;
+
+			// Add space for BOM.
+			frameSize += 2;
+		}
 
 		if (encodedFrame)
 			frameSize++;
 
-		buffer.write(frameID, _bufferOffset);				// Frame ID.
+		buffer.write(frameID, _bufferOffset);						// Frame ID.
 		_bufferOffset += 4;
 
-		buffer.writeUInt32BE(frameSize, _bufferOffset);		// Frame size.
+		buffer.writeUInt32BE(frameSize, _bufferOffset);				// Frame size.
 		_bufferOffset += 4;
 
-		buffer.writeUInt16BE(0, _bufferOffset);				// Flags.
+		buffer.writeUInt16BE(0, _bufferOffset);						// Flags.
 		_bufferOffset += 2;
+
+		var encodingType = 'ascii';
 
 		if (encodedFrame)
 		{
-			buffer.writeUInt8(0, _bufferOffset);			// Encoding byte.
+			var encodingByte = 0;
+
+			if (unicodeString)
+			{
+				encodingByte = 1;
+				encodingType = 'utf16le';
+			}
+
+			buffer.writeUInt8(encodingByte, _bufferOffset);			// Encoding byte.
 			_bufferOffset += 1;
+
+			if (unicodeString)
+			{
+				buffer.writeUInt16BE(65534, _bufferOffset);
+				_bufferOffset += 2;
+			}
 		}
 
-		buffer.write(data, _bufferOffset);					// Data.
-		_bufferOffset += data.length;
+		buffer.write(data, _bufferOffset, dataSize, encodingType);	// Data.
+		_bufferOffset += dataSize;
 	}
 
 	function getArtworkType(mimeType)
@@ -145,6 +257,14 @@ function TagWriter()
 		_bufferOffset += data.buffer.length;
 
 		console.log('Artwork length: ' + data.buffer.length);
+	}
+
+	function writePadding()
+	{
+		var paddingBuffer = new Buffer(10);
+		paddingBuffer.fill(0);
+
+		_newTagBuffer = Buffer.concat([_newTagBuffer, paddingBuffer], _newTagBuffer.length + paddingBuffer.length);	// Padding.
 	}
 
 	function copyMissingTagData()
@@ -213,6 +333,8 @@ function TagWriter()
 
 		if (_newTag.artwork)
 			writeArtworkFrame('PIC', _newTag.artwork);
+
+		writePadding();
 	}
 
 	////////////////////////////////////////////////////////////////////////////
