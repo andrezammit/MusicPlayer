@@ -120,6 +120,7 @@ app.use(
     	getHTML(request,
     		function (data, mimeType)
     		{
+    			response.writeHead(200, { 'Content-Type': mimeType });
     			response.write(data);  
     			response.end();		
     		});
