@@ -245,6 +245,7 @@ MusicPlayer.engine = (function()
 		    	var audioElement = getAudioElement();
 		    	audioElement.volume = ratio;
 
+		    	_currentVolume = ratio;
 				setCookie('lastVolume', ratio);
 		    }
 		});
@@ -411,6 +412,11 @@ MusicPlayer.engine = (function()
 		currentAlbum.removeClass('currentAlbum');
 
 		_playingAlbumEntry = null;
+	}
+
+	function clearTitleBar()
+	{
+		document.title = 'MusicPlayer';
 	}
 
 	function chooseAlbum(event, callback)
@@ -825,7 +831,23 @@ MusicPlayer.engine = (function()
 			setPlayingAlbum();
 		}
 		
+		updateTitleBar();
 		updateControlBarInfo();
+	}
+
+	function updateTitleBar()
+	{
+		getTrackObject(_currentTrackID, 
+			function(trackObject)
+			{
+				var trackInfo = trackObject[2];
+
+				var song = trackInfo.song;
+				var artist = trackInfo.albumArtist;
+
+				var title = 'MusicPlayer - ' + artist + ' - ' + song;
+				document.title = title;
+			});
 	}
 
 	function updateControlBarInfo()
@@ -977,6 +999,7 @@ MusicPlayer.engine = (function()
 		_currentAlbumEntry = null;
 		setCookie('lastTime', 0);
 
+		clearTitleBar();
 		clearPlayingAlbum();
 	}
 
