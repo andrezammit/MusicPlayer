@@ -26,4 +26,6 @@ node_modules
 Settings
 *.db
 *.mp3
-Server/artwork
+artwork
+database
+*.zip

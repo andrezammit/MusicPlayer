@@ -73,7 +73,10 @@ MusicPlayer.engine = (function()
 			{
 				theme: "minimal-dark",
 				setTop: 0,
-				snapAmount: 600,
+				mouseWheel:
+				{
+					scrollAmount: 300,
+				},
 				advanced:
 				{
 					updateOnImageLoad: false,
@@ -234,7 +237,7 @@ MusicPlayer.engine = (function()
 		$("#volumeContainer").knobKnob(
 		{
 		    snap : 10,
-		    value: 360 * getCookie('lastVolume'),
+		    value: 359 * getCookie('lastVolume'),
 		    turn : function(ratio)
 		    {
 		    	console.log('Volume: ' + ratio);
