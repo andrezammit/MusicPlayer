@@ -93,9 +93,13 @@ function clearArtworkIfOnlyReference(id, callback)
                 function(error, count)
                 {
                     if (count <= 1)
-                        fs.unlink(artworkPath);
-
-                    callback();
+                    {
+                        fs.unlink(artworkPath,
+                            function(error)
+                            {
+                                callback();
+                            });
+                    }
                 });
         });
 }
@@ -340,7 +344,7 @@ function getAlbumTracks(albumArtist, album, callback)
 
 function deleteAlbum(artist, album, callback)
 {
-    collection.remove({ artist: artist, album: album }, { w: 1 },
+    collection.remove({ albumArtist: artist, album: album }, { w: 1 },
         function(error, removed)
         {
             var artworkFile = artist + '_' + album;
@@ -349,9 +353,11 @@ function deleteAlbum(artist, album, callback)
             artworkFile = encodeURI(artworkFile);
 
             var artworkPath = fileSystem.getArtworkFolder() + artworkFile + '.jpg';
-            fs.unlink(artworkPath);
-
-            callback();
+            fs.unlink(artworkPath,
+                function (error)
+                {
+                    callback();
+                });
         });
 }
 
