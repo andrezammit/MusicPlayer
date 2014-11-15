@@ -80,7 +80,7 @@ MusicPlayer.engine = (function()
 				advanced:
 				{
 					updateOnImageLoad: false,
-				}
+				},
 			});
 
 		$("#tracksContainer").mCustomScrollbar(
@@ -215,7 +215,7 @@ MusicPlayer.engine = (function()
 					});
 			});
 
-		$(document).keyup(
+		$(document).keydown(
 			function(event)
 			{
 				if (event.which == 27)
@@ -254,7 +254,19 @@ MusicPlayer.engine = (function()
 	function resizeDialogs()
 	{
 		var height = $("#dialogContainer").height();
-		$(".modalContent").css('max-height', height - 175);
+
+		$("#dialogContainer").children().each(
+			function() 
+			{
+				var dialog = $(this);
+				var maxHeight = parseInt(dialog.css('max-height'));
+
+				if (maxHeight == 0)
+					return;
+
+				var newHeight = Math.min(height - 150, maxHeight);
+				dialog.css('height', newHeight);
+			});
 	}
 
 	function getAudioElement()
