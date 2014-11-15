@@ -4,6 +4,15 @@ MusicPlayer.dialogs = (function()
 {
 	function initDialogs()
 	{
+		$(".dialogs").children().keydown(
+			function(event)
+			{
+				if (event.which == 27)
+				{
+					closeDialog($(this));
+				}
+			});
+
 		var closeDialogButtons = $(".dialogs").find(".closeDialog, .cancelBtn");
 		
 		closeDialogButtons.click(
@@ -322,7 +331,7 @@ MusicPlayer.dialogs = (function()
 
 				if (!validate(newTag))
 					return;
-				
+
 				closeDialog(editAlbumDlg);
 				callback(newTag);
 			});
