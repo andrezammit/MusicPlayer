@@ -66,10 +66,7 @@ function processArtworkRequest(request, callback)
 		function (error, data) 
 		{
 			if (error)
-			{
-				returnDefaultArtwork(callback);
-				return;
-			}
+				data = "";
 
 			callback(data, 'image/jpeg');
 		});
@@ -125,23 +122,6 @@ app.use(
     			response.end();		
     		});
 	});
-
-function returnDefaultArtwork(callback)
-{
-	var artworkPath = 'Client/images/defaultArtwork.png';
-
-	fs.readFile(artworkPath, 
-		function (error, data) 
-		{
-			if (error)
-			{
-				callback(getFileNotFoundResponse(artworkPath), "text/html");
-				return;
-			}
-
-			callback(data, 'image/png');
-		});
-}
 
 function getDataFromURL(url)
 {

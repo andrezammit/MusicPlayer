@@ -128,7 +128,7 @@ function AlbumEntry(templateElement)
 					musicPlayer.chooseAlbum(event);
 				});
 
-			_clone.mouseover(
+			_clone.mouseenter(
 				function(event)
 				{
 					musicPlayer.onAlbumHover(event);
@@ -161,6 +161,19 @@ function AlbumEntry(templateElement)
 				function()
 				{
   					albumArtwork.toggleClass('menuOpen');
+				});
+
+			albumArtwork.one('error', 
+				function() 
+				{ 
+					this.src = 'images/defaultArtwork.png';
+
+					albumArtwork.css('opacity', '0.6');
+
+					var altAlbumArtwork = $("<div class='altAlbumArtwork'></div>");
+					altAlbumArtwork.html(_albumArtist + '<br />' + _album);
+
+					_clone.find(".albumArtwork").append(altAlbumArtwork);
 				});
 		})();
 
