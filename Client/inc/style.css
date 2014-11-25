@@ -157,6 +157,8 @@ a:hover
 .albumArtwork:hover,
 .albumArtwork.menuopen
 { 
+	position: absolute;
+
 	z-index: 3;
 
 	width: 210px;
@@ -174,7 +176,6 @@ a:hover
 	height: 200px;
 
 	position: absolute;
-	z-index: 1;
 
 	background: white;
 
@@ -634,6 +635,12 @@ a:hover
 	text-align: left;
 }
 
+.song:hover
+{
+	cursor: hand;
+	text-decoration: underline;
+}
+
 .time
 {
 	right: 30px;
@@ -656,7 +663,7 @@ a:hover
 	transition: background-color 400ms linear;
 }
 
-.menuLink .menuOpen
+.menuLink.menuOpen
 {
 	display: block;
 	background-color: rgb(219, 219, 219);
@@ -1238,11 +1245,12 @@ input:hover
 {
 	position: absolute;
 	overflow: hidden;
-	white-space: nowrap;
 
-	width: 100%;
+	width: calc(100% - 10px);
+
+	padding-left: 10px;
 
 	z-index: 3;
 
-	font-size: 50px;
+	font-size: 33px;
 }

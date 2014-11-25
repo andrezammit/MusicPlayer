@@ -16,11 +16,13 @@ function TrackEntry(templateElement)
 
 	function getElement()
 	{
+		var songName = _clone.find(".song");
+		songName.html(_song);
+
 		_clone.data("artist", _artist);
 		_clone.data("album", _album);
 
 		_clone.find(".track").html(_track);
-		_clone.find(".song").html(_song);
 		_clone.find(".time").html(_time);
 
 		var playLink = _clone.find(".playButtonSmall");
@@ -31,6 +33,12 @@ function TrackEntry(templateElement)
 			var menuOpen = false;
 
 			playLink.click(
+				function()
+				{
+					musicPlayer.playSong(_id);
+				});
+
+			songName.click(
 				function()
 				{
 					musicPlayer.playSong(_id);
@@ -112,11 +120,12 @@ function AlbumEntry(templateElement)
 
 	function getElement()
 	{
-		var albumArtwork = _clone.find(".albumImageSmall");
+		var albumImageSmall = _clone.find(".albumImageSmall");
+		var albumArtwork = _clone.find(".albumArtwork");
 
 		(function()
 		{
-			albumArtwork.bind('load', 
+			albumImageSmall.bind('load', 
 				function() 
 				{
 					_clone.css('opacity', 1)
@@ -163,12 +172,12 @@ function AlbumEntry(templateElement)
   					albumArtwork.toggleClass('menuOpen');
 				});
 
-			albumArtwork.one('error', 
+			albumImageSmall.one('error', 
 				function() 
 				{ 
 					this.src = 'images/defaultArtwork.png';
 
-					albumArtwork.css('opacity', '0.6');
+					albumImageSmall.css('opacity', '0.6');
 
 					var altAlbumArtwork = $("<div class='altAlbumArtwork'></div>");
 					altAlbumArtwork.html(_albumArtist + '<br />' + _album);
@@ -184,8 +193,8 @@ function AlbumEntry(templateElement)
 		
 		var imageURL = 'getArtwork?' + encodedURL;
 
-		albumArtwork.attr('src', imageURL);
-		albumArtwork.attr('alt', _albumArtist + ' - ' + _album);
+		albumImageSmall.attr('src', imageURL);
+		albumImageSmall.attr('alt', _albumArtist + ' - ' + _album);
 
 		_clone.data("artist", _albumArtist);
 		_clone.data("album", _album);
