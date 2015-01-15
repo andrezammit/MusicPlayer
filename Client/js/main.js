@@ -183,6 +183,12 @@ MusicPlayer.engine = (function()
 				addFolders();
 			});
 
+		$("#showAbout").click(
+			function()
+			{
+				showAbout();
+			});
+
 		$("#power").click(
 			function()
 			{				
@@ -1204,6 +1210,11 @@ MusicPlayer.engine = (function()
 		{
 			location.reload(true);
 		}
+	}
+
+	function showAbout()
+	{
+		dialogs.about();
 	}
 
 	function editAlbum(artist, album)

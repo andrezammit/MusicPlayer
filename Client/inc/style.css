@@ -820,6 +820,26 @@ a:hover
 	transform: translateX(-50%) translateY(-50%);
 }
 
+#about
+{
+	display: none;
+
+	top: 50%;
+	left: 50%;
+	
+	position: absolute;
+	
+	width: 500px;
+	height: 430px;
+
+	z-index: 6;
+	
+	background-color: white;
+	box-shadow: 1px 1px 20px #000000;
+
+	transform: translateX(-50%) translateY(-50%);
+}
+
 #filePicker
 {
 	display: none;
@@ -892,7 +912,7 @@ a:hover
 
 .label
 {
-	width: 100%;
+	width: 98%;
 	height: 15px;
 
 	padding-left: 5px;
@@ -900,6 +920,18 @@ a:hover
 
 	font-weight: bold;	
 	font-size: small;
+}
+
+.smallText
+{
+	font-size: 10px;
+	height: 15px;
+}
+
+.largeText
+{
+	font-size: 40px;
+	height: 50px;
 }
 
 input

@@ -508,6 +508,22 @@ MusicPlayer.dialogs = (function()
 		showDialog(showProgressDlg);
 	}
 
+	function about()
+	{
+		$("body").mCustomScrollbar('disable');
+
+		var aboutDlg = $(".dialogs").find("#about");
+
+		aboutDlg.find(".okBtn").off('click');
+		aboutDlg.find(".okBtn").click(
+			function()
+			{
+				closeDialog(aboutDlg);
+			});
+
+		showDialog(aboutDlg);
+	}
+
 	return {
 		initDialogs: function()
 		{
@@ -537,6 +553,11 @@ MusicPlayer.dialogs = (function()
 		showProgress: function(data)
 		{
 			showProgress(data);	
+		},
+
+		about: function()
+		{
+			about();
 		},
 	};
 })();
