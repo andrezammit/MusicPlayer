@@ -7,6 +7,7 @@ call "%VS120COMNTOOLS%vsvars32.bat"
 echo Settings build variables...
 set MP_ReleaseDir="H:\Projects\Bin\Release"
 
+rmdir /s /q %MP_ReleaseDir%
 mkdir %MP_ReleaseDir%
 
 set MP_7ZipDir="C:\Program Files\7-Zip"
@@ -35,7 +36,7 @@ echo Copying node.js binary...
 call robocopy %MP_NodeJSDir% %MP_ReleaseDir%\Server node.exe /E
 
 echo Copying Version file...
-call robocopy %MP_WebDir% %MP_ReleaseDir%\Client Version.txt
+call robocopy %MP_WebDir% %MP_ReleaseDir% Version.txt
 
 echo Creating MusicPlayer archive...
 call %MP_7ZipDir%\7z a -r -x!*.pdb -x!.git %MP_ReleaseDir%\MusicPlayer.zip %MP_ReleaseDir%\*.*
