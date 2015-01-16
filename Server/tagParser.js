@@ -49,6 +49,79 @@ function readUntilNullChar(buffer, offset)
 	return result;
 }
 
+function getFrameEncodingType(frameEncodingByte)
+{
+	switch (frameEncodingByte)
+	{
+	default:
+	case 0:
+		return 'ascii';
+
+	case 3: 
+		return 'utf8';
+
+	case 1:
+	case 2:
+		return 'utf16le';
+		return 'utf16le';
+	}
+}
+
+function readEncodedString(buffer, offset)
+{
+	var tmpOffset = offset;
+	var encodingByte = buffer.readUInt8(tmpOffset);
+	
+	// Skip the encoding byte.
+
+	tmpOffset += 1;
+
+	encodingType = getFrameEncodingType(encodingByte);
+
+	if (buffer[tmpOffset] == 0xFF)
+	{
+		// Skip the Unicode BOM.
+
+		tmpOffset += 2;
+		encodingByte = 1;
+		encodingType = 'utf16le';
+	}
+
+	var dataEnd = tmpOffset;
+	var encodedString = '';
+
+	for (var cnt = tmpOffset; cnt < buffer.length; cnt++)
+	{
+		dataEnd++;
+
+		var currentByte = buffer[cnt];
+
+		if (currentByte == 0)
+		{
+			if (encodingByte == 0 || encodingByte == 3)
+				break;
+
+			if (buffer[cnt + 1] == 0)
+			{
+				dataEnd++;
+				break;
+			}	
+			
+			continue;			
+		}
+		else if (encodingByte == 1 || encodingByte == 2)
+		{
+			cnt++;
+			dataEnd++;
+		}	
+	}
+	
+	encodedString = buffer.toString(encodingType, tmpOffset, dataEnd);
+
+	var bytesRead = dataEnd - offset;
+	return { string: encodedString, bytesRead: bytesRead };
+}
+
 function TagParser(includeArtwork, artworkThumb, checkArtworkCache, normalizeArtwork)
 {
 	if (typeof includeArtwork === 'undefined')
@@ -74,7 +147,7 @@ function TagParser(includeArtwork, artworkThumb, checkArtworkCache, normalizeArt
 
 	var _fd = null;
 
-	var _tag = { };
+	var _tag = { artist: 'Unknown Artist', album: 'Unknown Album' };
 
 	var _callback = null;
 
@@ -126,24 +199,6 @@ function TagParser(includeArtwork, artworkThumb, checkArtworkCache, normalizeArt
 			return true;
 
 		return false;
-	}
-
-	function getFrameEncodingType(frameEncodingByte)
-	{
-		switch (frameEncodingByte)
-		{
-		default:
-		case 0:
-			return 'ascii';
-
-		case 3: 
-			return 'utf8';
-
-		case 1:
-		case 2:
-			return 'utf16le';
-			return 'utf16le';
-		}
 	}
 
 	function setTagDefaults()
@@ -410,16 +465,12 @@ function TagParser(includeArtwork, artworkThumb, checkArtworkCache, normalizeArt
 					tmpDataSize -= mimeType.length + 1;
 				}
 
-				var pictureType = _dataBuffer.readUInt8(tmpOffset);
-
-				tmpOffset += 1;
-				tmpDataSize -= 1;
-
-				var description = readUntilNullChar(_dataBuffer, tmpOffset);
+				var encodedString = readEncodedString(_dataBuffer, tmpOffset);
+				var description = encodedString.string;
 
 				// assumed that the description is using 1 byte per character and ignoring encodings.
-				tmpOffset += description.length + 1;
-				tmpDataSize -= description.length + 1;
+				tmpOffset += encodedString.bytesRead;
+				tmpDataSize -= encodedString.bytesRead;
 
 				frameData = new Buffer(tmpDataSize);
 
