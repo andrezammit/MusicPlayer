@@ -46,3 +46,5 @@ echo Building MusicPlayer launcher...
 call msbuild %MP_LauncherDir%\Launcher.vcxproj /p:Configuration=Release
 
 echo Done.
+
+pause
