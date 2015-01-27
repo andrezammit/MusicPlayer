@@ -365,17 +365,16 @@ function onUpdateAlbumInfo(socket, queryData)
 
 			function updateSongInfoDone(fileDone, error)
 			{
-				songsDone++;
-				sendProgress(socket, songsDone, docs.length, 'Updating Album', fileDone)
+				sendProgress(socket, songsDone + 1, docs.length, 'Updating Album', fileDone)
 
-				if (songsDone == docs.length)
+				if (songsDone == docs.length - 1)
 				{
 					var replyData = { };
 					sendReply(socket, 'updateAlbumInfoReply', replyData);
 				}
 				else
 				{
-					updateSongInfo(docs[songsDone]._id, queryData.tag, updateSongInfoDone);
+					updateSongInfo(docs[++songsDone]._id, queryData.tag, updateSongInfoDone);
 				}
 			}
 

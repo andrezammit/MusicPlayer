@@ -97,9 +97,13 @@ function clearArtworkIfOnlyReference(id, callback)
                         fs.unlink(artworkPath,
                             function(error)
                             {
-                                callback();
+                                if (callback)
+                                    callback();
                             });
                     }
+
+                    if (callback)
+                       callback();
                 });
         });
 }
