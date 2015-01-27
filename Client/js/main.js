@@ -81,6 +81,14 @@ MusicPlayer.engine = (function()
 				{
 					updateOnImageLoad: false,
 				},
+				callbacks:
+				{
+        			onScrollStart:
+        			function()
+        			{
+            			closeMenus($(".menus")[0])
+        			}
+    			}
 			});
 
 		$("#tracksContainer").mCustomScrollbar(
@@ -128,16 +136,7 @@ MusicPlayer.engine = (function()
 		$(".menus").mouseup(
 			function (event)
 			{
-		    	var container = $(".menus");
-
-			    if (container.is(event.target))
-			    {
-			    	var parent = $(".menuOpen");
-			     	parent.trigger('menuClosed');
-
-			     	container.children().hide();
-			        container.hide();
-			    }
+				closeMenus(event.target);
 			});
 	
 		$("#closeTracksLink").click(
@@ -255,6 +254,20 @@ MusicPlayer.engine = (function()
 				setCookie('lastVolume', ratio);
 		    }
 		});
+	}
+
+	function closeMenus(target)
+	{
+		var container = $(".menus");
+
+		if (container.is(target))
+		{
+			var parent = $(".menuOpen");
+		 	parent.trigger('menuClosed');
+
+		 	container.children().hide();
+		    container.hide();
+		}
 	}
 
 	function resizeDialogs()
